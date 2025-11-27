@@ -23,7 +23,7 @@ class HeadersPanel(Panel):
     - CORS header analysis
     """
 
-    panel_id: ClassVar[str] = "headers"
+    panel_id: ClassVar[str] = "HeadersPanel"
     title: ClassVar[str] = "Headers"
     template: ClassVar[str] = "panels/headers.html"
     has_content: ClassVar[bool] = True

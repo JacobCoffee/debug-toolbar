@@ -204,7 +204,7 @@ class TemplatesPanel(Panel):
     capture timing data transparently.
     """
 
-    panel_id: ClassVar[str] = "templates"
+    panel_id: ClassVar[str] = "TemplatesPanel"
     title: ClassVar[str] = "Templates"
     template: ClassVar[str] = "panels/templates.html"
     has_content: ClassVar[bool] = True
