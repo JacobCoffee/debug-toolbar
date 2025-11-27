@@ -109,9 +109,9 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#screenshots">Screenshots</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
 <li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#screenshots">Screenshots</a><ul>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -280,6 +280,35 @@ API Reference</div>
 </div>
 </div>
 </section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Litestar</span><span class="p">,</span> <span class="n">get</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarPlugin</span><span class="p">,</span> <span class="n">LitestarDebugToolbarConfig</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span data-line="5"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="6">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, World!&quot;</span><span class="p">}</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="9"><span class="n">app</span> <span class="o">=</span> <span class="n">Litestar</span><span class="p">(</span>
+</span><span data-line="10">    <span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+</span><span data-line="11">    <span class="n">plugins</span><span class="o">=</span><span class="p">[</span><span class="n">DebugToolbarPlugin</span><span class="p">(</span><span class="n">config</span><span class="p">)],</span>
+</span><span data-line="12"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Async-Native</strong>: Built from the ground up for async/await patterns</p></li>
+<li><p><strong>Framework-Agnostic Core</strong>: Works with any ASGI framework</p></li>
+<li><p><strong>Litestar Integration</strong>: First-class plugin support</p></li>
+<li><p><strong>Pluggable Panels</strong>: Easy to add, remove, or customize</p></li>
+<li><p><strong>Dark/Light Themes</strong>: Toggle between themes</p></li>
+<li><p><strong>Flexible Positioning</strong>: Left, right, top, or bottom</p></li>
+<li><p><strong>SQL Analysis</strong>: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB</p></li>
+</ul>
+</section>
 <section id="screenshots">
 <h2>Screenshots<a class="headerlink" href="#screenshots" title="Link to this heading">¶</a></h2>
 <div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
@@ -339,35 +368,6 @@ Request History</div>
 </div>
 </div>
 </div>
-</div>
-</section>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<ul class="simple">
-<li><p><strong>Async-Native</strong>: Built from the ground up for async/await patterns</p></li>
-<li><p><strong>Framework-Agnostic Core</strong>: Works with any ASGI framework</p></li>
-<li><p><strong>Litestar Integration</strong>: First-class plugin support</p></li>
-<li><p><strong>Pluggable Panels</strong>: Easy to add, remove, or customize</p></li>
-<li><p><strong>Dark/Light Themes</strong>: Toggle between themes</p></li>
-<li><p><strong>Flexible Positioning</strong>: Left, right, top, or bottom</p></li>
-<li><p><strong>SQL Analysis</strong>: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB</p></li>
-</ul>
-</section>
-<section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Litestar</span><span class="p">,</span> <span class="n">get</span>
-</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarPlugin</span><span class="p">,</span> <span class="n">LitestarDebugToolbarConfig</span>
-</span><span data-line="3">
-</span><span data-line="4"><span class="nd">@get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
-</span><span data-line="5"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span data-line="6">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, World!&quot;</span><span class="p">}</span>
-</span><span data-line="7">
-</span><span data-line="8"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span data-line="9"><span class="n">app</span> <span class="o">=</span> <span class="n">Litestar</span><span class="p">(</span>
-</span><span data-line="10">    <span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
-</span><span data-line="11">    <span class="n">plugins</span><span class="o">=</span><span class="p">[</span><span class="n">DebugToolbarPlugin</span><span class="p">(</span><span class="n">config</span><span class="p">)],</span>
-</span><span data-line="12"><span class="p">)</span>
-</span></pre></div>
 </div>
 <div class="toctree-wrapper compound">
 </div>
