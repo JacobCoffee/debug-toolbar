@@ -26,7 +26,8 @@ from advanced_alchemy.filters import LimitOffset
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
 from litestar import Litestar, MediaType, delete, get, post
 from litestar.di import Provide
-from litestar.params import Parameter
+from litestar.enums import RequestEncodingType
+from litestar.params import Body, Parameter
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
@@ -165,13 +166,24 @@ async def list_users(
     return [{"id": str(u.id), "name": u.name, "email": u.email} for u in users]
 
 
-@post("/api/users")
-async def create_user(user_repo: UserRepository, data: dict) -> dict:
-    """Create a new user."""
+@post("/api/users", media_type=MediaType.HTML)
+async def create_user(
+    user_repo: UserRepository,
+    data: Annotated[dict, Body(media_type=RequestEncodingType.URL_ENCODED)],
+) -> str:
+    """Create a new user from form submission."""
     logger.info("Creating user: %s", data.get("name"))
     user = await user_repo.add(User(name=data["name"], email=data["email"]))
     await user_repo.session.commit()
-    return {"id": str(user.id), "name": user.name, "email": user.email}
+    return f"""<!DOCTYPE html>
+<html>
+<head><title>User Created</title></head>
+<body>
+    <h1>User Created</h1>
+    <p>Created user: {user.name} ({user.email})</p>
+    <a href="/users">Back to Users</a>
+</body>
+</html>"""
 
 
 @delete("/api/users/{user_id:uuid}")
