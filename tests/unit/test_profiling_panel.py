@@ -30,6 +30,7 @@ def profiling_panel(mock_toolbar: MagicMock) -> ProfilingPanel:
         try:
             panel._profiler.disable()
         except Exception:
+            # Ignore exceptions during profiler cleanup to avoid interfering with test teardown
             pass
 
 

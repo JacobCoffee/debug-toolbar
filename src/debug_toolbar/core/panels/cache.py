@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
@@ -292,18 +293,17 @@ class CacheTracker:
         )
 
 
-_active_tracker: CacheTracker | None = None
+_active_tracker: ContextVar[CacheTracker | None] = ContextVar("_active_tracker", default=None)
 
 
 def _get_tracker() -> CacheTracker | None:
-    """Get the currently active cache tracker."""
-    return _active_tracker
+    """Get the currently active cache tracker for the current context."""
+    return _active_tracker.get()
 
 
 def _set_tracker(tracker: CacheTracker | None) -> None:
-    """Set the active cache tracker."""
-    global _active_tracker  # noqa: PLW0603
-    _active_tracker = tracker
+    """Set the active cache tracker for the current context."""
+    _active_tracker.set(tracker)
 
 
 class CachePanel(Panel):

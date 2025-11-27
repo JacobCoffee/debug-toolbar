@@ -5,11 +5,16 @@ memcached operations when they occur during a request.
 
 Note: This is a demonstration of the panel's capabilities. In practice, the
 panel is automatically enabled when added to the debug toolbar configuration.
+
+WARNING: This example uses private methods (_record_operation) for educational
+purposes only. Applications should NOT call private methods directly. In normal
+use, the panel automatically patches Redis and memcached clients to track
+operations transparently.
 """
 
 from __future__ import annotations
 
-from debug_toolbar.core.panels.cache import CachePanel, CacheTracker
+from debug_toolbar.core.panels.cache import CacheTracker
 
 
 def demo_manual_tracking() -> None:

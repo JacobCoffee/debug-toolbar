@@ -14,10 +14,8 @@ if TYPE_CHECKING:
     from debug_toolbar.core.toolbar import DebugToolbar
 
     try:
-        from jinja2 import Environment as Jinja2Environment
         from jinja2 import Template as Jinja2Template
     except ImportError:
-        Jinja2Environment = Any  # type: ignore[misc]
         Jinja2Template = Any  # type: ignore[misc]
 
     try:
