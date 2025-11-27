@@ -29,7 +29,7 @@ class TestSettingsPanelIntegration:
 
         assert settings_panel is not None
         assert settings_panel.enabled is True
-        assert settings_panel.get_panel_id() == "settings"
+        assert settings_panel.get_panel_id() == "SettingsPanel"
 
     @pytest.mark.asyncio
     async def test_settings_panel_generates_stats_in_toolbar(self) -> None:
@@ -62,24 +62,24 @@ class TestSettingsPanelIntegration:
 
     @pytest.mark.asyncio
     async def test_settings_panel_with_custom_config(self) -> None:
-        """Test Settings Panel with custom configuration."""
+        """Test Settings Panel with custom configuration.
+
+        This test directly instantiates a SettingsPanel with custom settings
+        and verifies the configuration is properly applied and sensitive
+        values are redacted.
+        """
         custom_settings = {
             "app_name": "Test App",
             "version": "1.0.0",
             "api_key": "secret123",
         }
 
+        toolbar = DebugToolbar(config=DebugToolbarConfig())
         panel = SettingsPanel(
-            DebugToolbar(config=DebugToolbarConfig()),
+            toolbar,
             custom_settings=custom_settings,
             show_env=False,
         )
-
-        config = DebugToolbarConfig(
-            enabled=True,
-            extra_panels=[type(panel)],
-        )
-        toolbar = DebugToolbar(config=config)
 
         context = await toolbar.process_request()
         stats = await panel.generate_stats(context)
@@ -104,7 +104,7 @@ class TestSettingsPanelIntegration:
 
         settings_panel_data = None
         for panel_data in toolbar_data["panels"]:
-            if panel_data["panel_id"] == "settings":
+            if panel_data["panel_id"] == "SettingsPanel":
                 settings_panel_data = panel_data
                 break
 

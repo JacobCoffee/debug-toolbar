@@ -317,7 +317,7 @@ class CachePanel(Panel):
     - Aggregate statistics
     """
 
-    panel_id: ClassVar[str] = "cache"
+    panel_id: ClassVar[str] = "CachePanel"
     title: ClassVar[str] = "Cache"
     template: ClassVar[str] = "panels/cache.html"
     has_content: ClassVar[bool] = True

@@ -40,7 +40,7 @@ class TestSettingsPanel:
 
     def test_panel_class_attributes(self) -> None:
         """Test panel class attributes are set correctly."""
-        assert SettingsPanel.panel_id == "settings"
+        assert SettingsPanel.panel_id == "SettingsPanel"
         assert SettingsPanel.title == "Settings"
         assert SettingsPanel.nav_title == "Settings"
         assert SettingsPanel.has_content is True

@@ -27,7 +27,7 @@ class TestHeadersPanel:
 
     def test_panel_attributes(self, headers_panel: HeadersPanel) -> None:
         """Test panel class attributes."""
-        assert headers_panel.get_panel_id() == "headers"
+        assert headers_panel.get_panel_id() == "HeadersPanel"
         assert headers_panel.title == "Headers"
         assert headers_panel.has_content is True
         assert headers_panel.nav_title == "Headers"

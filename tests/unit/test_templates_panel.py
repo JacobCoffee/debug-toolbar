@@ -167,7 +167,7 @@ class TestTemplatesPanel:
 
     def test_panel_attributes(self, templates_panel: TemplatesPanel) -> None:
         """Test panel class attributes are set correctly."""
-        assert templates_panel.panel_id == "templates"
+        assert templates_panel.panel_id == "TemplatesPanel"
         assert templates_panel.title == "Templates"
         assert templates_panel.nav_title == "Templates"
         assert templates_panel.has_content is True
@@ -285,10 +285,10 @@ class TestTemplatesPanel:
         context: RequestContext,
     ) -> None:
         """Test generate_server_timing with renders."""
-        context.store_panel_data("templates", "total_time", 0.45)
-        context.store_panel_data("templates", "total_renders", 3)
+        context.store_panel_data("TemplatesPanel", "total_time", 0.45)
+        context.store_panel_data("TemplatesPanel", "total_renders", 3)
         context.store_panel_data(
-            "templates",
+            "TemplatesPanel",
             "renders",
             [
                 {"template_name": "t1.html", "engine": "jinja2", "render_time": 0.1, "context_keys": None},
@@ -296,7 +296,7 @@ class TestTemplatesPanel:
                 {"template_name": "t3.html", "engine": "jinja2", "render_time": 0.15, "context_keys": None},
             ],
         )
-        context.store_panel_data("templates", "engines_used", ["jinja2", "mako"])
+        context.store_panel_data("TemplatesPanel", "engines_used", ["jinja2", "mako"])
 
         timings = templates_panel.generate_server_timing(context)
 

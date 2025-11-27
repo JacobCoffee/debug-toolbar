@@ -213,7 +213,7 @@ class TestCachePanel:
 
     def test_panel_attributes(self, cache_panel: CachePanel) -> None:
         """Test panel class attributes."""
-        assert cache_panel.panel_id == "cache"
+        assert cache_panel.panel_id == "CachePanel"
         assert cache_panel.title == "Cache"
         assert cache_panel.template == "panels/cache.html"
         assert cache_panel.has_content is True

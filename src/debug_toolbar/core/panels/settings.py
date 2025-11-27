@@ -30,7 +30,7 @@ class SettingsPanel(Panel):
         sensitive_keys: Additional keys to redact beyond default patterns.
     """
 
-    panel_id: ClassVar[str] = "settings"
+    panel_id: ClassVar[str] = "SettingsPanel"
     title: ClassVar[str] = "Settings"
     template: ClassVar[str] = "panels/settings.html"
     has_content: ClassVar[bool] = True
