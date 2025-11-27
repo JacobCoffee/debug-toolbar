@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import importlib
+import logging
 import time
 from typing import TYPE_CHECKING, Any
 
 from debug_toolbar.core.config import DebugToolbarConfig
 from debug_toolbar.core.context import RequestContext, ensure_request_context, get_request_context, set_request_context
 from debug_toolbar.core.storage import ToolbarStorage
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from debug_toolbar.core.panel import Panel
@@ -91,7 +94,8 @@ class DebugToolbar:
             module_path, class_name = import_path.rsplit(".", 1)
             module = importlib.import_module(module_path)
             return getattr(module, class_name)
-        except (ImportError, AttributeError, ValueError):
+        except (ImportError, AttributeError, ValueError) as e:
+            logger.warning("Failed to import panel '%s': %s", import_path, e)
             return None
 
     def get_panel(self, panel_id: str) -> Panel | None:
