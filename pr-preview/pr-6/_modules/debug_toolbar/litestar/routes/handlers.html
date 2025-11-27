@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>debug_toolbar.litestar.routes.handlers - Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="debug_toolbar.litestar.routes.handlers"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../../../index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.html">debug_toolbar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.html">debug_toolbar.core</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/_autosummary/debug_toolbar.litestar.routes.html">debug_toolbar.litestar.routes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../comparison.html">Debug Toolbar Comparison</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../../../index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../../index.html"><span itemprop="name">Module code</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="2" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">debug_toolbar.litestar.routes.handlers</strong>
+        <meta itemprop="position" content="3" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <h1>Source code for debug_toolbar.litestar.routes.handlers</h1><div class="highlight"><pre>
+<span></span><span data-line="1"><span class="sd">&quot;&quot;&quot;Debug toolbar API route handlers.&quot;&quot;&quot;</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
+</span><span data-line="6"><span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFoundException</span>
+</span><span data-line="9"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+</span><span data-line="10">
+</span><span data-line="11"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Router</span><span class="p">,</span> <span class="n">get</span><span class="p">,</span> <span class="n">post</span>
+</span><span data-line="12">
+</span><span data-line="13"><span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+</span><span data-line="14">    <span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.core.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">ToolbarStorage</span>
+</span><span data-line="15">
+</span><span data-line="16">
+</span><span data-line="17"><span class="n">DEFAULT_DISPLAY_DEPTH</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span data-line="18"><span class="n">DEFAULT_MAX_ITEMS</span> <span class="o">=</span> <span class="mi">100</span>
+</span><span data-line="19"><span class="n">DEFAULT_MAX_STRING</span> <span class="o">=</span> <span class="mi">1000</span>
+</span><span data-line="20">
+</span><span data-line="21">
+</span><span data-line="22"><span class="k">def</span><span class="w"> </span><span class="nf">_escape_html</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="23"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Escape HTML special characters.&quot;&quot;&quot;</span>
+</span><span data-line="24">    <span class="k">return</span> <span class="p">(</span>
+</span><span data-line="25">        <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;amp;&quot;</span><span class="p">)</span>
+</span><span data-line="26">        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;lt;&quot;</span><span class="p">)</span>
+</span><span data-line="27">        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;gt;&quot;</span><span class="p">)</span>
+</span><span data-line="28">        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&amp;quot;&quot;</span><span class="p">)</span>
+</span><span data-line="29">        <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&amp;#x27;&quot;</span><span class="p">)</span>
+</span><span data-line="30">    <span class="p">)</span>
+</span><span data-line="31">
+</span><span data-line="32">
+</span><span data-line="33"><span class="k">def</span><span class="w"> </span><span class="nf">_format_value</span><span class="p">(</span>  <span class="c1"># noqa: PLR0911, PLR0912, C901</span>
+</span><span data-line="34">    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span data-line="35">    <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_DISPLAY_DEPTH</span><span class="p">,</span>
+</span><span data-line="36">    <span class="n">max_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_ITEMS</span><span class="p">,</span>
+</span><span data-line="37">    <span class="n">max_string</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DEFAULT_MAX_STRING</span><span class="p">,</span>
+</span><span data-line="38"><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="39"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a value for HTML display.&quot;&quot;&quot;</span>
+</span><span data-line="40">    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="41">        <span class="k">return</span> <span class="s2">&quot;&lt;span class=&#39;null&#39;&gt;null&lt;/span&gt;&quot;</span>
+</span><span data-line="42">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+</span><span data-line="43">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;bool&#39;&gt;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="44">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">):</span>
+</span><span data-line="45">        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+</span><span data-line="46">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;number&#39;&gt;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="47">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;number&#39;&gt;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="48">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+</span><span data-line="49">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_string</span><span class="p">:</span>
+</span><span data-line="50">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;string&#39;&gt;</span><span class="si">{</span><span class="n">_escape_html</span><span class="p">(</span><span class="n">value</span><span class="p">[:</span><span class="n">max_string</span><span class="p">])</span><span class="si">}</span><span class="s2">...&lt;/span&gt;&quot;</span>
+</span><span data-line="51">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;string&#39;&gt;</span><span class="si">{</span><span class="n">_escape_html</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="52">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">):</span>
+</span><span data-line="53">        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="54">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;array&#39;&gt;[</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2"> items]&lt;/span&gt;&quot;</span>
+</span><span data-line="55">        <span class="n">shown</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="n">max_items</span><span class="p">]</span>
+</span><span data-line="56">        <span class="n">items</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">max_depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_items</span><span class="p">,</span> <span class="n">max_string</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">shown</span><span class="p">)</span>
+</span><span data-line="57">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_items</span><span class="p">:</span>
+</span><span data-line="58">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;array&#39;&gt;[</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">, ...</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">max_items</span><span class="si">}</span><span class="s2"> more]&lt;/span&gt;&quot;</span>
+</span><span data-line="59">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;array&#39;&gt;[</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">]&lt;/span&gt;&quot;</span>
+</span><span data-line="60">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span data-line="61">        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+</span><span data-line="62">            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;object&#39;&gt;</span><span class="se">{{</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2"> keys</span><span class="se">}}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="63">        <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="64">        <span class="n">dict_items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">())[:</span><span class="n">max_items</span><span class="p">]</span>
+</span><span data-line="65">        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_items</span><span class="p">:</span>
+</span><span data-line="66">            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span data-line="67">                <span class="sa">f</span><span class="s2">&quot;&lt;strong&gt;</span><span class="si">{</span><span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span><span class="si">}</span><span class="s2">&lt;/strong&gt;: </span><span class="si">{</span><span class="n">_format_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="n">max_depth</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">max_items</span><span class="p">,</span><span class="w"> </span><span class="n">max_string</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span data-line="68">            <span class="p">)</span>
+</span><span data-line="69">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_items</span><span class="p">:</span>
+</span><span data-line="70">            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;...</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">max_items</span><span class="si">}</span><span class="s2"> more&quot;</span><span class="p">)</span>
+</span><span data-line="71">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;object&#39;&gt;</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">)</span><span class="si">}</span><span class="se">}}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="72">    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;span class=&#39;unknown&#39;&gt;</span><span class="si">{</span><span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)[:</span><span class="n">max_string</span><span class="p">])</span><span class="si">}</span><span class="s2">&lt;/span&gt;&quot;</span>
+</span><span data-line="73">
+</span><span data-line="74">
+</span><span data-line="75"><span class="k">def</span><span class="w"> </span><span class="nf">_render_panel_content</span><span class="p">(</span><span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="76"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Render panel content as HTML.&quot;&quot;&quot;</span>
+</span><span data-line="77">    <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="p">:</span>
+</span><span data-line="78">        <span class="k">return</span> <span class="s2">&quot;&lt;p class=&#39;empty&#39;&gt;No data&lt;/p&gt;&quot;</span>
+</span><span data-line="79">    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="80">    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span data-line="81">        <span class="n">escaped_key</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+</span><span data-line="82">        <span class="n">formatted_value</span> <span class="o">=</span> <span class="n">_format_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</span><span data-line="83">        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;tr&gt;&lt;td class=&#39;key&#39;&gt;</span><span class="si">{</span><span class="n">escaped_key</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;td class=&#39;value&#39;&gt;</span><span class="si">{</span><span class="n">formatted_value</span><span class="si">}</span><span class="s2">&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="p">)</span>
+</span><span data-line="84">    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;table class=&#39;panel-table&#39;&gt;&lt;tbody&gt;</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span><span class="si">}</span><span class="s2">&lt;/tbody&gt;&lt;/table&gt;&quot;</span>
+</span><span data-line="85">
+</span><span data-line="86">
+</span><span data-line="87"><span class="k">def</span><span class="w"> </span><span class="nf">_render_request_row</span><span class="p">(</span><span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="88"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Render a request row for the history table.&quot;&quot;&quot;</span>
+</span><span data-line="89">    <span class="n">metadata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="90">    <span class="n">timing</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timing_data&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="91">    <span class="n">total_time</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span data-line="92">    <span class="n">method</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">)))</span>
+</span><span data-line="93">    <span class="n">path</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)))</span>
+</span><span data-line="94">    <span class="n">status</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</span><span data-line="95">    <span class="n">status_class</span> <span class="o">=</span> <span class="n">status</span> <span class="o">//</span> <span class="mi">100</span>
+</span><span data-line="96">    <span class="c1"># Sanitize method for CSS class (only allow alphanumeric)</span>
+</span><span data-line="97">    <span class="n">method_class</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())</span>
+</span><span data-line="98">
+</span><span data-line="99">    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="100"><span class="s2">        &lt;tr class=&quot;request-row&quot; data-request-id=&quot;</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span data-line="101"><span class="s2">            onclick=&quot;window.location=&#39;/_debug_toolbar/</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&#39;&quot;&gt;</span>
+</span><span data-line="102"><span class="s2">            &lt;td&gt;&lt;code&gt;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">request_id</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/code&gt;&lt;/td&gt;</span>
+</span><span data-line="103"><span class="s2">            &lt;td&gt;&lt;span class=&quot;method method-</span><span class="si">{</span><span class="n">method_class</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&lt;/span&gt;&lt;/td&gt;</span>
+</span><span data-line="104"><span class="s2">            &lt;td class=&quot;path&quot;&gt;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+</span><span data-line="105"><span class="s2">            &lt;td&gt;&lt;span class=&quot;status status-</span><span class="si">{</span><span class="n">status_class</span><span class="si">}</span><span class="s2">xx&quot;&gt;</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&lt;/span&gt;&lt;/td&gt;</span>
+</span><span data-line="106"><span class="s2">            &lt;td class=&quot;time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/td&gt;</span>
+</span><span data-line="107"><span class="s2">        &lt;/tr&gt;</span>
+</span><span data-line="108"><span class="s2">    &quot;&quot;&quot;</span>
+</span><span data-line="109">
+</span><span data-line="110">
+<div class="viewcode-block" id="create_debug_toolbar_router">
+<a class="viewcode-back" href="../../../../api/_autosummary/debug_toolbar.litestar.routes.handlers.html#debug_toolbar.litestar.routes.create_debug_toolbar_router">[docs]</a>
+</span><span data-line="111"><span class="k">def</span><span class="w"> </span><span class="nf">create_debug_toolbar_router</span><span class="p">(</span><span class="n">storage</span><span class="p">:</span> <span class="n">ToolbarStorage</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Router</span><span class="p">:</span>  <span class="c1"># noqa: C901</span>
+</span><span data-line="112"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Create the debug toolbar router with routes.</span>
+</span><span data-line="113">
+</span><span data-line="114"><span class="sd">    Args:</span>
+</span><span data-line="115"><span class="sd">        storage: The toolbar storage instance.</span>
+</span><span data-line="116">
+</span><span data-line="117"><span class="sd">    Returns:</span>
+</span><span data-line="118"><span class="sd">        Configured Router for debug toolbar.</span>
+</span><span data-line="119"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="120">
+</span><span data-line="121">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_toolbar_index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="122"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the debug toolbar history page.&quot;&quot;&quot;</span>
+</span><span data-line="123">        <span class="n">requests</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+</span><span data-line="124">        <span class="n">rows_html</span> <span class="o">=</span> <span class="p">[</span><span class="n">_render_request_row</span><span class="p">(</span><span class="n">rid</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">rid</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">]</span>
+</span><span data-line="125">        <span class="n">empty_row</span> <span class="o">=</span> <span class="s1">&#39;&lt;tr&gt;&lt;td colspan=&quot;5&quot; class=&quot;empty&quot;&gt;No requests recorded yet&lt;/td&gt;&lt;/tr&gt;&#39;</span>
+</span><span data-line="126">        <span class="n">tbody_content</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">rows_html</span> <span class="k">else</span> <span class="n">empty_row</span>
+</span><span data-line="127">
+</span><span data-line="128">        <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;</span>
+</span><span data-line="129"><span class="s2">&lt;html lang=&quot;en&quot;&gt;</span>
+</span><span data-line="130"><span class="s2">&lt;head&gt;</span>
+</span><span data-line="131"><span class="s2">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
+</span><span data-line="132"><span class="s2">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;</span>
+</span><span data-line="133"><span class="s2">    &lt;title&gt;Debug Toolbar - Request History&lt;/title&gt;</span>
+</span><span data-line="134"><span class="s2">    &lt;link rel=&quot;stylesheet&quot; href=&quot;/_debug_toolbar/static/toolbar.css&quot;&gt;</span>
+</span><span data-line="135"><span class="s2">    &lt;script&gt;document.documentElement.dataset.theme=localStorage.getItem(&#39;debug-toolbar-theme&#39;)||&#39;dark&#39;;&lt;/script&gt;</span>
+</span><span data-line="136"><span class="s2">&lt;/head&gt;</span>
+</span><span data-line="137"><span class="s2">&lt;body&gt;</span>
+</span><span data-line="138"><span class="s2">    &lt;div class=&quot;toolbar-page&quot;&gt;</span>
+</span><span data-line="139"><span class="s2">        &lt;header class=&quot;toolbar-header&quot;&gt;</span>
+</span><span data-line="140"><span class="s2">            &lt;div class=&quot;header-row&quot;&gt;</span>
+</span><span data-line="141"><span class="s2">                &lt;h1&gt;Debug Toolbar&lt;/h1&gt;</span>
+</span><span data-line="142"><span class="s2">                &lt;button class=&quot;toolbar-theme-btn page-theme-btn&quot; onclick=&quot;togglePageTheme(this)&quot; title=&quot;Toggle theme&quot;&gt;</span>
+</span><span data-line="143"><span class="s2">                    &lt;span class=&quot;theme-icon&quot;&gt;&lt;/span&gt;</span>
+</span><span data-line="144"><span class="s2">                &lt;/button&gt;</span>
+</span><span data-line="145"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="146"><span class="s2">            &lt;p&gt;Request History (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">requests</span><span class="p">)</span><span class="si">}</span><span class="s2"> requests)&lt;/p&gt;</span>
+</span><span data-line="147"><span class="s2">        &lt;/header&gt;</span>
+</span><span data-line="148">
+</span><span data-line="149"><span class="s2">        &lt;main class=&quot;toolbar-main&quot;&gt;</span>
+</span><span data-line="150"><span class="s2">            &lt;table class=&quot;requests-table&quot;&gt;</span>
+</span><span data-line="151"><span class="s2">                &lt;thead&gt;</span>
+</span><span data-line="152"><span class="s2">                    &lt;tr&gt;</span>
+</span><span data-line="153"><span class="s2">                        &lt;th&gt;Request ID&lt;/th&gt;</span>
+</span><span data-line="154"><span class="s2">                        &lt;th&gt;Method&lt;/th&gt;</span>
+</span><span data-line="155"><span class="s2">                        &lt;th&gt;Path&lt;/th&gt;</span>
+</span><span data-line="156"><span class="s2">                        &lt;th&gt;Status&lt;/th&gt;</span>
+</span><span data-line="157"><span class="s2">                        &lt;th&gt;Time&lt;/th&gt;</span>
+</span><span data-line="158"><span class="s2">                    &lt;/tr&gt;</span>
+</span><span data-line="159"><span class="s2">                &lt;/thead&gt;</span>
+</span><span data-line="160"><span class="s2">                &lt;tbody&gt;</span>
+</span><span data-line="161"><span class="s2">                    </span><span class="si">{</span><span class="n">tbody_content</span><span class="si">}</span>
+</span><span data-line="162"><span class="s2">                &lt;/tbody&gt;</span>
+</span><span data-line="163"><span class="s2">            &lt;/table&gt;</span>
+</span><span data-line="164"><span class="s2">        &lt;/main&gt;</span>
+</span><span data-line="165"><span class="s2">    &lt;/div&gt;</span>
+</span><span data-line="166"><span class="s2">    &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
+</span><span data-line="167"><span class="s2">&lt;/body&gt;</span>
+</span><span data-line="168"><span class="s2">&lt;/html&gt;&quot;&quot;&quot;</span>
+</span><span data-line="169">        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">html</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
+</span><span data-line="170">
+</span><span data-line="171">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_request_detail</span><span class="p">(</span><span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="172"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get detailed view for a specific request.&quot;&quot;&quot;</span>
+</span><span data-line="173">        <span class="n">data</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
+</span><span data-line="174">        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="175">            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request </span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+</span><span data-line="176">
+</span><span data-line="177">        <span class="n">metadata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="178">        <span class="n">timing</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timing_data&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="179">        <span class="n">panel_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;panel_data&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="180">        <span class="n">total_time</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span data-line="181">
+</span><span data-line="182">        <span class="n">method</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">)))</span>
+</span><span data-line="183">        <span class="n">path</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)))</span>
+</span><span data-line="184">        <span class="n">status</span> <span class="o">=</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status_code&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</span><span data-line="185">        <span class="n">status_class</span> <span class="o">=</span> <span class="n">status</span> <span class="o">//</span> <span class="mi">100</span>
+</span><span data-line="186">        <span class="c1"># Sanitize method for CSS class</span>
+</span><span data-line="187">        <span class="n">method_class</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())</span>
+</span><span data-line="188">        <span class="c1"># Pre-escape metadata values for display</span>
+</span><span data-line="189">        <span class="n">query_string</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;query_string&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;(none)&quot;</span><span class="p">))</span>
+</span><span data-line="190">        <span class="n">content_type</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response_content_type&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)))</span>
+</span><span data-line="191">        <span class="n">client_host</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_host&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)))</span>
+</span><span data-line="192">        <span class="n">client_port</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;client_port&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)))</span>
+</span><span data-line="193">
+</span><span data-line="194">        <span class="n">panels_html</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="195">        <span class="k">for</span> <span class="n">panel_id</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">panel_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span data-line="196">            <span class="n">panel_content</span> <span class="o">=</span> <span class="n">_render_panel_content</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+</span><span data-line="197">            <span class="c1"># Sanitize panel_id for use in HTML id and JS (alphanumeric + underscore only)</span>
+</span><span data-line="198">            <span class="n">panel_id_class</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">panel_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+</span><span data-line="199">            <span class="n">panel_title</span> <span class="o">=</span> <span class="n">_escape_html</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">panel_id</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Panel&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+</span><span data-line="200">            <span class="n">panels_html</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="201"><span class="s2">                &lt;div class=&quot;panel&quot; id=&quot;panel-</span><span class="si">{</span><span class="n">panel_id_class</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
+</span><span data-line="202"><span class="s2">                    &lt;div class=&quot;panel-header&quot; onclick=&quot;togglePanel(&#39;</span><span class="si">{</span><span class="n">panel_id_class</span><span class="si">}</span><span class="s2">&#39;)&quot;&gt;</span>
+</span><span data-line="203"><span class="s2">                        &lt;span class=&quot;panel-title&quot;&gt;</span><span class="si">{</span><span class="n">panel_title</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
+</span><span data-line="204"><span class="s2">                        &lt;span class=&quot;panel-toggle&quot;&gt;+&lt;/span&gt;</span>
+</span><span data-line="205"><span class="s2">                    &lt;/div&gt;</span>
+</span><span data-line="206"><span class="s2">                    &lt;div class=&quot;panel-content&quot;&gt;</span>
+</span><span data-line="207"><span class="s2">                        </span><span class="si">{</span><span class="n">panel_content</span><span class="si">}</span>
+</span><span data-line="208"><span class="s2">                    &lt;/div&gt;</span>
+</span><span data-line="209"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="210"><span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+</span><span data-line="211">
+</span><span data-line="212">        <span class="n">panels_section</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">panels_html</span><span class="p">)</span> <span class="k">if</span> <span class="n">panels_html</span> <span class="k">else</span> <span class="s1">&#39;&lt;p class=&quot;empty&quot;&gt;No panel data&lt;/p&gt;&#39;</span>
+</span><span data-line="213">
+</span><span data-line="214">        <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;!DOCTYPE html&gt;</span>
+</span><span data-line="215"><span class="s2">&lt;html lang=&quot;en&quot;&gt;</span>
+</span><span data-line="216"><span class="s2">&lt;head&gt;</span>
+</span><span data-line="217"><span class="s2">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
+</span><span data-line="218"><span class="s2">    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;</span>
+</span><span data-line="219"><span class="s2">    &lt;title&gt;Debug Toolbar - Request </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">request_id</span><span class="p">)[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
+</span><span data-line="220"><span class="s2">    &lt;link rel=&quot;stylesheet&quot; href=&quot;/_debug_toolbar/static/toolbar.css&quot;&gt;</span>
+</span><span data-line="221"><span class="s2">    &lt;script&gt;document.documentElement.dataset.theme=localStorage.getItem(&#39;debug-toolbar-theme&#39;)||&#39;dark&#39;;&lt;/script&gt;</span>
+</span><span data-line="222"><span class="s2">&lt;/head&gt;</span>
+</span><span data-line="223"><span class="s2">&lt;body&gt;</span>
+</span><span data-line="224"><span class="s2">    &lt;div class=&quot;toolbar-page&quot;&gt;</span>
+</span><span data-line="225"><span class="s2">        &lt;header class=&quot;toolbar-header&quot;&gt;</span>
+</span><span data-line="226"><span class="s2">            &lt;a href=&quot;/_debug_toolbar/&quot; class=&quot;back-link&quot;&gt;&amp;larr; Back to History&lt;/a&gt;</span>
+</span><span data-line="227"><span class="s2">            &lt;div class=&quot;header-row&quot;&gt;</span>
+</span><span data-line="228"><span class="s2">                &lt;h1&gt;Request Details&lt;/h1&gt;</span>
+</span><span data-line="229"><span class="s2">                &lt;button class=&quot;toolbar-theme-btn page-theme-btn&quot; onclick=&quot;togglePageTheme(this)&quot; title=&quot;Toggle theme&quot;&gt;</span>
+</span><span data-line="230"><span class="s2">                    &lt;span class=&quot;theme-icon&quot;&gt;&lt;/span&gt;</span>
+</span><span data-line="231"><span class="s2">                &lt;/button&gt;</span>
+</span><span data-line="232"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="233"><span class="s2">            &lt;div class=&quot;request-summary&quot;&gt;</span>
+</span><span data-line="234"><span class="s2">                &lt;span class=&quot;method method-</span><span class="si">{</span><span class="n">method_class</span><span class="si">}</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
+</span><span data-line="235"><span class="s2">                &lt;span class=&quot;path&quot;&gt;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
+</span><span data-line="236"><span class="s2">                &lt;span class=&quot;status status-</span><span class="si">{</span><span class="n">status_class</span><span class="si">}</span><span class="s2">xx&quot;&gt;</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
+</span><span data-line="237"><span class="s2">                &lt;span class=&quot;time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/span&gt;</span>
+</span><span data-line="238"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="239"><span class="s2">        &lt;/header&gt;</span>
+</span><span data-line="240">
+</span><span data-line="241"><span class="s2">        &lt;main class=&quot;toolbar-main&quot;&gt;</span>
+</span><span data-line="242"><span class="s2">            &lt;section class=&quot;metadata-section&quot;&gt;</span>
+</span><span data-line="243"><span class="s2">                &lt;h2&gt;Request Metadata&lt;/h2&gt;</span>
+</span><span data-line="244"><span class="s2">                &lt;dl class=&quot;metadata-list&quot;&gt;</span>
+</span><span data-line="245"><span class="s2">                    &lt;dt&gt;Request ID&lt;/dt&gt;</span>
+</span><span data-line="246"><span class="s2">                    &lt;dd&gt;&lt;code&gt;</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&lt;/code&gt;&lt;/dd&gt;</span>
+</span><span data-line="247"><span class="s2">                    &lt;dt&gt;Method&lt;/dt&gt;</span>
+</span><span data-line="248"><span class="s2">                    &lt;dd&gt;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&lt;/dd&gt;</span>
+</span><span data-line="249"><span class="s2">                    &lt;dt&gt;Path&lt;/dt&gt;</span>
+</span><span data-line="250"><span class="s2">                    &lt;dd&gt;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&lt;/dd&gt;</span>
+</span><span data-line="251"><span class="s2">                    &lt;dt&gt;Query String&lt;/dt&gt;</span>
+</span><span data-line="252"><span class="s2">                    &lt;dd&gt;&lt;code&gt;</span><span class="si">{</span><span class="n">query_string</span><span class="si">}</span><span class="s2">&lt;/code&gt;&lt;/dd&gt;</span>
+</span><span data-line="253"><span class="s2">                    &lt;dt&gt;Status Code&lt;/dt&gt;</span>
+</span><span data-line="254"><span class="s2">                    &lt;dd&gt;</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&lt;/dd&gt;</span>
+</span><span data-line="255"><span class="s2">                    &lt;dt&gt;Content Type&lt;/dt&gt;</span>
+</span><span data-line="256"><span class="s2">                    &lt;dd&gt;</span><span class="si">{</span><span class="n">content_type</span><span class="si">}</span><span class="s2">&lt;/dd&gt;</span>
+</span><span data-line="257"><span class="s2">                    &lt;dt&gt;Client&lt;/dt&gt;</span>
+</span><span data-line="258"><span class="s2">                    &lt;dd&gt;</span><span class="si">{</span><span class="n">client_host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">client_port</span><span class="si">}</span><span class="s2">&lt;/dd&gt;</span>
+</span><span data-line="259"><span class="s2">                &lt;/dl&gt;</span>
+</span><span data-line="260"><span class="s2">            &lt;/section&gt;</span>
+</span><span data-line="261">
+</span><span data-line="262"><span class="s2">            &lt;section class=&quot;panels-section&quot;&gt;</span>
+</span><span data-line="263"><span class="s2">                &lt;h2&gt;Panels&lt;/h2&gt;</span>
+</span><span data-line="264"><span class="s2">                &lt;div class=&quot;panels-container&quot;&gt;</span>
+</span><span data-line="265"><span class="s2">                    </span><span class="si">{</span><span class="n">panels_section</span><span class="si">}</span>
+</span><span data-line="266"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="267"><span class="s2">            &lt;/section&gt;</span>
+</span><span data-line="268"><span class="s2">        &lt;/main&gt;</span>
+</span><span data-line="269"><span class="s2">    &lt;/div&gt;</span>
+</span><span data-line="270"><span class="s2">    &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
+</span><span data-line="271"><span class="s2">&lt;/body&gt;</span>
+</span><span data-line="272"><span class="s2">&lt;/html&gt;&quot;&quot;&quot;</span>
+</span><span data-line="273">        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">html</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
+</span><span data-line="274">
+</span><span data-line="275">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_requests_json</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+</span><span data-line="276"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all requests as JSON.&quot;&quot;&quot;</span>
+</span><span data-line="277">        <span class="n">requests</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+</span><span data-line="278">        <span class="k">return</span> <span class="p">[</span>
+</span><span data-line="279">            <span class="p">{</span>
+</span><span data-line="280">                <span class="s2">&quot;request_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">rid</span><span class="p">),</span>
+</span><span data-line="281">                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+</span><span data-line="282">                <span class="s2">&quot;timing&quot;</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timing_data&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+</span><span data-line="283">            <span class="p">}</span>
+</span><span data-line="284">            <span class="k">for</span> <span class="n">rid</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">requests</span>
+</span><span data-line="285">        <span class="p">]</span>
+</span><span data-line="286">
+</span><span data-line="287">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_request_json</span><span class="p">(</span><span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span data-line="288"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a specific request as JSON.&quot;&quot;&quot;</span>
+</span><span data-line="289">        <span class="n">data</span> <span class="o">=</span> <span class="n">storage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
+</span><span data-line="290">        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="291">            <span class="k">raise</span> <span class="n">NotFoundException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request </span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+</span><span data-line="292">        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;request_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">request_id</span><span class="p">),</span> <span class="o">**</span><span class="n">data</span><span class="p">}</span>
+</span><span data-line="293">
+</span><span data-line="294">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">post_explain</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+</span><span data-line="295"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute EXPLAIN for a SQL query.</span>
+</span><span data-line="296">
+</span><span data-line="297"><span class="sd">        Expects JSON body with &#39;sql&#39; and optional &#39;parameters&#39;.</span>
+</span><span data-line="298"><span class="sd">        Requires app.state.db_engine to be set.</span>
+</span><span data-line="299"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span data-line="300">        <span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.extras.advanced_alchemy.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExplainExecutor</span>
+</span><span data-line="301">
+</span><span data-line="302">        <span class="n">sql</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sql&quot;</span><span class="p">)</span>
+</span><span data-line="303">        <span class="n">parameters</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parameters&quot;</span><span class="p">)</span>
+</span><span data-line="304">        <span class="k">if</span> <span class="ow">not</span> <span class="n">sql</span><span class="p">:</span>
+</span><span data-line="305">            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing &#39;sql&#39; in request body&quot;</span><span class="p">}</span>
+</span><span data-line="306">
+</span><span data-line="307">        <span class="n">engine</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;db_engine&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span data-line="308">        <span class="k">if</span> <span class="ow">not</span> <span class="n">engine</span><span class="p">:</span>
+</span><span data-line="309">            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No database engine available for EXPLAIN&quot;</span><span class="p">}</span>
+</span><span data-line="310">
+</span><span data-line="311">        <span class="k">return</span> <span class="k">await</span> <span class="n">ExplainExecutor</span><span class="o">.</span><span class="n">execute_explain</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+</span><span data-line="312">
+</span><span data-line="313">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_static_css</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="314"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve the toolbar CSS.&quot;&quot;&quot;</span>
+</span><span data-line="315">        <span class="n">css</span> <span class="o">=</span> <span class="n">get_toolbar_css</span><span class="p">()</span>
+</span><span data-line="316">        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">css</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;text/css&quot;</span><span class="p">)</span>
+</span><span data-line="317">
+</span><span data-line="318">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_static_js</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="319"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Serve the toolbar JavaScript.&quot;&quot;&quot;</span>
+</span><span data-line="320">        <span class="n">js</span> <span class="o">=</span> <span class="n">get_toolbar_js</span><span class="p">()</span>
+</span><span data-line="321">        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">js</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="s2">&quot;application/javascript&quot;</span><span class="p">)</span>
+</span><span data-line="322">
+</span><span data-line="323">    <span class="n">index_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)(</span><span class="n">get_toolbar_index</span><span class="p">)</span>
+</span><span data-line="324">    <span class="n">detail_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/{request_id:uuid}&quot;</span><span class="p">)(</span><span class="n">get_request_detail</span><span class="p">)</span>
+</span><span data-line="325">    <span class="n">api_requests_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/api/requests&quot;</span><span class="p">)(</span><span class="n">get_requests_json</span><span class="p">)</span>
+</span><span data-line="326">    <span class="n">api_request_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/api/requests/{request_id:uuid}&quot;</span><span class="p">)(</span><span class="n">get_request_json</span><span class="p">)</span>
+</span><span data-line="327">    <span class="n">api_explain_handler</span> <span class="o">=</span> <span class="n">post</span><span class="p">(</span><span class="s2">&quot;/api/explain&quot;</span><span class="p">)(</span><span class="n">post_explain</span><span class="p">)</span>
+</span><span data-line="328">    <span class="n">css_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/static/toolbar.css&quot;</span><span class="p">)(</span><span class="n">get_static_css</span><span class="p">)</span>
+</span><span data-line="329">    <span class="n">js_handler</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="s2">&quot;/static/toolbar.js&quot;</span><span class="p">)(</span><span class="n">get_static_js</span><span class="p">)</span>
+</span><span data-line="330">
+</span><span data-line="331">    <span class="k">return</span> <span class="n">Router</span><span class="p">(</span>
+</span><span data-line="332">        <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/_debug_toolbar&quot;</span><span class="p">,</span>
+</span><span data-line="333">        <span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="334">            <span class="n">index_handler</span><span class="p">,</span>
+</span><span data-line="335">            <span class="n">detail_handler</span><span class="p">,</span>
+</span><span data-line="336">            <span class="n">api_requests_handler</span><span class="p">,</span>
+</span><span data-line="337">            <span class="n">api_request_handler</span><span class="p">,</span>
+</span><span data-line="338">            <span class="n">api_explain_handler</span><span class="p">,</span>
+</span><span data-line="339">            <span class="n">css_handler</span><span class="p">,</span>
+</span><span data-line="340">            <span class="n">js_handler</span><span class="p">,</span>
+</span><span data-line="341">        <span class="p">],</span>
+</span><span data-line="342">        <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Debug Toolbar&quot;</span><span class="p">],</span>
+</span><span data-line="343">    <span class="p">)</span></div>
+
+</span><span data-line="344">
+</span><span data-line="345">
+<div class="viewcode-block" id="get_toolbar_css">
+<a class="viewcode-back" href="../../../../api/_autosummary/debug_toolbar.litestar.routes.handlers.html#debug_toolbar.litestar.routes.get_toolbar_css">[docs]</a>
+</span><span data-line="346"><span class="k">def</span><span class="w"> </span><span class="nf">get_toolbar_css</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="347"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the toolbar CSS styles.</span>
+</span><span data-line="348">
+</span><span data-line="349"><span class="sd">    The inline toolbar supports 4 positions: right (default), left, top, bottom.</span>
+</span><span data-line="350"><span class="sd">    Position is controlled via data-position attribute on #debug-toolbar element.</span>
+</span><span data-line="351"><span class="sd">    Theme is controlled via data-theme attribute (dark/light).</span>
+</span><span data-line="352"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span data-line="353">    <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="354"><span class="s2">:root, [data-theme=&quot;dark&quot;] {</span>
+</span><span data-line="355"><span class="s2">    --dt-bg-primary: #1e1e1e;</span>
+</span><span data-line="356"><span class="s2">    --dt-bg-secondary: #2d2d2d;</span>
+</span><span data-line="357"><span class="s2">    --dt-bg-tertiary: #3d3d3d;</span>
+</span><span data-line="358"><span class="s2">    --dt-text-primary: #ffffff;</span>
+</span><span data-line="359"><span class="s2">    --dt-text-secondary: #b0b0b0;</span>
+</span><span data-line="360"><span class="s2">    --dt-text-muted: #707070;</span>
+</span><span data-line="361"><span class="s2">    --dt-accent: #007acc;</span>
+</span><span data-line="362"><span class="s2">    --dt-accent-hover: #0098ff;</span>
+</span><span data-line="363"><span class="s2">    --dt-success: #4ec9b0;</span>
+</span><span data-line="364"><span class="s2">    --dt-warning: #dcdcaa;</span>
+</span><span data-line="365"><span class="s2">    --dt-error: #f14c4c;</span>
+</span><span data-line="366"><span class="s2">    --dt-border: #404040;</span>
+</span><span data-line="367"><span class="s2">    --dt-font-mono: &#39;SF Mono&#39;, &#39;Monaco&#39;, &#39;Inconsolata&#39;, &#39;Fira Code&#39;, monospace;</span>
+</span><span data-line="368"><span class="s2">    --dt-font-sans: -apple-system, BlinkMacSystemFont, &#39;Segoe UI&#39;, Roboto, sans-serif;</span>
+</span><span data-line="369"><span class="s2">}</span>
+</span><span data-line="370">
+</span><span data-line="371"><span class="s2">[data-theme=&quot;light&quot;] {</span>
+</span><span data-line="372"><span class="s2">    --dt-bg-primary: #ffffff;</span>
+</span><span data-line="373"><span class="s2">    --dt-bg-secondary: #f5f5f5;</span>
+</span><span data-line="374"><span class="s2">    --dt-bg-tertiary: #e8e8e8;</span>
+</span><span data-line="375"><span class="s2">    --dt-text-primary: #1e1e1e;</span>
+</span><span data-line="376"><span class="s2">    --dt-text-secondary: #555555;</span>
+</span><span data-line="377"><span class="s2">    --dt-text-muted: #888888;</span>
+</span><span data-line="378"><span class="s2">    --dt-accent: #0066cc;</span>
+</span><span data-line="379"><span class="s2">    --dt-accent-hover: #0052a3;</span>
+</span><span data-line="380"><span class="s2">    --dt-success: #2e7d32;</span>
+</span><span data-line="381"><span class="s2">    --dt-warning: #f57c00;</span>
+</span><span data-line="382"><span class="s2">    --dt-error: #c62828;</span>
+</span><span data-line="383"><span class="s2">    --dt-border: #d0d0d0;</span>
+</span><span data-line="384"><span class="s2">}</span>
+</span><span data-line="385">
+</span><span data-line="386"><span class="s2">* { box-sizing: border-box; }</span>
+</span><span data-line="387">
+</span><span data-line="388"><span class="s2">body {</span>
+</span><span data-line="389"><span class="s2">    margin: 0;</span>
+</span><span data-line="390"><span class="s2">    padding: 0;</span>
+</span><span data-line="391"><span class="s2">    font-family: var(--dt-font-sans);</span>
+</span><span data-line="392"><span class="s2">    background: var(--dt-bg-primary);</span>
+</span><span data-line="393"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="394"><span class="s2">    line-height: 1.5;</span>
+</span><span data-line="395"><span class="s2">}</span>
+</span><span data-line="396">
+</span><span data-line="397"><span class="s2">.toolbar-page {</span>
+</span><span data-line="398"><span class="s2">    min-height: 100vh;</span>
+</span><span data-line="399"><span class="s2">    display: flex;</span>
+</span><span data-line="400"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="401"><span class="s2">}</span>
+</span><span data-line="402">
+</span><span data-line="403"><span class="s2">.toolbar-header {</span>
+</span><span data-line="404"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="405"><span class="s2">    padding: 20px 24px;</span>
+</span><span data-line="406"><span class="s2">    border-bottom: 2px solid var(--dt-accent);</span>
+</span><span data-line="407"><span class="s2">}</span>
+</span><span data-line="408">
+</span><span data-line="409"><span class="s2">.header-row {</span>
+</span><span data-line="410"><span class="s2">    display: flex;</span>
+</span><span data-line="411"><span class="s2">    justify-content: space-between;</span>
+</span><span data-line="412"><span class="s2">    align-items: center;</span>
+</span><span data-line="413"><span class="s2">}</span>
+</span><span data-line="414">
+</span><span data-line="415"><span class="s2">.toolbar-header h1 {</span>
+</span><span data-line="416"><span class="s2">    margin: 0 0 8px 0;</span>
+</span><span data-line="417"><span class="s2">    font-size: 24px;</span>
+</span><span data-line="418"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="419"><span class="s2">    color: var(--dt-accent);</span>
+</span><span data-line="420"><span class="s2">}</span>
+</span><span data-line="421">
+</span><span data-line="422"><span class="s2">.page-theme-btn {</span>
+</span><span data-line="423"><span class="s2">    width: 32px;</span>
+</span><span data-line="424"><span class="s2">    height: 32px;</span>
+</span><span data-line="425"><span class="s2">    font-size: 18px;</span>
+</span><span data-line="426"><span class="s2">}</span>
+</span><span data-line="427">
+</span><span data-line="428"><span class="s2">.theme-icon::before {</span>
+</span><span data-line="429"><span class="s2">    content: &#39;</span><span class="se">\u2600</span><span class="s2">&#39;;</span>
+</span><span data-line="430"><span class="s2">}</span>
+</span><span data-line="431">
+</span><span data-line="432"><span class="s2">[data-theme=&quot;light&quot;] .theme-icon::before {</span>
+</span><span data-line="433"><span class="s2">    content: &#39;</span><span class="se">\u263e</span><span class="s2">&#39;;</span>
+</span><span data-line="434"><span class="s2">}</span>
+</span><span data-line="435">
+</span><span data-line="436"><span class="s2">.toolbar-header p {</span>
+</span><span data-line="437"><span class="s2">    margin: 0;</span>
+</span><span data-line="438"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="439"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="440"><span class="s2">}</span>
+</span><span data-line="441">
+</span><span data-line="442"><span class="s2">.back-link {</span>
+</span><span data-line="443"><span class="s2">    display: inline-block;</span>
+</span><span data-line="444"><span class="s2">    margin-bottom: 12px;</span>
+</span><span data-line="445"><span class="s2">    color: var(--dt-accent);</span>
+</span><span data-line="446"><span class="s2">    text-decoration: none;</span>
+</span><span data-line="447"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="448"><span class="s2">}</span>
+</span><span data-line="449">
+</span><span data-line="450"><span class="s2">.back-link:hover {</span>
+</span><span data-line="451"><span class="s2">    color: var(--dt-accent-hover);</span>
+</span><span data-line="452"><span class="s2">    text-decoration: underline;</span>
+</span><span data-line="453"><span class="s2">}</span>
+</span><span data-line="454">
+</span><span data-line="455"><span class="s2">.request-summary {</span>
+</span><span data-line="456"><span class="s2">    display: flex;</span>
+</span><span data-line="457"><span class="s2">    align-items: center;</span>
+</span><span data-line="458"><span class="s2">    gap: 12px;</span>
+</span><span data-line="459"><span class="s2">    margin-top: 12px;</span>
+</span><span data-line="460"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="461"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="462"><span class="s2">}</span>
+</span><span data-line="463">
+</span><span data-line="464"><span class="s2">.toolbar-main {</span>
+</span><span data-line="465"><span class="s2">    flex: 1;</span>
+</span><span data-line="466"><span class="s2">    padding: 24px;</span>
+</span><span data-line="467"><span class="s2">}</span>
+</span><span data-line="468">
+</span><span data-line="469"><span class="s2">.requests-table {</span>
+</span><span data-line="470"><span class="s2">    width: 100%;</span>
+</span><span data-line="471"><span class="s2">    border-collapse: collapse;</span>
+</span><span data-line="472"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="473"><span class="s2">}</span>
+</span><span data-line="474">
+</span><span data-line="475"><span class="s2">.requests-table th,</span>
+</span><span data-line="476"><span class="s2">.requests-table td {</span>
+</span><span data-line="477"><span class="s2">    padding: 12px 16px;</span>
+</span><span data-line="478"><span class="s2">    text-align: left;</span>
+</span><span data-line="479"><span class="s2">    border-bottom: 1px solid var(--dt-border);</span>
+</span><span data-line="480"><span class="s2">}</span>
+</span><span data-line="481">
+</span><span data-line="482"><span class="s2">.requests-table th {</span>
+</span><span data-line="483"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="484"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="485"><span class="s2">    font-weight: 500;</span>
+</span><span data-line="486"><span class="s2">    text-transform: uppercase;</span>
+</span><span data-line="487"><span class="s2">    font-size: 11px;</span>
+</span><span data-line="488"><span class="s2">    letter-spacing: 0.5px;</span>
+</span><span data-line="489"><span class="s2">}</span>
+</span><span data-line="490">
+</span><span data-line="491"><span class="s2">.requests-table tbody tr {</span>
+</span><span data-line="492"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="493"><span class="s2">    transition: background 0.15s;</span>
+</span><span data-line="494"><span class="s2">}</span>
+</span><span data-line="495">
+</span><span data-line="496"><span class="s2">.requests-table tbody tr:hover {</span>
+</span><span data-line="497"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="498"><span class="s2">}</span>
+</span><span data-line="499">
+</span><span data-line="500"><span class="s2">.requests-table code {</span>
+</span><span data-line="501"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="502"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="503"><span class="s2">}</span>
+</span><span data-line="504">
+</span><span data-line="505"><span class="s2">.requests-table .path {</span>
+</span><span data-line="506"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="507"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="508"><span class="s2">}</span>
+</span><span data-line="509">
+</span><span data-line="510"><span class="s2">.requests-table .time {</span>
+</span><span data-line="511"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="512"><span class="s2">    color: var(--dt-success);</span>
+</span><span data-line="513"><span class="s2">}</span>
+</span><span data-line="514">
+</span><span data-line="515"><span class="s2">.empty {</span>
+</span><span data-line="516"><span class="s2">    text-align: center;</span>
+</span><span data-line="517"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="518"><span class="s2">    padding: 40px !important;</span>
+</span><span data-line="519"><span class="s2">}</span>
+</span><span data-line="520">
+</span><span data-line="521"><span class="s2">.method {</span>
+</span><span data-line="522"><span class="s2">    display: inline-block;</span>
+</span><span data-line="523"><span class="s2">    padding: 2px 8px;</span>
+</span><span data-line="524"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="525"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="526"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="527"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="528"><span class="s2">    text-transform: uppercase;</span>
+</span><span data-line="529"><span class="s2">}</span>
+</span><span data-line="530">
+</span><span data-line="531"><span class="s2">.method-get { background: #2d5a2d; color: #98c379; }</span>
+</span><span data-line="532"><span class="s2">.method-post { background: #5a4a2d; color: #e5c07b; }</span>
+</span><span data-line="533"><span class="s2">.method-put { background: #2d4a5a; color: #61afef; }</span>
+</span><span data-line="534"><span class="s2">.method-patch { background: #4a2d5a; color: #c678dd; }</span>
+</span><span data-line="535"><span class="s2">.method-delete { background: #5a2d2d; color: #e06c75; }</span>
+</span><span data-line="536">
+</span><span data-line="537"><span class="s2">.status {</span>
+</span><span data-line="538"><span class="s2">    display: inline-block;</span>
+</span><span data-line="539"><span class="s2">    padding: 2px 8px;</span>
+</span><span data-line="540"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="541"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="542"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="543"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="544"><span class="s2">}</span>
+</span><span data-line="545">
+</span><span data-line="546"><span class="s2">.status-2xx { background: #2d5a2d; color: #98c379; }</span>
+</span><span data-line="547"><span class="s2">.status-3xx { background: #2d4a5a; color: #61afef; }</span>
+</span><span data-line="548"><span class="s2">.status-4xx { background: #5a4a2d; color: #e5c07b; }</span>
+</span><span data-line="549"><span class="s2">.status-5xx { background: #5a2d2d; color: #e06c75; }</span>
+</span><span data-line="550">
+</span><span data-line="551"><span class="s2">.metadata-section,</span>
+</span><span data-line="552"><span class="s2">.panels-section {</span>
+</span><span data-line="553"><span class="s2">    margin-bottom: 32px;</span>
+</span><span data-line="554"><span class="s2">}</span>
+</span><span data-line="555">
+</span><span data-line="556"><span class="s2">.metadata-section h2,</span>
+</span><span data-line="557"><span class="s2">.panels-section h2 {</span>
+</span><span data-line="558"><span class="s2">    font-size: 16px;</span>
+</span><span data-line="559"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="560"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="561"><span class="s2">    margin: 0 0 16px 0;</span>
+</span><span data-line="562"><span class="s2">    text-transform: uppercase;</span>
+</span><span data-line="563"><span class="s2">    letter-spacing: 0.5px;</span>
+</span><span data-line="564"><span class="s2">}</span>
+</span><span data-line="565">
+</span><span data-line="566"><span class="s2">.metadata-list {</span>
+</span><span data-line="567"><span class="s2">    display: grid;</span>
+</span><span data-line="568"><span class="s2">    grid-template-columns: 150px 1fr;</span>
+</span><span data-line="569"><span class="s2">    gap: 8px 16px;</span>
+</span><span data-line="570"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="571"><span class="s2">    padding: 16px;</span>
+</span><span data-line="572"><span class="s2">    border-radius: 8px;</span>
+</span><span data-line="573"><span class="s2">}</span>
+</span><span data-line="574">
+</span><span data-line="575"><span class="s2">.metadata-list dt {</span>
+</span><span data-line="576"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="577"><span class="s2">    font-size: 13px;</span>
+</span><span data-line="578"><span class="s2">}</span>
+</span><span data-line="579">
+</span><span data-line="580"><span class="s2">.metadata-list dd {</span>
+</span><span data-line="581"><span class="s2">    margin: 0;</span>
+</span><span data-line="582"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="583"><span class="s2">    font-size: 13px;</span>
+</span><span data-line="584"><span class="s2">    word-break: break-all;</span>
+</span><span data-line="585"><span class="s2">}</span>
+</span><span data-line="586">
+</span><span data-line="587"><span class="s2">.metadata-list code {</span>
+</span><span data-line="588"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="589"><span class="s2">    padding: 2px 6px;</span>
+</span><span data-line="590"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="591"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="592"><span class="s2">}</span>
+</span><span data-line="593">
+</span><span data-line="594"><span class="s2">.panels-container {</span>
+</span><span data-line="595"><span class="s2">    display: flex;</span>
+</span><span data-line="596"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="597"><span class="s2">    gap: 8px;</span>
+</span><span data-line="598"><span class="s2">}</span>
+</span><span data-line="599">
+</span><span data-line="600"><span class="s2">.panel {</span>
+</span><span data-line="601"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="602"><span class="s2">    border-radius: 8px;</span>
+</span><span data-line="603"><span class="s2">    overflow: hidden;</span>
+</span><span data-line="604"><span class="s2">}</span>
+</span><span data-line="605">
+</span><span data-line="606"><span class="s2">.panel-header {</span>
+</span><span data-line="607"><span class="s2">    display: flex;</span>
+</span><span data-line="608"><span class="s2">    justify-content: space-between;</span>
+</span><span data-line="609"><span class="s2">    align-items: center;</span>
+</span><span data-line="610"><span class="s2">    padding: 12px 16px;</span>
+</span><span data-line="611"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="612"><span class="s2">    transition: background 0.15s;</span>
+</span><span data-line="613"><span class="s2">}</span>
+</span><span data-line="614">
+</span><span data-line="615"><span class="s2">.panel-header:hover {</span>
+</span><span data-line="616"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="617"><span class="s2">}</span>
+</span><span data-line="618">
+</span><span data-line="619"><span class="s2">.panel-title {</span>
+</span><span data-line="620"><span class="s2">    font-weight: 500;</span>
+</span><span data-line="621"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="622"><span class="s2">}</span>
+</span><span data-line="623">
+</span><span data-line="624"><span class="s2">.panel-toggle {</span>
+</span><span data-line="625"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="626"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="627"><span class="s2">    font-size: 18px;</span>
+</span><span data-line="628"><span class="s2">    width: 24px;</span>
+</span><span data-line="629"><span class="s2">    text-align: center;</span>
+</span><span data-line="630"><span class="s2">}</span>
+</span><span data-line="631">
+</span><span data-line="632"><span class="s2">.panel-content {</span>
+</span><span data-line="633"><span class="s2">    padding: 16px;</span>
+</span><span data-line="634"><span class="s2">    border-top: 1px solid var(--dt-border);</span>
+</span><span data-line="635"><span class="s2">    background: var(--dt-bg-primary);</span>
+</span><span data-line="636"><span class="s2">    max-height: 0;</span>
+</span><span data-line="637"><span class="s2">    overflow: hidden;</span>
+</span><span data-line="638"><span class="s2">    opacity: 0;</span>
+</span><span data-line="639"><span class="s2">    transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out;</span>
+</span><span data-line="640"><span class="s2">    padding: 0 16px;</span>
+</span><span data-line="641"><span class="s2">}</span>
+</span><span data-line="642">
+</span><span data-line="643"><span class="s2">.panel-content.expanded {</span>
+</span><span data-line="644"><span class="s2">    max-height: 500px;</span>
+</span><span data-line="645"><span class="s2">    overflow-y: auto;</span>
+</span><span data-line="646"><span class="s2">    opacity: 1;</span>
+</span><span data-line="647"><span class="s2">    padding: 16px;</span>
+</span><span data-line="648"><span class="s2">}</span>
+</span><span data-line="649">
+</span><span data-line="650"><span class="s2">.panel-table {</span>
+</span><span data-line="651"><span class="s2">    width: 100%;</span>
+</span><span data-line="652"><span class="s2">    border-collapse: collapse;</span>
+</span><span data-line="653"><span class="s2">    font-size: 13px;</span>
+</span><span data-line="654"><span class="s2">}</span>
+</span><span data-line="655">
+</span><span data-line="656"><span class="s2">.panel-table td {</span>
+</span><span data-line="657"><span class="s2">    padding: 8px 12px;</span>
+</span><span data-line="658"><span class="s2">    border-bottom: 1px solid var(--dt-border);</span>
+</span><span data-line="659"><span class="s2">    vertical-align: top;</span>
+</span><span data-line="660"><span class="s2">}</span>
+</span><span data-line="661">
+</span><span data-line="662"><span class="s2">.panel-table .key {</span>
+</span><span data-line="663"><span class="s2">    width: 200px;</span>
+</span><span data-line="664"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="665"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="666"><span class="s2">}</span>
+</span><span data-line="667">
+</span><span data-line="668"><span class="s2">.panel-table .value {</span>
+</span><span data-line="669"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="670"><span class="s2">    word-break: break-all;</span>
+</span><span data-line="671"><span class="s2">}</span>
+</span><span data-line="672">
+</span><span data-line="673"><span class="s2">.null { color: var(--dt-text-muted); font-style: italic; }</span>
+</span><span data-line="674"><span class="s2">.bool { color: #569cd6; }</span>
+</span><span data-line="675"><span class="s2">.number { color: var(--dt-success); }</span>
+</span><span data-line="676"><span class="s2">.string { color: #ce9178; }</span>
+</span><span data-line="677"><span class="s2">.array { color: var(--dt-warning); }</span>
+</span><span data-line="678"><span class="s2">.object { color: #9cdcfe; }</span>
+</span><span data-line="679"><span class="s2">.unknown { color: var(--dt-text-secondary); }</span>
+</span><span data-line="680">
+</span><span data-line="681"><span class="s2">.array-items, .object-items {</span>
+</span><span data-line="682"><span class="s2">    padding-left: 16px;</span>
+</span><span data-line="683"><span class="s2">    border-left: 2px solid var(--dt-border);</span>
+</span><span data-line="684"><span class="s2">    margin: 4px 0;</span>
+</span><span data-line="685"><span class="s2">}</span>
+</span><span data-line="686">
+</span><span data-line="687"><span class="s2">.array-item, .object-item {</span>
+</span><span data-line="688"><span class="s2">    padding: 2px 0;</span>
+</span><span data-line="689"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="690"><span class="s2">}</span>
+</span><span data-line="691">
+</span><span data-line="692"><span class="s2">.array-more, .object-more {</span>
+</span><span data-line="693"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="694"><span class="s2">    font-style: italic;</span>
+</span><span data-line="695"><span class="s2">    padding: 2px 0;</span>
+</span><span data-line="696"><span class="s2">}</span>
+</span><span data-line="697">
+</span><span data-line="698"><span class="s2">#debug-toolbar {</span>
+</span><span data-line="699"><span class="s2">    position: fixed;</span>
+</span><span data-line="700"><span class="s2">    background: var(--dt-bg-primary);</span>
+</span><span data-line="701"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="702"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="703"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="704"><span class="s2">    z-index: 99999;</span>
+</span><span data-line="705"><span class="s2">    box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);</span>
+</span><span data-line="706"><span class="s2">    display: flex;</span>
+</span><span data-line="707"><span class="s2">    overflow: hidden;</span>
+</span><span data-line="708"><span class="s2">}</span>
+</span><span data-line="709">
+</span><span data-line="710"><span class="s2">/* Default position: right */</span>
+</span><span data-line="711"><span class="s2">#debug-toolbar,</span>
+</span><span data-line="712"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;] {</span>
+</span><span data-line="713"><span class="s2">    top: 0;</span>
+</span><span data-line="714"><span class="s2">    right: 0;</span>
+</span><span data-line="715"><span class="s2">    bottom: 0;</span>
+</span><span data-line="716"><span class="s2">    width: 400px;</span>
+</span><span data-line="717"><span class="s2">    min-width: 250px;</span>
+</span><span data-line="718"><span class="s2">    max-width: 80vw;</span>
+</span><span data-line="719"><span class="s2">    border-left: 2px solid var(--dt-accent);</span>
+</span><span data-line="720"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="721"><span class="s2">}</span>
+</span><span data-line="722">
+</span><span data-line="723"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;] {</span>
+</span><span data-line="724"><span class="s2">    top: 0;</span>
+</span><span data-line="725"><span class="s2">    left: 0;</span>
+</span><span data-line="726"><span class="s2">    bottom: 0;</span>
+</span><span data-line="727"><span class="s2">    right: auto;</span>
+</span><span data-line="728"><span class="s2">    width: 400px;</span>
+</span><span data-line="729"><span class="s2">    min-width: 250px;</span>
+</span><span data-line="730"><span class="s2">    max-width: 80vw;</span>
+</span><span data-line="731"><span class="s2">    border-right: 2px solid var(--dt-accent);</span>
+</span><span data-line="732"><span class="s2">    border-left: none;</span>
+</span><span data-line="733"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="734"><span class="s2">}</span>
+</span><span data-line="735">
+</span><span data-line="736"><span class="s2">#debug-toolbar[data-position=&quot;top&quot;] {</span>
+</span><span data-line="737"><span class="s2">    top: 0;</span>
+</span><span data-line="738"><span class="s2">    left: 0;</span>
+</span><span data-line="739"><span class="s2">    right: 0;</span>
+</span><span data-line="740"><span class="s2">    bottom: auto;</span>
+</span><span data-line="741"><span class="s2">    width: 100vw;</span>
+</span><span data-line="742"><span class="s2">    max-width: 100vw;</span>
+</span><span data-line="743"><span class="s2">    height: auto;</span>
+</span><span data-line="744"><span class="s2">    min-height: 40px;</span>
+</span><span data-line="745"><span class="s2">    max-height: 60vh;</span>
+</span><span data-line="746"><span class="s2">    border-bottom: 2px solid var(--dt-accent);</span>
+</span><span data-line="747"><span class="s2">    border-left: none;</span>
+</span><span data-line="748"><span class="s2">    border-right: none;</span>
+</span><span data-line="749"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="750"><span class="s2">}</span>
+</span><span data-line="751">
+</span><span data-line="752"><span class="s2">#debug-toolbar[data-position=&quot;bottom&quot;] {</span>
+</span><span data-line="753"><span class="s2">    bottom: 0;</span>
+</span><span data-line="754"><span class="s2">    left: 0;</span>
+</span><span data-line="755"><span class="s2">    right: 0;</span>
+</span><span data-line="756"><span class="s2">    top: auto;</span>
+</span><span data-line="757"><span class="s2">    width: 100vw;</span>
+</span><span data-line="758"><span class="s2">    max-width: 100vw;</span>
+</span><span data-line="759"><span class="s2">    height: auto;</span>
+</span><span data-line="760"><span class="s2">    min-height: 40px;</span>
+</span><span data-line="761"><span class="s2">    max-height: 60vh;</span>
+</span><span data-line="762"><span class="s2">    border-top: 2px solid var(--dt-accent);</span>
+</span><span data-line="763"><span class="s2">    border-left: none;</span>
+</span><span data-line="764"><span class="s2">    border-right: none;</span>
+</span><span data-line="765"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="766"><span class="s2">}</span>
+</span><span data-line="767">
+</span><span data-line="768"><span class="s2">#debug-toolbar.collapsed .toolbar-panels,</span>
+</span><span data-line="769"><span class="s2">#debug-toolbar.collapsed .toolbar-details,</span>
+</span><span data-line="770"><span class="s2">#debug-toolbar.collapsed .toolbar-content {</span>
+</span><span data-line="771"><span class="s2">    display: none;</span>
+</span><span data-line="772"><span class="s2">}</span>
+</span><span data-line="773">
+</span><span data-line="774"><span class="s2">/* Collapsed state for side positions */</span>
+</span><span data-line="775"><span class="s2">#debug-toolbar.collapsed[data-position=&quot;right&quot;],</span>
+</span><span data-line="776"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;].collapsed,</span>
+</span><span data-line="777"><span class="s2">#debug-toolbar.collapsed[data-position=&quot;left&quot;],</span>
+</span><span data-line="778"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;].collapsed {</span>
+</span><span data-line="779"><span class="s2">    width: auto;</span>
+</span><span data-line="780"><span class="s2">    min-width: 0;</span>
+</span><span data-line="781"><span class="s2">}</span>
+</span><span data-line="782">
+</span><span data-line="783"><span class="s2">#debug-toolbar.collapsed[data-position=&quot;top&quot;],</span>
+</span><span data-line="784"><span class="s2">#debug-toolbar[data-position=&quot;top&quot;].collapsed,</span>
+</span><span data-line="785"><span class="s2">#debug-toolbar.collapsed[data-position=&quot;bottom&quot;],</span>
+</span><span data-line="786"><span class="s2">#debug-toolbar[data-position=&quot;bottom&quot;].collapsed {</span>
+</span><span data-line="787"><span class="s2">    height: auto;</span>
+</span><span data-line="788"><span class="s2">    min-height: 0;</span>
+</span><span data-line="789"><span class="s2">}</span>
+</span><span data-line="790">
+</span><span data-line="791"><span class="s2">/* Resize handle */</span>
+</span><span data-line="792"><span class="s2">.toolbar-resize-handle {</span>
+</span><span data-line="793"><span class="s2">    position: absolute;</span>
+</span><span data-line="794"><span class="s2">    background: transparent;</span>
+</span><span data-line="795"><span class="s2">    z-index: 10;</span>
+</span><span data-line="796"><span class="s2">}</span>
+</span><span data-line="797">
+</span><span data-line="798"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;] .toolbar-resize-handle {</span>
+</span><span data-line="799"><span class="s2">    left: 0;</span>
+</span><span data-line="800"><span class="s2">    top: 0;</span>
+</span><span data-line="801"><span class="s2">    bottom: 0;</span>
+</span><span data-line="802"><span class="s2">    width: 6px;</span>
+</span><span data-line="803"><span class="s2">    cursor: ew-resize;</span>
+</span><span data-line="804"><span class="s2">}</span>
+</span><span data-line="805">
+</span><span data-line="806"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;] .toolbar-resize-handle {</span>
+</span><span data-line="807"><span class="s2">    right: 0;</span>
+</span><span data-line="808"><span class="s2">    top: 0;</span>
+</span><span data-line="809"><span class="s2">    bottom: 0;</span>
+</span><span data-line="810"><span class="s2">    width: 6px;</span>
+</span><span data-line="811"><span class="s2">    cursor: ew-resize;</span>
+</span><span data-line="812"><span class="s2">}</span>
+</span><span data-line="813">
+</span><span data-line="814"><span class="s2">#debug-toolbar[data-position=&quot;top&quot;] .toolbar-resize-handle {</span>
+</span><span data-line="815"><span class="s2">    left: 0;</span>
+</span><span data-line="816"><span class="s2">    right: 0;</span>
+</span><span data-line="817"><span class="s2">    bottom: 0;</span>
+</span><span data-line="818"><span class="s2">    height: 6px;</span>
+</span><span data-line="819"><span class="s2">    cursor: ns-resize;</span>
+</span><span data-line="820"><span class="s2">}</span>
+</span><span data-line="821">
+</span><span data-line="822"><span class="s2">#debug-toolbar[data-position=&quot;bottom&quot;] .toolbar-resize-handle {</span>
+</span><span data-line="823"><span class="s2">    left: 0;</span>
+</span><span data-line="824"><span class="s2">    right: 0;</span>
+</span><span data-line="825"><span class="s2">    top: 0;</span>
+</span><span data-line="826"><span class="s2">    height: 6px;</span>
+</span><span data-line="827"><span class="s2">    cursor: ns-resize;</span>
+</span><span data-line="828"><span class="s2">}</span>
+</span><span data-line="829">
+</span><span data-line="830"><span class="s2">.toolbar-resize-handle:hover {</span>
+</span><span data-line="831"><span class="s2">    background: var(--dt-accent);</span>
+</span><span data-line="832"><span class="s2">    opacity: 0.5;</span>
+</span><span data-line="833"><span class="s2">}</span>
+</span><span data-line="834">
+</span><span data-line="835"><span class="s2">/* Toolbar content area */</span>
+</span><span data-line="836"><span class="s2">.toolbar-content {</span>
+</span><span data-line="837"><span class="s2">    flex: 1;</span>
+</span><span data-line="838"><span class="s2">    overflow-y: auto;</span>
+</span><span data-line="839"><span class="s2">    overflow-x: hidden;</span>
+</span><span data-line="840"><span class="s2">}</span>
+</span><span data-line="841">
+</span><span data-line="842"><span class="s2">.toolbar-bar {</span>
+</span><span data-line="843"><span class="s2">    display: flex;</span>
+</span><span data-line="844"><span class="s2">    align-items: center;</span>
+</span><span data-line="845"><span class="s2">    padding: 8px 16px;</span>
+</span><span data-line="846"><span class="s2">    gap: 12px;</span>
+</span><span data-line="847"><span class="s2">    flex-wrap: wrap;</span>
+</span><span data-line="848"><span class="s2">}</span>
+</span><span data-line="849">
+</span><span data-line="850"><span class="s2">/* Horizontal layout for top/bottom positions */</span>
+</span><span data-line="851"><span class="s2">#debug-toolbar[data-position=&quot;top&quot;] .toolbar-bar,</span>
+</span><span data-line="852"><span class="s2">#debug-toolbar[data-position=&quot;bottom&quot;] .toolbar-bar {</span>
+</span><span data-line="853"><span class="s2">    flex-direction: row;</span>
+</span><span data-line="854"><span class="s2">    flex-wrap: nowrap;</span>
+</span><span data-line="855"><span class="s2">    width: 100%;</span>
+</span><span data-line="856"><span class="s2">}</span>
+</span><span data-line="857">
+</span><span data-line="858"><span class="s2">#debug-toolbar[data-position=&quot;top&quot;] .toolbar-panels,</span>
+</span><span data-line="859"><span class="s2">#debug-toolbar[data-position=&quot;bottom&quot;] .toolbar-panels {</span>
+</span><span data-line="860"><span class="s2">    flex: 1;</span>
+</span><span data-line="861"><span class="s2">    flex-wrap: wrap;</span>
+</span><span data-line="862"><span class="s2">    justify-content: flex-start;</span>
+</span><span data-line="863"><span class="s2">}</span>
+</span><span data-line="864">
+</span><span data-line="865"><span class="s2">/* Vertical layout for side positions */</span>
+</span><span data-line="866"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;] .toolbar-bar,</span>
+</span><span data-line="867"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;] .toolbar-bar {</span>
+</span><span data-line="868"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="869"><span class="s2">    align-items: flex-start;</span>
+</span><span data-line="870"><span class="s2">}</span>
+</span><span data-line="871">
+</span><span data-line="872"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;] .toolbar-panels,</span>
+</span><span data-line="873"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;] .toolbar-panels {</span>
+</span><span data-line="874"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="875"><span class="s2">    width: 100%;</span>
+</span><span data-line="876"><span class="s2">}</span>
+</span><span data-line="877">
+</span><span data-line="878"><span class="s2">#debug-toolbar[data-position=&quot;right&quot;] .toolbar-panel-btn,</span>
+</span><span data-line="879"><span class="s2">#debug-toolbar[data-position=&quot;left&quot;] .toolbar-panel-btn {</span>
+</span><span data-line="880"><span class="s2">    width: 100%;</span>
+</span><span data-line="881"><span class="s2">    text-align: left;</span>
+</span><span data-line="882"><span class="s2">}</span>
+</span><span data-line="883">
+</span><span data-line="884"><span class="s2">.toolbar-controls {</span>
+</span><span data-line="885"><span class="s2">    display: flex;</span>
+</span><span data-line="886"><span class="s2">    gap: 8px;</span>
+</span><span data-line="887"><span class="s2">    align-items: center;</span>
+</span><span data-line="888"><span class="s2">}</span>
+</span><span data-line="889">
+</span><span data-line="890"><span class="s2">.toolbar-position-controls {</span>
+</span><span data-line="891"><span class="s2">    display: flex;</span>
+</span><span data-line="892"><span class="s2">    gap: 4px;</span>
+</span><span data-line="893"><span class="s2">}</span>
+</span><span data-line="894">
+</span><span data-line="895"><span class="s2">.toolbar-position-btn,</span>
+</span><span data-line="896"><span class="s2">.toolbar-theme-btn {</span>
+</span><span data-line="897"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="898"><span class="s2">    border: none;</span>
+</span><span data-line="899"><span class="s2">    width: 24px;</span>
+</span><span data-line="900"><span class="s2">    height: 24px;</span>
+</span><span data-line="901"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="902"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="903"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="904"><span class="s2">    font-size: 10px;</span>
+</span><span data-line="905"><span class="s2">    display: flex;</span>
+</span><span data-line="906"><span class="s2">    align-items: center;</span>
+</span><span data-line="907"><span class="s2">    justify-content: center;</span>
+</span><span data-line="908"><span class="s2">    transition: background 0.15s, color 0.15s;</span>
+</span><span data-line="909"><span class="s2">}</span>
+</span><span data-line="910">
+</span><span data-line="911"><span class="s2">.toolbar-position-btn:hover,</span>
+</span><span data-line="912"><span class="s2">.toolbar-theme-btn:hover {</span>
+</span><span data-line="913"><span class="s2">    background: var(--dt-accent);</span>
+</span><span data-line="914"><span class="s2">    color: white;</span>
+</span><span data-line="915"><span class="s2">}</span>
+</span><span data-line="916">
+</span><span data-line="917"><span class="s2">.toolbar-position-btn.active {</span>
+</span><span data-line="918"><span class="s2">    background: var(--dt-accent);</span>
+</span><span data-line="919"><span class="s2">    color: white;</span>
+</span><span data-line="920"><span class="s2">}</span>
+</span><span data-line="921">
+</span><span data-line="922"><span class="s2">.toolbar-theme-btn {</span>
+</span><span data-line="923"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="924"><span class="s2">}</span>
+</span><span data-line="925">
+</span><span data-line="926"><span class="s2">.toolbar-brand {</span>
+</span><span data-line="927"><span class="s2">    font-weight: bold;</span>
+</span><span data-line="928"><span class="s2">    color: var(--dt-accent);</span>
+</span><span data-line="929"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="930"><span class="s2">}</span>
+</span><span data-line="931">
+</span><span data-line="932"><span class="s2">.toolbar-brand:hover {</span>
+</span><span data-line="933"><span class="s2">    color: var(--dt-accent-hover);</span>
+</span><span data-line="934"><span class="s2">}</span>
+</span><span data-line="935">
+</span><span data-line="936"><span class="s2">.toolbar-time {</span>
+</span><span data-line="937"><span class="s2">    color: var(--dt-success);</span>
+</span><span data-line="938"><span class="s2">}</span>
+</span><span data-line="939">
+</span><span data-line="940"><span class="s2">.toolbar-panels {</span>
+</span><span data-line="941"><span class="s2">    display: flex;</span>
+</span><span data-line="942"><span class="s2">    gap: 8px;</span>
+</span><span data-line="943"><span class="s2">    flex: 1;</span>
+</span><span data-line="944"><span class="s2">}</span>
+</span><span data-line="945">
+</span><span data-line="946"><span class="s2">.toolbar-panel-btn {</span>
+</span><span data-line="947"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="948"><span class="s2">    border: none;</span>
+</span><span data-line="949"><span class="s2">    padding: 4px 12px;</span>
+</span><span data-line="950"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="951"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="952"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="953"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="954"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="955"><span class="s2">    transition: all 0.15s;</span>
+</span><span data-line="956"><span class="s2">}</span>
+</span><span data-line="957">
+</span><span data-line="958"><span class="s2">.toolbar-panel-btn:hover {</span>
+</span><span data-line="959"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="960"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="961"><span class="s2">}</span>
+</span><span data-line="962">
+</span><span data-line="963"><span class="s2">.toolbar-panel-btn.active {</span>
+</span><span data-line="964"><span class="s2">    background: var(--dt-accent);</span>
+</span><span data-line="965"><span class="s2">    color: white;</span>
+</span><span data-line="966"><span class="s2">}</span>
+</span><span data-line="967">
+</span><span data-line="968"><span class="s2">.toolbar-request-id {</span>
+</span><span data-line="969"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="970"><span class="s2">}</span>
+</span><span data-line="971">
+</span><span data-line="972"><span class="s2">.toolbar-history-link {</span>
+</span><span data-line="973"><span class="s2">    color: var(--dt-accent);</span>
+</span><span data-line="974"><span class="s2">    text-decoration: none;</span>
+</span><span data-line="975"><span class="s2">}</span>
+</span><span data-line="976">
+</span><span data-line="977"><span class="s2">.toolbar-history-link:hover {</span>
+</span><span data-line="978"><span class="s2">    text-decoration: underline;</span>
+</span><span data-line="979"><span class="s2">}</span>
+</span><span data-line="980">
+</span><span data-line="981"><span class="s2">.toolbar-details {</span>
+</span><span data-line="982"><span class="s2">    max-height: 0;</span>
+</span><span data-line="983"><span class="s2">    overflow: hidden;</span>
+</span><span data-line="984"><span class="s2">    border-top: 1px solid var(--dt-border);</span>
+</span><span data-line="985"><span class="s2">    padding: 0 16px;</span>
+</span><span data-line="986"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="987"><span class="s2">    opacity: 0;</span>
+</span><span data-line="988"><span class="s2">    transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease-out;</span>
+</span><span data-line="989"><span class="s2">}</span>
+</span><span data-line="990">
+</span><span data-line="991"><span class="s2">.toolbar-details.expanded {</span>
+</span><span data-line="992"><span class="s2">    max-height: 60vh;</span>
+</span><span data-line="993"><span class="s2">    overflow-y: auto;</span>
+</span><span data-line="994"><span class="s2">    padding: 16px;</span>
+</span><span data-line="995"><span class="s2">    opacity: 1;</span>
+</span><span data-line="996"><span class="s2">}</span>
+</span><span data-line="997">
+</span><span data-line="998"><span class="s2">.sql-query-container {</span>
+</span><span data-line="999"><span class="s2">    margin-bottom: 16px;</span>
+</span><span data-line="1000"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="1001"><span class="s2">    border-radius: 6px;</span>
+</span><span data-line="1002"><span class="s2">    padding: 12px;</span>
+</span><span data-line="1003"><span class="s2">}</span>
+</span><span data-line="1004">
+</span><span data-line="1005"><span class="s2">.sql-query-header {</span>
+</span><span data-line="1006"><span class="s2">    display: flex;</span>
+</span><span data-line="1007"><span class="s2">    justify-content: space-between;</span>
+</span><span data-line="1008"><span class="s2">    align-items: center;</span>
+</span><span data-line="1009"><span class="s2">    margin-bottom: 8px;</span>
+</span><span data-line="1010"><span class="s2">}</span>
+</span><span data-line="1011">
+</span><span data-line="1012"><span class="s2">.sql-query-title {</span>
+</span><span data-line="1013"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="1014"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="1015"><span class="s2">}</span>
+</span><span data-line="1016">
+</span><span data-line="1017"><span class="s2">.sql-query-code {</span>
+</span><span data-line="1018"><span class="s2">    background: var(--dt-bg-primary);</span>
+</span><span data-line="1019"><span class="s2">    padding: 10px;</span>
+</span><span data-line="1020"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="1021"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="1022"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="1023"><span class="s2">    color: var(--dt-warning);</span>
+</span><span data-line="1024"><span class="s2">    overflow-x: auto;</span>
+</span><span data-line="1025"><span class="s2">    margin-bottom: 8px;</span>
+</span><span data-line="1026"><span class="s2">    white-space: pre-wrap;</span>
+</span><span data-line="1027"><span class="s2">    word-break: break-all;</span>
+</span><span data-line="1028"><span class="s2">}</span>
+</span><span data-line="1029">
+</span><span data-line="1030"><span class="s2">.sql-query-params {</span>
+</span><span data-line="1031"><span class="s2">    font-size: 11px;</span>
+</span><span data-line="1032"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="1033"><span class="s2">    margin-bottom: 8px;</span>
+</span><span data-line="1034"><span class="s2">}</span>
+</span><span data-line="1035">
+</span><span data-line="1036"><span class="s2">.sql-explain-btn {</span>
+</span><span data-line="1037"><span class="s2">    background: var(--dt-accent);</span>
+</span><span data-line="1038"><span class="s2">    color: white;</span>
+</span><span data-line="1039"><span class="s2">    border: none;</span>
+</span><span data-line="1040"><span class="s2">    padding: 6px 12px;</span>
+</span><span data-line="1041"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="1042"><span class="s2">    font-size: 11px;</span>
+</span><span data-line="1043"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="1044"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="1045"><span class="s2">    transition: background 0.15s;</span>
+</span><span data-line="1046"><span class="s2">}</span>
+</span><span data-line="1047">
+</span><span data-line="1048"><span class="s2">.sql-explain-btn:hover {</span>
+</span><span data-line="1049"><span class="s2">    background: var(--dt-accent-hover);</span>
+</span><span data-line="1050"><span class="s2">}</span>
+</span><span data-line="1051">
+</span><span data-line="1052"><span class="s2">.sql-explain-btn:disabled {</span>
+</span><span data-line="1053"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="1054"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="1055"><span class="s2">    cursor: not-allowed;</span>
+</span><span data-line="1056"><span class="s2">}</span>
+</span><span data-line="1057">
+</span><span data-line="1058"><span class="s2">.explain-modal {</span>
+</span><span data-line="1059"><span class="s2">    position: fixed;</span>
+</span><span data-line="1060"><span class="s2">    top: 0;</span>
+</span><span data-line="1061"><span class="s2">    left: 0;</span>
+</span><span data-line="1062"><span class="s2">    right: 0;</span>
+</span><span data-line="1063"><span class="s2">    bottom: 0;</span>
+</span><span data-line="1064"><span class="s2">    background: rgba(0, 0, 0, 0.8);</span>
+</span><span data-line="1065"><span class="s2">    z-index: 100000;</span>
+</span><span data-line="1066"><span class="s2">    display: flex;</span>
+</span><span data-line="1067"><span class="s2">    align-items: center;</span>
+</span><span data-line="1068"><span class="s2">    justify-content: center;</span>
+</span><span data-line="1069"><span class="s2">    padding: 20px;</span>
+</span><span data-line="1070"><span class="s2">}</span>
+</span><span data-line="1071">
+</span><span data-line="1072"><span class="s2">.explain-modal-content {</span>
+</span><span data-line="1073"><span class="s2">    background: var(--dt-bg-primary);</span>
+</span><span data-line="1074"><span class="s2">    border: 2px solid var(--dt-accent);</span>
+</span><span data-line="1075"><span class="s2">    border-radius: 8px;</span>
+</span><span data-line="1076"><span class="s2">    max-width: 900px;</span>
+</span><span data-line="1077"><span class="s2">    max-height: 80vh;</span>
+</span><span data-line="1078"><span class="s2">    width: 100%;</span>
+</span><span data-line="1079"><span class="s2">    display: flex;</span>
+</span><span data-line="1080"><span class="s2">    flex-direction: column;</span>
+</span><span data-line="1081"><span class="s2">    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);</span>
+</span><span data-line="1082"><span class="s2">}</span>
+</span><span data-line="1083">
+</span><span data-line="1084"><span class="s2">.explain-modal-header {</span>
+</span><span data-line="1085"><span class="s2">    display: flex;</span>
+</span><span data-line="1086"><span class="s2">    justify-content: space-between;</span>
+</span><span data-line="1087"><span class="s2">    align-items: center;</span>
+</span><span data-line="1088"><span class="s2">    padding: 16px 20px;</span>
+</span><span data-line="1089"><span class="s2">    border-bottom: 1px solid var(--dt-border);</span>
+</span><span data-line="1090"><span class="s2">}</span>
+</span><span data-line="1091">
+</span><span data-line="1092"><span class="s2">.explain-modal-title {</span>
+</span><span data-line="1093"><span class="s2">    font-size: 16px;</span>
+</span><span data-line="1094"><span class="s2">    font-weight: 600;</span>
+</span><span data-line="1095"><span class="s2">    color: var(--dt-accent);</span>
+</span><span data-line="1096"><span class="s2">    margin: 0;</span>
+</span><span data-line="1097"><span class="s2">}</span>
+</span><span data-line="1098">
+</span><span data-line="1099"><span class="s2">.explain-modal-close {</span>
+</span><span data-line="1100"><span class="s2">    background: transparent;</span>
+</span><span data-line="1101"><span class="s2">    border: none;</span>
+</span><span data-line="1102"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="1103"><span class="s2">    font-size: 24px;</span>
+</span><span data-line="1104"><span class="s2">    cursor: pointer;</span>
+</span><span data-line="1105"><span class="s2">    padding: 0;</span>
+</span><span data-line="1106"><span class="s2">    width: 32px;</span>
+</span><span data-line="1107"><span class="s2">    height: 32px;</span>
+</span><span data-line="1108"><span class="s2">    display: flex;</span>
+</span><span data-line="1109"><span class="s2">    align-items: center;</span>
+</span><span data-line="1110"><span class="s2">    justify-content: center;</span>
+</span><span data-line="1111"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="1112"><span class="s2">    transition: background 0.15s, color 0.15s;</span>
+</span><span data-line="1113"><span class="s2">}</span>
+</span><span data-line="1114">
+</span><span data-line="1115"><span class="s2">.explain-modal-close:hover {</span>
+</span><span data-line="1116"><span class="s2">    background: var(--dt-bg-tertiary);</span>
+</span><span data-line="1117"><span class="s2">    color: var(--dt-text-primary);</span>
+</span><span data-line="1118"><span class="s2">}</span>
+</span><span data-line="1119">
+</span><span data-line="1120"><span class="s2">.explain-modal-body {</span>
+</span><span data-line="1121"><span class="s2">    padding: 20px;</span>
+</span><span data-line="1122"><span class="s2">    overflow-y: auto;</span>
+</span><span data-line="1123"><span class="s2">    flex: 1;</span>
+</span><span data-line="1124"><span class="s2">}</span>
+</span><span data-line="1125">
+</span><span data-line="1126"><span class="s2">.explain-result {</span>
+</span><span data-line="1127"><span class="s2">    font-family: var(--dt-font-mono);</span>
+</span><span data-line="1128"><span class="s2">    font-size: 12px;</span>
+</span><span data-line="1129"><span class="s2">}</span>
+</span><span data-line="1130">
+</span><span data-line="1131"><span class="s2">.explain-result pre {</span>
+</span><span data-line="1132"><span class="s2">    background: var(--dt-bg-secondary);</span>
+</span><span data-line="1133"><span class="s2">    padding: 12px;</span>
+</span><span data-line="1134"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="1135"><span class="s2">    overflow-x: auto;</span>
+</span><span data-line="1136"><span class="s2">    margin: 0;</span>
+</span><span data-line="1137"><span class="s2">}</span>
+</span><span data-line="1138">
+</span><span data-line="1139"><span class="s2">.explain-error {</span>
+</span><span data-line="1140"><span class="s2">    color: var(--dt-error);</span>
+</span><span data-line="1141"><span class="s2">    padding: 12px;</span>
+</span><span data-line="1142"><span class="s2">    background: rgba(241, 76, 76, 0.1);</span>
+</span><span data-line="1143"><span class="s2">    border-radius: 4px;</span>
+</span><span data-line="1144"><span class="s2">    border-left: 3px solid var(--dt-error);</span>
+</span><span data-line="1145"><span class="s2">}</span>
+</span><span data-line="1146">
+</span><span data-line="1147"><span class="s2">.toolbar-controls-separator {</span>
+</span><span data-line="1148"><span class="s2">    color: var(--dt-text-muted);</span>
+</span><span data-line="1149"><span class="s2">    margin: 0 4px;</span>
+</span><span data-line="1150"><span class="s2">    font-size: 14px;</span>
+</span><span data-line="1151"><span class="s2">}</span>
+</span><span data-line="1152">
+</span><span data-line="1153"><span class="s2">.toolbar-request-info {</span>
+</span><span data-line="1154"><span class="s2">    display: flex;</span>
+</span><span data-line="1155"><span class="s2">    align-items: center;</span>
+</span><span data-line="1156"><span class="s2">    gap: 8px;</span>
+</span><span data-line="1157"><span class="s2">    color: var(--dt-text-secondary);</span>
+</span><span data-line="1158"><span class="s2">}</span>
+</span><span data-line="1159"><span class="s2">&quot;&quot;&quot;</span></div>
+
+</span><span data-line="1160">
+</span><span data-line="1161">
+<div class="viewcode-block" id="get_toolbar_js">
+<a class="viewcode-back" href="../../../../api/_autosummary/debug_toolbar.litestar.routes.handlers.html#debug_toolbar.litestar.routes.get_toolbar_js">[docs]</a>
+</span><span data-line="1162"><span class="k">def</span><span class="w"> </span><span class="nf">get_toolbar_js</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="1163"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the toolbar JavaScript.&quot;&quot;&quot;</span>
+</span><span data-line="1164">    <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="1165"><span class="s2">function togglePageTheme(btn) {</span>
+</span><span data-line="1166"><span class="s2">    const current = document.documentElement.dataset.theme || &#39;dark&#39;;</span>
+</span><span data-line="1167"><span class="s2">    const next = current === &#39;dark&#39; ? &#39;light&#39; : &#39;dark&#39;;</span>
+</span><span data-line="1168"><span class="s2">    document.documentElement.dataset.theme = next;</span>
+</span><span data-line="1169"><span class="s2">    localStorage.setItem(&#39;debug-toolbar-theme&#39;, next);</span>
+</span><span data-line="1170"><span class="s2">}</span>
+</span><span data-line="1171">
+</span><span data-line="1172"><span class="s2">function togglePanel(panelId) {</span>
+</span><span data-line="1173"><span class="s2">    const panel = document.getElementById(&#39;panel-&#39; + panelId);</span>
+</span><span data-line="1174"><span class="s2">    if (!panel) return;</span>
+</span><span data-line="1175"><span class="s2">    const content = panel.querySelector(&#39;.panel-content&#39;);</span>
+</span><span data-line="1176"><span class="s2">    const toggle = panel.querySelector(&#39;.panel-toggle&#39;);</span>
+</span><span data-line="1177"><span class="s2">    const isExpanded = content.classList.contains(&#39;expanded&#39;);</span>
+</span><span data-line="1178"><span class="s2">    if (isExpanded) {</span>
+</span><span data-line="1179"><span class="s2">        content.classList.remove(&#39;expanded&#39;);</span>
+</span><span data-line="1180"><span class="s2">        toggle.textContent = &#39;+&#39;;</span>
+</span><span data-line="1181"><span class="s2">    } else {</span>
+</span><span data-line="1182"><span class="s2">        content.classList.add(&#39;expanded&#39;);</span>
+</span><span data-line="1183"><span class="s2">        toggle.textContent = &#39;-&#39;;</span>
+</span><span data-line="1184"><span class="s2">    }</span>
+</span><span data-line="1185"><span class="s2">}</span>
+</span><span data-line="1186">
+</span><span data-line="1187"><span class="s2">class DebugToolbar {</span>
+</span><span data-line="1188"><span class="s2">    constructor(element) {</span>
+</span><span data-line="1189"><span class="s2">        this.element = element;</span>
+</span><span data-line="1190"><span class="s2">        this.isCollapsed = false;</span>
+</span><span data-line="1191"><span class="s2">        this.activePanel = null;</span>
+</span><span data-line="1192"><span class="s2">        this.position = localStorage.getItem(&#39;debug-toolbar-position&#39;) || &#39;right&#39;;</span>
+</span><span data-line="1193"><span class="s2">        this.theme = localStorage.getItem(&#39;debug-toolbar-theme&#39;) || &#39;dark&#39;;</span>
+</span><span data-line="1194"><span class="s2">        this.size = parseInt(localStorage.getItem(&#39;debug-toolbar-size&#39;) || &#39;400&#39;, 10);</span>
+</span><span data-line="1195"><span class="s2">        this.isResizing = false;</span>
+</span><span data-line="1196"><span class="s2">        this.init();</span>
+</span><span data-line="1197"><span class="s2">    }</span>
+</span><span data-line="1198">
+</span><span data-line="1199"><span class="s2">    init() {</span>
+</span><span data-line="1200"><span class="s2">        window.debugToolbar = this;</span>
+</span><span data-line="1201"><span class="s2">        this.setPosition(this.position);</span>
+</span><span data-line="1202"><span class="s2">        this.setTheme(this.theme);</span>
+</span><span data-line="1203"><span class="s2">        this.applySize();</span>
+</span><span data-line="1204"><span class="s2">        this.addThemeToggle();</span>
+</span><span data-line="1205"><span class="s2">        this.addPositionControls();</span>
+</span><span data-line="1206"><span class="s2">        this.addResizeHandle();</span>
+</span><span data-line="1207">
+</span><span data-line="1208"><span class="s2">        const brand = this.element.querySelector(&#39;.toolbar-brand&#39;);</span>
+</span><span data-line="1209"><span class="s2">        if (brand) {</span>
+</span><span data-line="1210"><span class="s2">            brand.addEventListener(&#39;click&#39;, () =&gt; this.toggle());</span>
+</span><span data-line="1211"><span class="s2">        }</span>
+</span><span data-line="1212"><span class="s2">        const panelBtns = this.element.querySelectorAll(&#39;.toolbar-panel-btn&#39;);</span>
+</span><span data-line="1213"><span class="s2">        panelBtns.forEach(btn =&gt; {</span>
+</span><span data-line="1214"><span class="s2">            btn.addEventListener(&#39;click&#39;, () =&gt; {</span>
+</span><span data-line="1215"><span class="s2">                this.showPanel(btn.dataset.panelId);</span>
+</span><span data-line="1216"><span class="s2">            });</span>
+</span><span data-line="1217"><span class="s2">        });</span>
+</span><span data-line="1218"><span class="s2">    }</span>
+</span><span data-line="1219">
+</span><span data-line="1220"><span class="s2">    addThemeToggle() {</span>
+</span><span data-line="1221"><span class="s2">        this.themeBtn = document.createElement(&#39;button&#39;);</span>
+</span><span data-line="1222"><span class="s2">        this.themeBtn.className = &#39;toolbar-theme-btn&#39;;</span>
+</span><span data-line="1223"><span class="s2">        this.themeBtn.title = &#39;Toggle theme&#39;;</span>
+</span><span data-line="1224"><span class="s2">        this.themeBtn.innerHTML = this.theme === &#39;dark&#39; ? &#39;</span><span class="se">\u2600</span><span class="s2">&#39; : &#39;</span><span class="se">\u263e</span><span class="s2">&#39;;</span>
+</span><span data-line="1225"><span class="s2">        this.themeBtn.addEventListener(&#39;click&#39;, (e) =&gt; {</span>
+</span><span data-line="1226"><span class="s2">            e.stopPropagation();</span>
+</span><span data-line="1227"><span class="s2">            this.setTheme(this.theme === &#39;dark&#39; ? &#39;light&#39; : &#39;dark&#39;);</span>
+</span><span data-line="1228"><span class="s2">            this.themeBtn.innerHTML = this.theme === &#39;dark&#39; ? &#39;</span><span class="se">\u2600</span><span class="s2">&#39; : &#39;</span><span class="se">\u263e</span><span class="s2">&#39;;</span>
+</span><span data-line="1229"><span class="s2">        });</span>
+</span><span data-line="1230"><span class="s2">    }</span>
+</span><span data-line="1231">
+</span><span data-line="1232"><span class="s2">    setTheme(theme) {</span>
+</span><span data-line="1233"><span class="s2">        this.theme = theme;</span>
+</span><span data-line="1234"><span class="s2">        this.element.dataset.theme = theme;</span>
+</span><span data-line="1235"><span class="s2">        document.documentElement.dataset.theme = theme;</span>
+</span><span data-line="1236"><span class="s2">        localStorage.setItem(&#39;debug-toolbar-theme&#39;, theme);</span>
+</span><span data-line="1237"><span class="s2">    }</span>
+</span><span data-line="1238">
+</span><span data-line="1239"><span class="s2">    addResizeHandle() {</span>
+</span><span data-line="1240"><span class="s2">        const handle = document.createElement(&#39;div&#39;);</span>
+</span><span data-line="1241"><span class="s2">        handle.className = &#39;toolbar-resize-handle&#39;;</span>
+</span><span data-line="1242"><span class="s2">        this.element.appendChild(handle);</span>
+</span><span data-line="1243">
+</span><span data-line="1244"><span class="s2">        handle.addEventListener(&#39;mousedown&#39;, (e) =&gt; {</span>
+</span><span data-line="1245"><span class="s2">            e.preventDefault();</span>
+</span><span data-line="1246"><span class="s2">            this.isResizing = true;</span>
+</span><span data-line="1247"><span class="s2">            document.body.style.cursor = this.isHorizontal() ? &#39;ew-resize&#39; : &#39;ns-resize&#39;;</span>
+</span><span data-line="1248"><span class="s2">            document.body.style.userSelect = &#39;none&#39;;</span>
+</span><span data-line="1249"><span class="s2">        });</span>
+</span><span data-line="1250">
+</span><span data-line="1251"><span class="s2">        document.addEventListener(&#39;mousemove&#39;, (e) =&gt; {</span>
+</span><span data-line="1252"><span class="s2">            if (!this.isResizing) return;</span>
+</span><span data-line="1253"><span class="s2">            this.handleResize(e);</span>
+</span><span data-line="1254"><span class="s2">        });</span>
+</span><span data-line="1255">
+</span><span data-line="1256"><span class="s2">        document.addEventListener(&#39;mouseup&#39;, () =&gt; {</span>
+</span><span data-line="1257"><span class="s2">            if (this.isResizing) {</span>
+</span><span data-line="1258"><span class="s2">                this.isResizing = false;</span>
+</span><span data-line="1259"><span class="s2">                document.body.style.cursor = &#39;&#39;;</span>
+</span><span data-line="1260"><span class="s2">                document.body.style.userSelect = &#39;&#39;;</span>
+</span><span data-line="1261"><span class="s2">                localStorage.setItem(&#39;debug-toolbar-size&#39;, String(this.size));</span>
+</span><span data-line="1262"><span class="s2">            }</span>
+</span><span data-line="1263"><span class="s2">        });</span>
+</span><span data-line="1264"><span class="s2">    }</span>
+</span><span data-line="1265">
+</span><span data-line="1266"><span class="s2">    isHorizontal() {</span>
+</span><span data-line="1267"><span class="s2">        return this.position === &#39;left&#39; || this.position === &#39;right&#39;;</span>
+</span><span data-line="1268"><span class="s2">    }</span>
+</span><span data-line="1269">
+</span><span data-line="1270"><span class="s2">    handleResize(e) {</span>
+</span><span data-line="1271"><span class="s2">        const minSize = this.isHorizontal() ? 250 : 100;</span>
+</span><span data-line="1272"><span class="s2">        const maxSize = this.isHorizontal() ? window.innerWidth * 0.8 : window.innerHeight * 0.6;</span>
+</span><span data-line="1273"><span class="s2">        let newSize;</span>
+</span><span data-line="1274">
+</span><span data-line="1275"><span class="s2">        if (this.position === &#39;right&#39;) {</span>
+</span><span data-line="1276"><span class="s2">            newSize = window.innerWidth - e.clientX;</span>
+</span><span data-line="1277"><span class="s2">        } else if (this.position === &#39;left&#39;) {</span>
+</span><span data-line="1278"><span class="s2">            newSize = e.clientX;</span>
+</span><span data-line="1279"><span class="s2">        } else if (this.position === &#39;bottom&#39;) {</span>
+</span><span data-line="1280"><span class="s2">            newSize = window.innerHeight - e.clientY;</span>
+</span><span data-line="1281"><span class="s2">        } else {</span>
+</span><span data-line="1282"><span class="s2">            newSize = e.clientY;</span>
+</span><span data-line="1283"><span class="s2">        }</span>
+</span><span data-line="1284">
+</span><span data-line="1285"><span class="s2">        this.size = Math.max(minSize, Math.min(maxSize, newSize));</span>
+</span><span data-line="1286"><span class="s2">        this.applySize();</span>
+</span><span data-line="1287"><span class="s2">    }</span>
+</span><span data-line="1288">
+</span><span data-line="1289"><span class="s2">    applySize() {</span>
+</span><span data-line="1290"><span class="s2">        if (this.isHorizontal()) {</span>
+</span><span data-line="1291"><span class="s2">            this.element.style.width = this.size + &#39;px&#39;;</span>
+</span><span data-line="1292"><span class="s2">            this.element.style.height = &#39;&#39;;</span>
+</span><span data-line="1293"><span class="s2">        } else {</span>
+</span><span data-line="1294"><span class="s2">            this.element.style.height = this.size + &#39;px&#39;;</span>
+</span><span data-line="1295"><span class="s2">            this.element.style.width = &#39;&#39;;</span>
+</span><span data-line="1296"><span class="s2">        }</span>
+</span><span data-line="1297"><span class="s2">    }</span>
+</span><span data-line="1298">
+</span><span data-line="1299"><span class="s2">    addPositionControls() {</span>
+</span><span data-line="1300"><span class="s2">        const bar = this.element.querySelector(&#39;.toolbar-bar&#39;);</span>
+</span><span data-line="1301"><span class="s2">        if (!bar) return;</span>
+</span><span data-line="1302">
+</span><span data-line="1303"><span class="s2">        const controlsWrapper = document.createElement(&#39;div&#39;);</span>
+</span><span data-line="1304"><span class="s2">        controlsWrapper.className = &#39;toolbar-controls&#39;;</span>
+</span><span data-line="1305">
+</span><span data-line="1306"><span class="s2">        const positionControls = document.createElement(&#39;div&#39;);</span>
+</span><span data-line="1307"><span class="s2">        positionControls.className = &#39;toolbar-position-controls&#39;;</span>
+</span><span data-line="1308">
+</span><span data-line="1309"><span class="s2">        const positions = [</span>
+</span><span data-line="1310"><span class="s2">            { pos: &#39;left&#39;, label: &#39;</span><span class="se">\u25c0</span><span class="s2">&#39; },</span>
+</span><span data-line="1311"><span class="s2">            { pos: &#39;top&#39;, label: &#39;</span><span class="se">\u25b2</span><span class="s2">&#39; },</span>
+</span><span data-line="1312"><span class="s2">            { pos: &#39;bottom&#39;, label: &#39;</span><span class="se">\u25bc</span><span class="s2">&#39; },</span>
+</span><span data-line="1313"><span class="s2">            { pos: &#39;right&#39;, label: &#39;</span><span class="se">\u25b6</span><span class="s2">&#39; }</span>
+</span><span data-line="1314"><span class="s2">        ];</span>
+</span><span data-line="1315">
+</span><span data-line="1316"><span class="s2">        positions.forEach(p =&gt; {</span>
+</span><span data-line="1317"><span class="s2">            const btn = document.createElement(&#39;button&#39;);</span>
+</span><span data-line="1318"><span class="s2">            btn.className = &#39;toolbar-position-btn&#39; + (p.pos === this.position ? &#39; active&#39; : &#39;&#39;);</span>
+</span><span data-line="1319"><span class="s2">            btn.dataset.position = p.pos;</span>
+</span><span data-line="1320"><span class="s2">            btn.title = &#39;Move to &#39; + p.pos;</span>
+</span><span data-line="1321"><span class="s2">            btn.textContent = p.label;</span>
+</span><span data-line="1322"><span class="s2">            btn.addEventListener(&#39;click&#39;, (e) =&gt; {</span>
+</span><span data-line="1323"><span class="s2">                e.stopPropagation();</span>
+</span><span data-line="1324"><span class="s2">                this.setPosition(p.pos);</span>
+</span><span data-line="1325"><span class="s2">            });</span>
+</span><span data-line="1326"><span class="s2">            positionControls.appendChild(btn);</span>
+</span><span data-line="1327"><span class="s2">        });</span>
+</span><span data-line="1328">
+</span><span data-line="1329"><span class="s2">        const separator = document.createElement(&#39;span&#39;);</span>
+</span><span data-line="1330"><span class="s2">        separator.className = &#39;toolbar-controls-separator&#39;;</span>
+</span><span data-line="1331"><span class="s2">        separator.textContent = &#39;|&#39;;</span>
+</span><span data-line="1332">
+</span><span data-line="1333"><span class="s2">        controlsWrapper.appendChild(positionControls);</span>
+</span><span data-line="1334"><span class="s2">        controlsWrapper.appendChild(separator);</span>
+</span><span data-line="1335"><span class="s2">        if (this.themeBtn) {</span>
+</span><span data-line="1336"><span class="s2">            controlsWrapper.appendChild(this.themeBtn);</span>
+</span><span data-line="1337"><span class="s2">        }</span>
+</span><span data-line="1338"><span class="s2">        bar.appendChild(controlsWrapper);</span>
+</span><span data-line="1339"><span class="s2">    }</span>
+</span><span data-line="1340">
+</span><span data-line="1341"><span class="s2">    setPosition(position) {</span>
+</span><span data-line="1342"><span class="s2">        const wasHorizontal = this.isHorizontal();</span>
+</span><span data-line="1343"><span class="s2">        this.position = position;</span>
+</span><span data-line="1344"><span class="s2">        this.element.dataset.position = position;</span>
+</span><span data-line="1345"><span class="s2">        localStorage.setItem(&#39;debug-toolbar-position&#39;, position);</span>
+</span><span data-line="1346">
+</span><span data-line="1347"><span class="s2">        this.element.querySelectorAll(&#39;.toolbar-position-btn&#39;).forEach(btn =&gt; {</span>
+</span><span data-line="1348"><span class="s2">            btn.classList.toggle(&#39;active&#39;, btn.dataset.position === position);</span>
+</span><span data-line="1349"><span class="s2">        });</span>
+</span><span data-line="1350">
+</span><span data-line="1351"><span class="s2">        if (wasHorizontal !== this.isHorizontal()) {</span>
+</span><span data-line="1352"><span class="s2">            this.size = this.isHorizontal() ? 400 : 300;</span>
+</span><span data-line="1353"><span class="s2">        }</span>
+</span><span data-line="1354"><span class="s2">        this.applySize();</span>
+</span><span data-line="1355"><span class="s2">    }</span>
+</span><span data-line="1356">
+</span><span data-line="1357"><span class="s2">    toggle() {</span>
+</span><span data-line="1358"><span class="s2">        this.isCollapsed = !this.isCollapsed;</span>
+</span><span data-line="1359"><span class="s2">        this.element.classList.toggle(&#39;collapsed&#39;, this.isCollapsed);</span>
+</span><span data-line="1360"><span class="s2">    }</span>
+</span><span data-line="1361">
+</span><span data-line="1362"><span class="s2">    showPanel(panelId) {</span>
+</span><span data-line="1363"><span class="s2">        const details = this.element.querySelector(&#39;.toolbar-details&#39;);</span>
+</span><span data-line="1364"><span class="s2">        const btns = this.element.querySelectorAll(&#39;.toolbar-panel-btn&#39;);</span>
+</span><span data-line="1365">
+</span><span data-line="1366"><span class="s2">        btns.forEach(btn =&gt; {</span>
+</span><span data-line="1367"><span class="s2">            btn.classList.toggle(&#39;active&#39;, btn.dataset.panelId === panelId);</span>
+</span><span data-line="1368"><span class="s2">        });</span>
+</span><span data-line="1369">
+</span><span data-line="1370"><span class="s2">        if (this.activePanel === panelId) {</span>
+</span><span data-line="1371"><span class="s2">            this.activePanel = null;</span>
+</span><span data-line="1372"><span class="s2">            if (details) details.classList.remove(&#39;expanded&#39;);</span>
+</span><span data-line="1373"><span class="s2">            return;</span>
+</span><span data-line="1374"><span class="s2">        }</span>
+</span><span data-line="1375">
+</span><span data-line="1376"><span class="s2">        this.activePanel = panelId;</span>
+</span><span data-line="1377"><span class="s2">        const requestId = this.element.dataset.requestId;</span>
+</span><span data-line="1378"><span class="s2">        if (requestId &amp;&amp; details) {</span>
+</span><span data-line="1379"><span class="s2">            fetch(&#39;/_debug_toolbar/api/requests/&#39; + requestId)</span>
+</span><span data-line="1380"><span class="s2">                .then(res =&gt; res.json())</span>
+</span><span data-line="1381"><span class="s2">                .then(data =&gt; {</span>
+</span><span data-line="1382"><span class="s2">                    const panelData = data.panel_data &amp;&amp; data.panel_data[panelId];</span>
+</span><span data-line="1383"><span class="s2">                    if (panelData) {</span>
+</span><span data-line="1384"><span class="s2">                        if (this.isSqlPanel(panelData)) {</span>
+</span><span data-line="1385"><span class="s2">                            details.innerHTML = this.renderSqlPanel(panelData);</span>
+</span><span data-line="1386"><span class="s2">                        } else {</span>
+</span><span data-line="1387"><span class="s2">                            details.innerHTML = this.renderPanelData(panelData);</span>
+</span><span data-line="1388"><span class="s2">                        }</span>
+</span><span data-line="1389"><span class="s2">                        details.classList.add(&#39;expanded&#39;);</span>
+</span><span data-line="1390"><span class="s2">                    }</span>
+</span><span data-line="1391"><span class="s2">                })</span>
+</span><span data-line="1392"><span class="s2">                .catch(err =&gt; console.error(&#39;Failed to load panel data:&#39;, err));</span>
+</span><span data-line="1393"><span class="s2">        }</span>
+</span><span data-line="1394"><span class="s2">    }</span>
+</span><span data-line="1395">
+</span><span data-line="1396"><span class="s2">    renderPanelData(data) {</span>
+</span><span data-line="1397"><span class="s2">        if (!data || Object.keys(data).length === 0) {</span>
+</span><span data-line="1398"><span class="s2">            return &#39;&lt;p class=&quot;empty&quot;&gt;No data&lt;/p&gt;&#39;;</span>
+</span><span data-line="1399"><span class="s2">        }</span>
+</span><span data-line="1400"><span class="s2">        let html = &#39;&lt;table class=&quot;panel-table&quot;&gt;&lt;tbody&gt;&#39;;</span>
+</span><span data-line="1401"><span class="s2">        for (const [key, value] of Object.entries(data)) {</span>
+</span><span data-line="1402"><span class="s2">            const escapedKey = this.escapeHtml(key);</span>
+</span><span data-line="1403"><span class="s2">            const formattedValue = this.formatValue(value, 0);</span>
+</span><span data-line="1404"><span class="s2">            html += &#39;&lt;tr&gt;&lt;td class=&quot;key&quot;&gt;&#39; + escapedKey + &#39;&lt;/td&gt;&#39;;</span>
+</span><span data-line="1405"><span class="s2">            html += &#39;&lt;td class=&quot;value&quot;&gt;&#39; + formattedValue + &#39;&lt;/td&gt;&lt;/tr&gt;&#39;;</span>
+</span><span data-line="1406"><span class="s2">        }</span>
+</span><span data-line="1407"><span class="s2">        html += &#39;&lt;/tbody&gt;&lt;/table&gt;&#39;;</span>
+</span><span data-line="1408"><span class="s2">        return html;</span>
+</span><span data-line="1409"><span class="s2">    }</span>
+</span><span data-line="1410">
+</span><span data-line="1411"><span class="s2">    formatValue(value, depth) {</span>
+</span><span data-line="1412"><span class="s2">        depth = depth || 0;</span>
+</span><span data-line="1413"><span class="s2">        const maxDepth = 10;</span>
+</span><span data-line="1414"><span class="s2">        const maxItems = 100;</span>
+</span><span data-line="1415"><span class="s2">        const maxStringLen = 1000;</span>
+</span><span data-line="1416">
+</span><span data-line="1417"><span class="s2">        if (value === null || value === undefined) {</span>
+</span><span data-line="1418"><span class="s2">            return &#39;&lt;span class=&quot;null&quot;&gt;null&lt;/span&gt;&#39;;</span>
+</span><span data-line="1419"><span class="s2">        }</span>
+</span><span data-line="1420"><span class="s2">        if (typeof value === &#39;boolean&#39;) {</span>
+</span><span data-line="1421"><span class="s2">            return &#39;&lt;span class=&quot;bool&quot;&gt;&#39; + value + &#39;&lt;/span&gt;&#39;;</span>
+</span><span data-line="1422"><span class="s2">        }</span>
+</span><span data-line="1423"><span class="s2">        if (typeof value === &#39;number&#39;) {</span>
+</span><span data-line="1424"><span class="s2">            return &#39;&lt;span class=&quot;number&quot;&gt;&#39; + value + &#39;&lt;/span&gt;&#39;;</span>
+</span><span data-line="1425"><span class="s2">        }</span>
+</span><span data-line="1426"><span class="s2">        if (typeof value === &#39;string&#39;) {</span>
+</span><span data-line="1427"><span class="s2">            const truncated = value.length &gt; maxStringLen ? value.substring(0, maxStringLen) + &#39;...&#39; : value;</span>
+</span><span data-line="1428"><span class="s2">            return &#39;&lt;span class=&quot;string&quot;&gt;&#39; + this.escapeHtml(truncated) + &#39;&lt;/span&gt;&#39;;</span>
+</span><span data-line="1429"><span class="s2">        }</span>
+</span><span data-line="1430"><span class="s2">        if (Array.isArray(value)) {</span>
+</span><span data-line="1431"><span class="s2">            if (value.length === 0) {</span>
+</span><span data-line="1432"><span class="s2">                return &#39;&lt;span class=&quot;array&quot;&gt;[]&lt;/span&gt;&#39;;</span>
+</span><span data-line="1433"><span class="s2">            }</span>
+</span><span data-line="1434"><span class="s2">            if (depth &gt;= maxDepth) {</span>
+</span><span data-line="1435"><span class="s2">                return &#39;&lt;span class=&quot;array&quot;&gt;[&#39; + value.length + &#39; items]&lt;/span&gt;&#39;;</span>
+</span><span data-line="1436"><span class="s2">            }</span>
+</span><span data-line="1437"><span class="s2">            const items = value.slice(0, maxItems).map(v =&gt; this.formatValue(v, depth + 1));</span>
+</span><span data-line="1438"><span class="s2">            let html = &#39;&lt;div class=&quot;array-items&quot;&gt;&#39;;</span>
+</span><span data-line="1439"><span class="s2">            items.forEach((item, i) =&gt; {</span>
+</span><span data-line="1440"><span class="s2">                html += &#39;&lt;div class=&quot;array-item&quot;&gt;&#39; + item + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1441"><span class="s2">            });</span>
+</span><span data-line="1442"><span class="s2">            if (value.length &gt; maxItems) {</span>
+</span><span data-line="1443"><span class="s2">                html += &#39;&lt;div class=&quot;array-more&quot;&gt;... and &#39; + (value.length - maxItems) + &#39; more&lt;/div&gt;&#39;;</span>
+</span><span data-line="1444"><span class="s2">            }</span>
+</span><span data-line="1445"><span class="s2">            html += &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1446"><span class="s2">            return html;</span>
+</span><span data-line="1447"><span class="s2">        }</span>
+</span><span data-line="1448"><span class="s2">        if (typeof value === &#39;object&#39;) {</span>
+</span><span data-line="1449"><span class="s2">            const keys = Object.keys(value);</span>
+</span><span data-line="1450"><span class="s2">            if (keys.length === 0) {</span>
+</span><span data-line="1451"><span class="s2">                return &#39;&lt;span class=&quot;object&quot;&gt;</span><span class="si">{}</span><span class="s2">&lt;/span&gt;&#39;;</span>
+</span><span data-line="1452"><span class="s2">            }</span>
+</span><span data-line="1453"><span class="s2">            if (depth &gt;= maxDepth) {</span>
+</span><span data-line="1454"><span class="s2">                return &#39;&lt;span class=&quot;object&quot;&gt;{&#39; + keys.length + &#39; keys}&lt;/span&gt;&#39;;</span>
+</span><span data-line="1455"><span class="s2">            }</span>
+</span><span data-line="1456"><span class="s2">            let html = &#39;&lt;div class=&quot;object-items&quot;&gt;&#39;;</span>
+</span><span data-line="1457"><span class="s2">            keys.slice(0, maxItems).forEach(k =&gt; {</span>
+</span><span data-line="1458"><span class="s2">                html += &#39;&lt;div class=&quot;object-item&quot;&gt;&lt;strong&gt;&#39; + this.escapeHtml(k) + &#39;:&lt;/strong&gt; &#39;;</span>
+</span><span data-line="1459"><span class="s2">                html += this.formatValue(value[k], depth + 1) + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1460"><span class="s2">            });</span>
+</span><span data-line="1461"><span class="s2">            if (keys.length &gt; maxItems) {</span>
+</span><span data-line="1462"><span class="s2">                html += &#39;&lt;div class=&quot;object-more&quot;&gt;... and &#39; + (keys.length - maxItems) + &#39; more&lt;/div&gt;&#39;;</span>
+</span><span data-line="1463"><span class="s2">            }</span>
+</span><span data-line="1464"><span class="s2">            html += &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1465"><span class="s2">            return html;</span>
+</span><span data-line="1466"><span class="s2">        }</span>
+</span><span data-line="1467"><span class="s2">        return &#39;&lt;span class=&quot;unknown&quot;&gt;&#39; + this.escapeHtml(String(value)) + &#39;&lt;/span&gt;&#39;;</span>
+</span><span data-line="1468"><span class="s2">    }</span>
+</span><span data-line="1469">
+</span><span data-line="1470"><span class="s2">    escapeHtml(text) {</span>
+</span><span data-line="1471"><span class="s2">        const div = document.createElement(&#39;div&#39;);</span>
+</span><span data-line="1472"><span class="s2">        div.textContent = text;</span>
+</span><span data-line="1473"><span class="s2">        return div.innerHTML;</span>
+</span><span data-line="1474"><span class="s2">    }</span>
+</span><span data-line="1475">
+</span><span data-line="1476"><span class="s2">    isSqlPanel(data) {</span>
+</span><span data-line="1477"><span class="s2">        return data &amp;&amp; (data.queries !== undefined || data.total_queries !== undefined);</span>
+</span><span data-line="1478"><span class="s2">    }</span>
+</span><span data-line="1479">
+</span><span data-line="1480"><span class="s2">    renderSqlPanel(data) {</span>
+</span><span data-line="1481"><span class="s2">        if (!data || !data.queries || data.queries.length === 0) {</span>
+</span><span data-line="1482"><span class="s2">            return &#39;&lt;p class=&quot;empty&quot;&gt;No SQL queries&lt;/p&gt;&#39;;</span>
+</span><span data-line="1483"><span class="s2">        }</span>
+</span><span data-line="1484">
+</span><span data-line="1485"><span class="s2">        let html = &#39;&lt;div class=&quot;sql-panel&quot;&gt;&#39;;</span>
+</span><span data-line="1486"><span class="s2">        html += &#39;&lt;h3&gt;Total Queries: &#39; + (data.total_queries || data.queries.length) + &#39;&lt;/h3&gt;&#39;;</span>
+</span><span data-line="1487">
+</span><span data-line="1488"><span class="s2">        data.queries.forEach((query, index) =&gt; {</span>
+</span><span data-line="1489"><span class="s2">            const supportsExplain = query.supports_explain !== false;</span>
+</span><span data-line="1490"><span class="s2">            const sql = query.sql || query.query || &#39;&#39;;</span>
+</span><span data-line="1491"><span class="s2">            const params = query.raw_parameters || query.parameters || </span><span class="si">{}</span><span class="s2">;</span>
+</span><span data-line="1492"><span class="s2">            const hasParams = params &amp;&amp; Object.keys(params).length &gt; 0;</span>
+</span><span data-line="1493"><span class="s2">            const sqlEncoded = btoa(unescape(encodeURIComponent(sql)));</span>
+</span><span data-line="1494"><span class="s2">            const paramsEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(params))));</span>
+</span><span data-line="1495">
+</span><span data-line="1496"><span class="s2">            html += &#39;&lt;div class=&quot;sql-query-container&quot;&gt;&#39;;</span>
+</span><span data-line="1497"><span class="s2">            html += &#39;&lt;div class=&quot;sql-query-header&quot;&gt;&#39;;</span>
+</span><span data-line="1498"><span class="s2">            html += &#39;&lt;span class=&quot;sql-query-title&quot;&gt;Query #&#39; + (index + 1) + &#39;&lt;/span&gt;&#39;;</span>
+</span><span data-line="1499"><span class="s2">            if (supportsExplain) {</span>
+</span><span data-line="1500"><span class="s2">                html += &#39;&lt;button class=&quot;sql-explain-btn&quot; data-sql=&quot;&#39; + sqlEncoded +</span>
+</span><span data-line="1501"><span class="s2">                        &#39;&quot; data-params=&quot;&#39; + paramsEncoded + &#39;&quot;&gt;EXPLAIN&lt;/button&gt;&#39;;</span>
+</span><span data-line="1502"><span class="s2">            } else {</span>
+</span><span data-line="1503"><span class="s2">                html += &#39;&lt;button class=&quot;sql-explain-btn&quot; disabled&gt;EXPLAIN (not supported)&lt;/button&gt;&#39;;</span>
+</span><span data-line="1504"><span class="s2">            }</span>
+</span><span data-line="1505"><span class="s2">            html += &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1506"><span class="s2">            html += &#39;&lt;div class=&quot;sql-query-code&quot;&gt;&#39; + this.escapeHtml(sql) + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1507"><span class="s2">            if (hasParams) {</span>
+</span><span data-line="1508"><span class="s2">                html += &#39;&lt;div class=&quot;sql-query-params&quot;&gt;&lt;strong&gt;Parameters:&lt;/strong&gt; &#39; +</span>
+</span><span data-line="1509"><span class="s2">                        this.escapeHtml(JSON.stringify(params)) + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1510"><span class="s2">            }</span>
+</span><span data-line="1511"><span class="s2">            if (query.duration !== undefined) {</span>
+</span><span data-line="1512"><span class="s2">                html += &#39;&lt;div class=&quot;sql-query-params&quot;&gt;&lt;strong&gt;Duration:&lt;/strong&gt; &#39; +</span>
+</span><span data-line="1513"><span class="s2">                        query.duration.toFixed(2) + &#39;ms&lt;/div&gt;&#39;;</span>
+</span><span data-line="1514"><span class="s2">            }</span>
+</span><span data-line="1515"><span class="s2">            html += &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1516"><span class="s2">        });</span>
+</span><span data-line="1517">
+</span><span data-line="1518"><span class="s2">        html += &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1519">
+</span><span data-line="1520"><span class="s2">        setTimeout(() =&gt; {</span>
+</span><span data-line="1521"><span class="s2">            document.querySelectorAll(&#39;.sql-explain-btn[data-sql]&#39;).forEach(btn =&gt; {</span>
+</span><span data-line="1522"><span class="s2">                btn.addEventListener(&#39;click&#39;, () =&gt; {</span>
+</span><span data-line="1523"><span class="s2">                    const sql = decodeURIComponent(escape(atob(btn.dataset.sql)));</span>
+</span><span data-line="1524"><span class="s2">                    const params = JSON.parse(decodeURIComponent(escape(atob(btn.dataset.params))));</span>
+</span><span data-line="1525"><span class="s2">                    this.runExplain(sql, params);</span>
+</span><span data-line="1526"><span class="s2">                });</span>
+</span><span data-line="1527"><span class="s2">            });</span>
+</span><span data-line="1528"><span class="s2">        }, 0);</span>
+</span><span data-line="1529">
+</span><span data-line="1530"><span class="s2">        return html;</span>
+</span><span data-line="1531"><span class="s2">    }</span>
+</span><span data-line="1532">
+</span><span data-line="1533"><span class="s2">    async runExplain(sql, parameters) {</span>
+</span><span data-line="1534"><span class="s2">        const modal = document.createElement(&#39;div&#39;);</span>
+</span><span data-line="1535"><span class="s2">        modal.className = &#39;explain-modal&#39;;</span>
+</span><span data-line="1536"><span class="s2">        modal.innerHTML = `</span>
+</span><span data-line="1537"><span class="s2">            &lt;div class=&quot;explain-modal-content&quot;&gt;</span>
+</span><span data-line="1538"><span class="s2">                &lt;div class=&quot;explain-modal-header&quot;&gt;</span>
+</span><span data-line="1539"><span class="s2">                    &lt;h3 class=&quot;explain-modal-title&quot;&gt;Query Execution Plan&lt;/h3&gt;</span>
+</span><span data-line="1540"><span class="s2">                    &lt;button class=&quot;explain-modal-close&quot;</span>
+</span><span data-line="1541"><span class="s2">                            onclick=&quot;this.closest(&#39;.explain-modal&#39;).remove()&quot;&gt;&amp;times;&lt;/button&gt;</span>
+</span><span data-line="1542"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="1543"><span class="s2">                &lt;div class=&quot;explain-modal-body&quot;&gt;</span>
+</span><span data-line="1544"><span class="s2">                    &lt;div class=&quot;explain-result&quot;&gt;Loading...&lt;/div&gt;</span>
+</span><span data-line="1545"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="1546"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="1547"><span class="s2">        `;</span>
+</span><span data-line="1548">
+</span><span data-line="1549"><span class="s2">        document.body.appendChild(modal);</span>
+</span><span data-line="1550">
+</span><span data-line="1551"><span class="s2">        modal.addEventListener(&#39;click&#39;, (e) =&gt; {</span>
+</span><span data-line="1552"><span class="s2">            if (e.target === modal) {</span>
+</span><span data-line="1553"><span class="s2">                modal.remove();</span>
+</span><span data-line="1554"><span class="s2">            }</span>
+</span><span data-line="1555"><span class="s2">        });</span>
+</span><span data-line="1556">
+</span><span data-line="1557"><span class="s2">        try {</span>
+</span><span data-line="1558"><span class="s2">            const response = await fetch(&#39;/_debug_toolbar/api/explain&#39;, {</span>
+</span><span data-line="1559"><span class="s2">                method: &#39;POST&#39;,</span>
+</span><span data-line="1560"><span class="s2">                headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },</span>
+</span><span data-line="1561"><span class="s2">                body: JSON.stringify({ sql: sql, parameters: parameters })</span>
+</span><span data-line="1562"><span class="s2">            });</span>
+</span><span data-line="1563">
+</span><span data-line="1564"><span class="s2">            const result = await response.json();</span>
+</span><span data-line="1565"><span class="s2">            const resultDiv = modal.querySelector(&#39;.explain-result&#39;);</span>
+</span><span data-line="1566">
+</span><span data-line="1567"><span class="s2">            if (result.error) {</span>
+</span><span data-line="1568"><span class="s2">                resultDiv.innerHTML = &#39;&lt;div class=&quot;explain-error&quot;&gt;&#39; + this.escapeHtml(result.error) + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1569"><span class="s2">            } else if (result.plan) {</span>
+</span><span data-line="1570"><span class="s2">                resultDiv.innerHTML = &#39;&lt;pre&gt;&#39; + this.escapeHtml(JSON.stringify(result.plan, null, 2)) + &#39;&lt;/pre&gt;&#39;;</span>
+</span><span data-line="1571"><span class="s2">            } else {</span>
+</span><span data-line="1572"><span class="s2">                resultDiv.innerHTML = &#39;&lt;pre&gt;&#39; + this.escapeHtml(JSON.stringify(result, null, 2)) + &#39;&lt;/pre&gt;&#39;;</span>
+</span><span data-line="1573"><span class="s2">            }</span>
+</span><span data-line="1574"><span class="s2">        } catch (err) {</span>
+</span><span data-line="1575"><span class="s2">            const resultDiv = modal.querySelector(&#39;.explain-result&#39;);</span>
+</span><span data-line="1576"><span class="s2">            resultDiv.innerHTML = &#39;&lt;div class=&quot;explain-error&quot;&gt;Failed to execute EXPLAIN: &#39; +</span>
+</span><span data-line="1577"><span class="s2">                                this.escapeHtml(err.message) + &#39;&lt;/div&gt;&#39;;</span>
+</span><span data-line="1578"><span class="s2">        }</span>
+</span><span data-line="1579"><span class="s2">    }</span>
+</span><span data-line="1580"><span class="s2">}</span>
+</span><span data-line="1581">
+</span><span data-line="1582"><span class="s2">document.addEventListener(&#39;DOMContentLoaded&#39;, () =&gt; {</span>
+</span><span data-line="1583"><span class="s2">    const toolbar = document.getElementById(&#39;debug-toolbar&#39;);</span>
+</span><span data-line="1584"><span class="s2">    if (toolbar) {</span>
+</span><span data-line="1585"><span class="s2">        new DebugToolbar(toolbar);</span>
+</span><span data-line="1586"><span class="s2">    }</span>
+</span><span data-line="1587"><span class="s2">});</span>
+</span><span data-line="1588"><span class="s2">&quot;&quot;&quot;</span></div>
+
+</span></pre></div>
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../../../../_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
