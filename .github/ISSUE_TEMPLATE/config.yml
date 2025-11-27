@@ -1,0 +1,8 @@
+blank_lines_enabled: true
+contact_links:
+  - name: Project Documentation
+    url: https://jacobcoffee.github.io/async-python-debug-toolbar
+    about: Official project documentation - please check here before opening an issue.
+  - name: Discord
+    url: https://discord.gg/litestar-919193495116337154
+    about: Join the Litestar Discord community to chat or get in touch with the maintainers.
