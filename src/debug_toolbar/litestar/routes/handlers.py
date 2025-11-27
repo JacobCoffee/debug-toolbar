@@ -36,7 +36,7 @@ def _format_value(value: Any, max_depth: int = 3) -> str:  # noqa: PLR0911
         return "<span class='null'>null</span>"
     if isinstance(value, bool):
         return f"<span class='bool'>{str(value).lower()}</span>"
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         if isinstance(value, float):
             return f"<span class='number'>{value:.4f}</span>"
         return f"<span class='number'>{value}</span>"
@@ -44,7 +44,7 @@ def _format_value(value: Any, max_depth: int = 3) -> str:  # noqa: PLR0911
         if len(value) > MAX_STRING_LENGTH:
             return f"<span class='string'>{_escape_html(value[:MAX_STRING_LENGTH])}...</span>"
         return f"<span class='string'>{_escape_html(value)}</span>"
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         if max_depth <= 0 or len(value) > MAX_ITEMS_DISPLAY:
             return f"<span class='array'>[{len(value)} items]</span>"
         items = ", ".join(_format_value(v, max_depth - 1) for v in value[:MAX_ITEMS_DISPLAY])
