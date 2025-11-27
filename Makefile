@@ -53,7 +53,7 @@ test: ## Run test suite
 	PYTHONDONTWRITEBYTECODE=1 uv run pytest
 
 test-cov: ## Run tests with coverage report
-	PYTHONDONTWRITEBYTECODE=1 uv run pytest --cov=async_debug_toolbar --cov=litestar_debug_toolbar --cov-report=term-missing --cov-report=html --cov-report=xml
+	PYTHONDONTWRITEBYTECODE=1 uv run pytest --cov=debug_toolbar --cov-report=term-missing --cov-report=html --cov-report=xml
 
 test-fast: ## Run tests without slow/integration tests
 	PYTHONDONTWRITEBYTECODE=1 uv run pytest -m "not integration"
