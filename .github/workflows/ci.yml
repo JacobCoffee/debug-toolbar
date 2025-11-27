@@ -1,0 +1,211 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ==================================================================================== #
+  # WORKFLOW SECURITY
+  # ==================================================================================== #
+  zizmor:
+    name: Workflow Security
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@e639db99335bc9038abc0e066dfcd72e23d26fb4 # v0.3.0
+        with:
+          advanced-security: false
+        continue-on-error: true
+
+  # ==================================================================================== #
+  # LINT, FORMAT, TYPE CHECK
+  # ==================================================================================== #
+  lint-format-typecheck:
+    name: Lint, Format & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v6
+        with:
+          enable-cache: true
+          version: "0.9.12"
+
+      - name: Set up Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run ruff check
+        uses: astral-sh/ruff-action@57714a7c8a2e59f32539362ba31877a1957dded1 # v3
+        with:
+          args: check
+          version: "0.9.0"
+
+      - name: Run ruff format check
+        uses: astral-sh/ruff-action@57714a7c8a2e59f32539362ba31877a1957dded1 # v3
+        with:
+          args: format --check
+          version: "0.9.0"
+
+      - name: Run ty type checker
+        run: uv run ty check src
+
+  # ==================================================================================== #
+  # SMOKE TESTS (Key configurations to catch issues early)
+  # ==================================================================================== #
+  smoke-test:
+    name: Smoke Test - Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: [lint-format-typecheck]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.10"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v6
+        with:
+          enable-cache: true
+          version: "0.9.12"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run tests
+        run: uv run pytest -n auto --reruns 2 --reruns-delay 1
+        shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
+
+  # ==================================================================================== #
+  # FULL TEST MATRIX (Runs after smoke tests pass)
+  # ==================================================================================== #
+  test:
+    name: Test - Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: [smoke-test]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        exclude:
+          - os: ubuntu-latest
+            python-version: "3.13"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.10"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v6
+        with:
+          enable-cache: true
+          version: "0.9.12"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run tests with coverage
+        run: uv run pytest --cov=async_debug_toolbar --cov=litestar_debug_toolbar --cov-report=term-missing --cov-report=xml -n auto --reruns 2 --reruns-delay 1
+        shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
+
+      - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  # ==================================================================================== #
+  # CI SUCCESS
+  # ==================================================================================== #
+  ci-success:
+    name: CI Success
+    runs-on: ubuntu-latest
+    needs: [lint-format-typecheck, smoke-test, test]
+    if: always()
+    steps:
+      - name: Check CI results
+        run: |
+          if [[ "${NEEDS_LINT_RESULT}" != "success" || \
+                "${NEEDS_SMOKE_RESULT}" != "success" || \
+                "${NEEDS_TEST_RESULT}" != "success" ]]; then
+            echo "CI failed!"
+            exit 1
+          fi
+          echo "CI passed!"
+        env:
+          NEEDS_LINT_RESULT: ${{ needs.lint-format-typecheck.result }}
+          NEEDS_SMOKE_RESULT: ${{ needs.smoke-test.result }}
+          NEEDS_TEST_RESULT: ${{ needs.test.result }}
