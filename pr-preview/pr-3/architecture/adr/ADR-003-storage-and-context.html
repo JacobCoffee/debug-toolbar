@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADR-003: Storage and Context Management - Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="prev" title="ADR-002: Panel System Design" href="ADR-002-panel-system-design.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="ADR-003: Storage and Context Management"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.html">debug_toolbar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.html">debug_toolbar.core</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ADR-003: Storage and Context Management</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#status">Status</a></li>
+<li><a class="reference internal" href="#date">Date</a></li>
+<li><a class="reference internal" href="#context">Context</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#options-considered">Options Considered</a><ul>
+<li><a class="reference internal" href="#request-context-options">Request Context Options</a></li>
+<li><a class="reference internal" href="#storage-options">Storage Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decision">Decision</a><ul>
+<li><a class="reference internal" href="#request-context-context-variables-option-b">Request Context: Context Variables (Option B)</a></li>
+<li><a class="reference internal" href="#application-storage-thread-safe-lru-ordereddict-option-b">Application Storage: Thread-safe LRU OrderedDict (Option B)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data-flow">Data Flow</a></li>
+<li><a class="reference internal" href="#consequences">Consequences</a><ul>
+<li><a class="reference internal" href="#positive">Positive</a></li>
+<li><a class="reference internal" href="#negative">Negative</a></li>
+<li><a class="reference internal" href="#memory-analysis">Memory Analysis</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-manager-api">Context Manager API</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">ADR-003: Storage and Context Management</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="adr-003-storage-and-context-management">
+<h1>ADR-003: Storage and Context Management<a class="headerlink" href="#adr-003-storage-and-context-management" title="Link to this heading">¶</a></h1>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Link to this heading">¶</a></h2>
+<p>Accepted</p>
+</section>
+<section id="date">
+<h2>Date<a class="headerlink" href="#date" title="Link to this heading">¶</a></h2>
+<p>2025-11-26</p>
+</section>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>The debug toolbar needs to:</p>
+<ol class="arabic simple">
+<li><p>Store panel data during request processing (request-scoped)</p></li>
+<li><p>Persist toolbar data for historical viewing (application-scoped)</p></li>
+<li><p>Support concurrent requests without data leakage</p></li>
+<li><p>Bound memory usage to prevent leaks</p></li>
+</ol>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Thread-safe storage for concurrent requests</p></li>
+<li><p>Async-compatible context propagation</p></li>
+<li><p>LRU eviction for bounded memory</p></li>
+<li><p>Fast O(1) access patterns</p></li>
+<li><p>No external dependencies (in-memory only)</p></li>
+</ul>
+</section>
+<section id="options-considered">
+<h3>Options Considered<a class="headerlink" href="#options-considered" title="Link to this heading">¶</a></h3>
+<section id="request-context-options">
+<h4>Request Context Options<a class="headerlink" href="#request-context-options" title="Link to this heading">¶</a></h4>
+<p><strong>Option A: Thread-local storage</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span data-line="2"><span class="n">_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Simple, well-understood</p></li>
+<li><p>Cons: Doesn’t work with async (coroutines share threads)</p></li>
+</ul>
+<p><strong>Option B: Context variables (contextvars)</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+</span><span data-line="2"><span class="n">_ctx</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span><span class="s2">&quot;toolbar_ctx&quot;</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Works with async, copy-on-write semantics</p></li>
+<li><p>Cons: Slightly more complex API</p></li>
+</ul>
+<p><strong>Option C: Request object attachment</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">debug_toolbar</span> <span class="o">=</span> <span class="p">{</span><span class="o">...</span><span class="p">}</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Framework-native pattern</p></li>
+<li><p>Cons: Framework-specific, needs adapter per framework</p></li>
+</ul>
+</section>
+<section id="storage-options">
+<h4>Storage Options<a class="headerlink" href="#storage-options" title="Link to this heading">¶</a></h4>
+<p><strong>Option A: Simple dict with manual cleanup</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">_storage</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Simple</p></li>
+<li><p>Cons: Unbounded growth, manual eviction needed</p></li>
+</ul>
+<p><strong>Option B: LRU cache</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+</span><span data-line="2"><span class="c1"># Or custom OrderedDict-based LRU</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Bounded, automatic eviction</p></li>
+<li><p>Cons: Thread safety concerns with OrderedDict</p></li>
+</ul>
+<p><strong>Option C: External cache (Redis)</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+</span></pre></div>
+</div>
+<ul class="simple">
+<li><p>Pros: Distributed, persistent</p></li>
+<li><p>Cons: External dependency, overkill for debug tool</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="decision">
+<h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">¶</a></h2>
+<section id="request-context-context-variables-option-b">
+<h3>Request Context: Context Variables (Option B)<a class="headerlink" href="#request-context-context-variables-option-b" title="Link to this heading">¶</a></h3>
+<p>We will use Python’s <code class="docutils literal notranslate"><span class="pre">contextvars</span></code> module for request-scoped data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># async_debug_toolbar/context.py</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">contextvars</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContextVar</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypedDict</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="k">class</span><span class="w"> </span><span class="nc">RequestContext</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+</span><span data-line="6">    <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span>
+</span><span data-line="7">    <span class="n">scope</span><span class="p">:</span> <span class="nb">dict</span>
+</span><span data-line="8">    <span class="n">panels_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</span><span data-line="9">    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span data-line="10">    <span class="n">end_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="n">_request_context</span><span class="p">:</span> <span class="n">ContextVar</span><span class="p">[</span><span class="n">RequestContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="n">ContextVar</span><span class="p">(</span>
+</span><span data-line="13">    <span class="s2">&quot;debug_toolbar_context&quot;</span><span class="p">,</span>
+</span><span data-line="14">    <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span data-line="15"><span class="p">)</span>
+</span><span data-line="16">
+</span><span data-line="17"><span class="k">def</span><span class="w"> </span><span class="nf">get_request_context</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RequestContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="18">    <span class="k">return</span> <span class="n">_request_context</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</span><span data-line="19">
+</span><span data-line="20"><span class="k">def</span><span class="w"> </span><span class="nf">set_request_context</span><span class="p">(</span><span class="n">ctx</span><span class="p">:</span> <span class="n">RequestContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="21">    <span class="n">_request_context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><strong>Rationale:</strong></p>
+<ul class="simple">
+<li><p>Native async support via copy-on-write semantics</p></li>
+<li><p>Each coroutine gets isolated context</p></li>
+<li><p>No risk of data leakage between concurrent requests</p></li>
+<li><p>Standard library, no dependencies</p></li>
+</ul>
+</section>
+<section id="application-storage-thread-safe-lru-ordereddict-option-b">
+<h3>Application Storage: Thread-safe LRU OrderedDict (Option B)<a class="headerlink" href="#application-storage-thread-safe-lru-ordereddict-option-b" title="Link to this heading">¶</a></h3>
+<p>We will implement a custom thread-safe LRU storage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># async_debug_toolbar/storage.py</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+</span><span data-line="3"><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="k">class</span><span class="w"> </span><span class="nc">ToolbarStorage</span><span class="p">:</span>
+</span><span data-line="6">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+</span><span data-line="7">        <span class="bp">self</span><span class="o">.</span><span class="n">_max_size</span> <span class="o">=</span> <span class="n">max_size</span>
+</span><span data-line="8">        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ToolbarRecord</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+</span><span data-line="9">        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+</span><span data-line="10">
+</span><span data-line="11">    <span class="k">def</span><span class="w"> </span><span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="12">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+</span><span data-line="13">            <span class="k">if</span> <span class="n">request_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+</span><span data-line="14">                <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
+</span><span data-line="15">            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">request_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">ToolbarRecord</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span data-line="16">
+</span><span data-line="17">            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_size</span><span class="p">:</span>
+</span><span data-line="18">                <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># Evict oldest</span>
+</span><span data-line="19">
+</span><span data-line="20">    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ToolbarRecord</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="21">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+</span><span data-line="22">            <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>
+</span><span data-line="23">            <span class="k">if</span> <span class="n">record</span><span class="p">:</span>
+</span><span data-line="24">                <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">request_id</span><span class="p">)</span>  <span class="c1"># LRU update</span>
+</span><span data-line="25">            <span class="k">return</span> <span class="n">record</span>
+</span></pre></div>
+</div>
+<p><strong>Rationale:</strong></p>
+<ul class="simple">
+<li><p>OrderedDict provides O(1) operations with ordering</p></li>
+<li><p>RLock ensures thread safety for concurrent access</p></li>
+<li><p>LRU eviction bounds memory usage</p></li>
+<li><p>No external dependencies</p></li>
+</ul>
+</section>
+</section>
+<section id="data-flow">
+<h2>Data Flow<a class="headerlink" href="#data-flow" title="Link to this heading">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">Request Start
+</span><span data-line="2">    │
+</span><span data-line="3">    ▼
+</span><span data-line="4">┌─────────────────────────────────────────┐
+</span><span data-line="5">│ set_request_context({                   │
+</span><span data-line="6">│     request_id: &quot;abc-123&quot;,              │
+</span><span data-line="7">│     scope: {...},                       │
+</span><span data-line="8">│     panels_data: {},                    │
+</span><span data-line="9">│     start_time: time.perf_counter(),    │
+</span><span data-line="10">│ })                                      │
+</span><span data-line="11">└─────────────────────────────────────────┘
+</span><span data-line="12">    │
+</span><span data-line="13">    ▼
+</span><span data-line="14">Panel.process_request()
+</span><span data-line="15">    │
+</span><span data-line="16">    ▼
+</span><span data-line="17">[Application Processing]
+</span><span data-line="18">    │
+</span><span data-line="19">    ▼
+</span><span data-line="20">Panel.process_response()
+</span><span data-line="21">    │
+</span><span data-line="22">    ├─► panel.record_stats({...})
+</span><span data-line="23">    │       │
+</span><span data-line="24">    │       ▼
+</span><span data-line="25">    │   ctx[&quot;panels_data&quot;][&quot;timer&quot;] = stats
+</span><span data-line="26">    │
+</span><span data-line="27">    ▼
+</span><span data-line="28">┌─────────────────────────────────────────┐
+</span><span data-line="29">│ storage.store(                          │
+</span><span data-line="30">│     request_id=&quot;abc-123&quot;,               │
+</span><span data-line="31">│     data=ctx[&quot;panels_data&quot;]             │
+</span><span data-line="32">│ )                                       │
+</span><span data-line="33">│                                         │
+</span><span data-line="34">│ [LRU eviction if needed]                │
+</span><span data-line="35">└─────────────────────────────────────────┘
+</span><span data-line="36">    │
+</span><span data-line="37">    ▼
+</span><span data-line="38">clear_request_context()
+</span></pre></div>
+</div>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">¶</a></h2>
+<section id="positive">
+<h3>Positive<a class="headerlink" href="#positive" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Async Safety</strong>: Contextvars work correctly with asyncio</p></li>
+<li><p><strong>Thread Safety</strong>: Storage protected by RLock</p></li>
+<li><p><strong>Bounded Memory</strong>: LRU ensures max N requests stored</p></li>
+<li><p><strong>Zero Dependencies</strong>: All stdlib components</p></li>
+<li><p><strong>Fast Access</strong>: O(1) for all operations</p></li>
+</ol>
+</section>
+<section id="negative">
+<h3>Negative<a class="headerlink" href="#negative" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>In-Memory Only</strong>: Lost on restart (acceptable for debug tool)</p></li>
+<li><p><strong>Per-Process</strong>: Not shared across workers (acceptable)</p></li>
+<li><p><strong>Lock Contention</strong>: Possible under extreme load (mitigated by fast operations)</p></li>
+</ol>
+</section>
+<section id="memory-analysis">
+<h3>Memory Analysis<a class="headerlink" href="#memory-analysis" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">Per</span><span class="o">-</span><span class="n">request</span> <span class="n">context</span><span class="p">:</span> <span class="o">~</span><span class="mi">5</span> <span class="n">KB</span> <span class="n">average</span>
+</span><span data-line="2">  <span class="o">-</span> <span class="n">request_id</span><span class="p">:</span> <span class="mi">36</span> <span class="nb">bytes</span> <span class="p">(</span><span class="n">UUID</span><span class="p">)</span>
+</span><span data-line="3">  <span class="o">-</span> <span class="n">scope</span> <span class="n">reference</span><span class="p">:</span> <span class="mi">8</span> <span class="nb">bytes</span>
+</span><span data-line="4">  <span class="o">-</span> <span class="n">panels_data</span><span class="p">:</span> <span class="o">~</span><span class="mi">5</span> <span class="n">KB</span> <span class="p">(</span><span class="n">varies</span> <span class="n">by</span> <span class="n">panels</span><span class="p">)</span>
+</span><span data-line="5">
+</span><span data-line="6"><span class="n">Storage</span> <span class="k">with</span> <span class="mi">50</span> <span class="n">requests</span><span class="p">:</span> <span class="o">~</span><span class="mi">250</span> <span class="n">KB</span>
+</span><span data-line="7">  <span class="o">-</span> <span class="n">Plus</span> <span class="n">ToolbarRecord</span> <span class="n">overhead</span><span class="p">:</span> <span class="o">~</span><span class="mi">50</span> <span class="n">KB</span>
+</span><span data-line="8">  <span class="o">-</span> <span class="n">Total</span><span class="p">:</span> <span class="o">~</span><span class="mi">300</span> <span class="n">KB</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="n">Maximum</span> <span class="n">memory</span> <span class="n">usage</span><span class="p">:</span> <span class="o">~</span><span class="mi">500</span> <span class="n">KB</span> <span class="p">(</span><span class="k">with</span> <span class="n">overhead</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="context-manager-api">
+<h2>Context Manager API<a class="headerlink" href="#context-manager-api" title="Link to this heading">¶</a></h2>
+<p>For clean lifecycle management:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">class</span><span class="w"> </span><span class="nc">RequestContextManager</span><span class="p">:</span>
+</span><span data-line="2">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">:</span> <span class="n">RequestContext</span><span class="p">):</span>
+</span><span data-line="3">        <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span> <span class="o">=</span> <span class="n">ctx</span>
+</span><span data-line="4">        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span data-line="5">
+</span><span data-line="6">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aenter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RequestContext</span><span class="p">:</span>
+</span><span data-line="7">        <span class="bp">self</span><span class="o">.</span><span class="n">_token</span> <span class="o">=</span> <span class="n">_request_context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span><span class="p">)</span>
+</span><span data-line="8">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ctx</span>
+</span><span data-line="9">
+</span><span data-line="10">    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__aexit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="11">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">:</span>
+</span><span data-line="12">            <span class="n">_request_context</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_token</span><span class="p">)</span>
+</span></pre></div>
+</div>
+<p>Usage in middleware:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">):</span>
+</span><span data-line="2">    <span class="n">ctx</span> <span class="o">=</span> <span class="n">RequestContext</span><span class="p">(</span>
+</span><span data-line="3">        <span class="n">request_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+</span><span data-line="4">        <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">,</span>
+</span><span data-line="5">        <span class="n">panels_data</span><span class="o">=</span><span class="p">{},</span>
+</span><span data-line="6">        <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span data-line="7">        <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span data-line="8">    <span class="p">)</span>
+</span><span data-line="9">
+</span><span data-line="10">    <span class="k">async</span> <span class="k">with</span> <span class="n">RequestContextManager</span><span class="p">(</span><span class="n">ctx</span><span class="p">):</span>
+</span><span data-line="11">        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">receive</span><span class="p">,</span> <span class="n">send</span><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://peps.python.org/pep-0567/">PEP 567 - Context Variables</a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/contextvars.html">Python contextvars documentation</a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.OrderedDict">OrderedDict implementation</a></p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="ADR-002-panel-system-design.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">ADR-002: Panel System Design</div></div>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/async-python-debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../../_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>

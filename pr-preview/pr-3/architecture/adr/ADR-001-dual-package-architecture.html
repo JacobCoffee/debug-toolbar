@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ADR-001: Dual Package Architecture - Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="ADR-002: Panel System Design" href="ADR-002-panel-system-design.html" /><link rel="prev" title="Async Python Debug Toolbar - Architecture Document" href="../ARCHITECTURE.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="ADR-001: Dual Package Architecture"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../../index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.html">debug_toolbar</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.html">debug_toolbar.core</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#status">Status</a></li>
+<li><a class="reference internal" href="#date">Date</a></li>
+<li><a class="reference internal" href="#context">Context</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#options-considered">Options Considered</a><ul>
+<li><a class="reference internal" href="#option-1-monolithic-package">Option 1: Monolithic Package</a></li>
+<li><a class="reference internal" href="#option-2-dual-package-with-shared-core">Option 2: Dual Package with Shared Core</a></li>
+<li><a class="reference internal" href="#option-3-plugin-architecture-with-core">Option 3: Plugin Architecture with Core</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decision">Decision</a><ul>
+<li><a class="reference internal" href="#package-structure">Package Structure</a></li>
+<li><a class="reference internal" href="#dependency-flow">Dependency Flow</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#consequences">Consequences</a><ul>
+<li><a class="reference internal" href="#positive">Positive</a></li>
+<li><a class="reference internal" href="#negative">Negative</a></li>
+<li><a class="reference internal" href="#neutral">Neutral</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#implementation-notes">Implementation Notes</a><ul>
+<li><a class="reference internal" href="#core-package-async-debug-toolbar">Core Package (<code class="docutils literal notranslate"><span class="pre">async-debug-toolbar</span></code>)</a></li>
+<li><a class="reference internal" href="#plugin-package-litestar-debug-toolbar">Plugin Package (<code class="docutils literal notranslate"><span class="pre">litestar-debug-toolbar</span></code>)</a></li>
+<li><a class="reference internal" href="#abstract-adapter-pattern">Abstract Adapter Pattern</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#related-decisions">Related Decisions</a></li>
+<li><a class="reference internal" href="#references">References</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../../index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">ADR-001: Dual Package Architecture</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="adr-001-dual-package-architecture">
+<h1>ADR-001: Dual Package Architecture<a class="headerlink" href="#adr-001-dual-package-architecture" title="Link to this heading">¶</a></h1>
+<section id="status">
+<h2>Status<a class="headerlink" href="#status" title="Link to this heading">¶</a></h2>
+<p>Accepted</p>
+</section>
+<section id="date">
+<h2>Date<a class="headerlink" href="#date" title="Link to this heading">¶</a></h2>
+<p>2025-11-26</p>
+</section>
+<section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<p>We need to design a debug toolbar for async Python web applications, with initial support for Litestar. The key decisions involve:</p>
+<ol class="arabic simple">
+<li><p><strong>Package organization</strong>: Single monolithic package vs. split core/plugin packages</p></li>
+<li><p><strong>Framework coupling</strong>: Tight integration vs. adapter pattern</p></li>
+<li><p><strong>Async design</strong>: Sync-first with async wrappers vs. async-native</p></li>
+</ol>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support Litestar as primary framework</p></li>
+<li><p>Enable future support for other async frameworks (FastAPI, Starlette, Quart)</p></li>
+<li><p>Maintain clean separation between core functionality and framework integration</p></li>
+<li><p>Support optional SQLAlchemy/Advanced-Alchemy integration</p></li>
+<li><p>Minimize dependencies in core package</p></li>
+</ul>
+</section>
+<section id="options-considered">
+<h3>Options Considered<a class="headerlink" href="#options-considered" title="Link to this heading">¶</a></h3>
+<section id="option-1-monolithic-package">
+<h4>Option 1: Monolithic Package<a class="headerlink" href="#option-1-monolithic-package" title="Link to this heading">¶</a></h4>
+<p>Single <code class="docutils literal notranslate"><span class="pre">litestar-debug-toolbar</span></code> package containing all functionality.</p>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li><p>Simpler installation (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">litestar-debug-toolbar</span></code>)</p></li>
+<li><p>Single source of truth</p></li>
+<li><p>Easier maintenance</p></li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li><p>Framework-specific code mixed with generic code</p></li>
+<li><p>Cannot reuse core for other frameworks</p></li>
+<li><p>Litestar becomes hard dependency</p></li>
+</ul>
+</section>
+<section id="option-2-dual-package-with-shared-core">
+<h4>Option 2: Dual Package with Shared Core<a class="headerlink" href="#option-2-dual-package-with-shared-core" title="Link to this heading">¶</a></h4>
+<p>Two packages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">async-debug-toolbar</span></code>: Framework-agnostic core</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">litestar-debug-toolbar</span></code>: Litestar-specific plugin</p></li>
+</ul>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li><p>Clean separation of concerns</p></li>
+<li><p>Core reusable for other frameworks</p></li>
+<li><p>Framework is optional dependency</p></li>
+<li><p>Smaller core package</p></li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li><p>More complex installation</p></li>
+<li><p>Two packages to maintain</p></li>
+<li><p>Version coordination required</p></li>
+</ul>
+</section>
+<section id="option-3-plugin-architecture-with-core">
+<h4>Option 3: Plugin Architecture with Core<a class="headerlink" href="#option-3-plugin-architecture-with-core" title="Link to this heading">¶</a></h4>
+<p>Single <code class="docutils literal notranslate"><span class="pre">async-debug-toolbar</span></code> package with optional extras:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">pip</span> <span class="n">install</span> <span class="k">async</span><span class="o">-</span><span class="n">debug</span><span class="o">-</span><span class="n">toolbar</span><span class="p">[</span><span class="n">litestar</span><span class="p">]</span>
+</span><span data-line="2"><span class="n">pip</span> <span class="n">install</span> <span class="k">async</span><span class="o">-</span><span class="n">debug</span><span class="o">-</span><span class="n">toolbar</span><span class="p">[</span><span class="n">fastapi</span><span class="p">]</span>
+</span></pre></div>
+</div>
+<p><strong>Pros:</strong></p>
+<ul class="simple">
+<li><p>Single package to install</p></li>
+<li><p>Framework as optional extra</p></li>
+<li><p>Clear extension pattern</p></li>
+</ul>
+<p><strong>Cons:</strong></p>
+<ul class="simple">
+<li><p>All code in one repo (could grow large)</p></li>
+<li><p>Plugin code shipped even if unused</p></li>
+<li><p>Namespace management complexity</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="decision">
+<h2>Decision<a class="headerlink" href="#decision" title="Link to this heading">¶</a></h2>
+<p>We will implement <strong>Option 2: Dual Package with Shared Core</strong>.</p>
+<section id="package-structure">
+<h3>Package Structure<a class="headerlink" href="#package-structure" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">async</span><span class="o">-</span><span class="n">debug</span><span class="o">-</span><span class="n">toolbar</span><span class="o">/</span>              <span class="c1"># Core package</span>
+</span><span data-line="2">  <span class="o">-</span> <span class="n">Panel</span> <span class="n">base</span> <span class="n">classes</span>
+</span><span data-line="3">  <span class="o">-</span> <span class="n">Configuration</span> <span class="n">system</span>
+</span><span data-line="4">  <span class="o">-</span> <span class="n">Storage</span> <span class="n">backend</span>
+</span><span data-line="5">  <span class="o">-</span> <span class="n">Template</span> <span class="n">engine</span>
+</span><span data-line="6">  <span class="o">-</span> <span class="n">Built</span><span class="o">-</span><span class="ow">in</span> <span class="n">panels</span>
+</span><span data-line="7">  <span class="o">-</span> <span class="n">Abstract</span> <span class="n">ASGI</span> <span class="n">adapter</span>
+</span><span data-line="8">
+</span><span data-line="9"><span class="n">litestar</span><span class="o">-</span><span class="n">debug</span><span class="o">-</span><span class="n">toolbar</span><span class="o">/</span>           <span class="c1"># Plugin package</span>
+</span><span data-line="10">  <span class="o">-</span> <span class="n">LitestarDebugToolbarPlugin</span>
+</span><span data-line="11">  <span class="o">-</span> <span class="n">LitestarDebugToolbarMiddleware</span>
+</span><span data-line="12">  <span class="o">-</span> <span class="n">LitestarAdapter</span> <span class="p">(</span><span class="n">implements</span> <span class="n">abstract</span> <span class="n">adapter</span><span class="p">)</span>
+</span><span data-line="13">  <span class="o">-</span> <span class="n">Litestar</span><span class="o">-</span><span class="n">specific</span> <span class="n">panels</span>
+</span></pre></div>
+</div>
+</section>
+<section id="dependency-flow">
+<h3>Dependency Flow<a class="headerlink" href="#dependency-flow" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1">litestar-debug-toolbar
+</span><span data-line="2">    └── depends on: async-debug-toolbar&gt;=1.0
+</span><span data-line="3">    └── depends on: litestar&gt;=2.0
+</span><span data-line="4">
+</span><span data-line="5">async-debug-toolbar
+</span><span data-line="6">    └── depends on: jinja2&gt;=3.1
+</span><span data-line="7">    └── optional[advanced-alchemy]: advanced-alchemy&gt;=0.10
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="consequences">
+<h2>Consequences<a class="headerlink" href="#consequences" title="Link to this heading">¶</a></h2>
+<section id="positive">
+<h3>Positive<a class="headerlink" href="#positive" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Framework Independence</strong>: Core can be used as foundation for FastAPI, Starlette, Quart, etc.</p></li>
+<li><p><strong>Minimal Dependencies</strong>: Core has only Jinja2 as dependency</p></li>
+<li><p><strong>Clear Boundaries</strong>: Framework-specific code isolated in plugin package</p></li>
+<li><p><strong>Testing Isolation</strong>: Core tests don’t require Litestar</p></li>
+<li><p><strong>Versioning Flexibility</strong>: Can release core and plugin independently</p></li>
+</ol>
+</section>
+<section id="negative">
+<h3>Negative<a class="headerlink" href="#negative" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Installation Complexity</strong>: Users install two packages (mitigated by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">litestar-debug-toolbar</span></code> which pulls in core)</p></li>
+<li><p><strong>Cross-Package Changes</strong>: Some changes require coordinated releases</p></li>
+<li><p><strong>Documentation Split</strong>: Must document both packages clearly</p></li>
+</ol>
+</section>
+<section id="neutral">
+<h3>Neutral<a class="headerlink" href="#neutral" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Monorepo vs. Multi-repo</strong>: We’ll use a monorepo with both packages for easier development, but publish as separate PyPI packages</p></li>
+</ol>
+</section>
+</section>
+<section id="implementation-notes">
+<h2>Implementation Notes<a class="headerlink" href="#implementation-notes" title="Link to this heading">¶</a></h2>
+<section id="core-package-async-debug-toolbar">
+<h3>Core Package (<code class="docutils literal notranslate"><span class="pre">async-debug-toolbar</span></code>)<a class="headerlink" href="#core-package-async-debug-toolbar" title="Link to this heading">¶</a></h3>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[project]</span>
+</span><span data-line="2"><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;async-debug-toolbar&quot;</span>
+</span><span data-line="3"><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;jinja2&gt;=3.1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;markupsafe&gt;=2.1&quot;</span><span class="p">]</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="k">[project.optional-dependencies]</span>
+</span><span data-line="6"><span class="n">advanced-alchemy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;advanced-alchemy&gt;=0.10&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;sqlalchemy&gt;=2.0&quot;</span><span class="p">]</span>
+</span></pre></div>
+</div>
+</section>
+<section id="plugin-package-litestar-debug-toolbar">
+<h3>Plugin Package (<code class="docutils literal notranslate"><span class="pre">litestar-debug-toolbar</span></code>)<a class="headerlink" href="#plugin-package-litestar-debug-toolbar" title="Link to this heading">¶</a></h3>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">[project]</span>
+</span><span data-line="2"><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;litestar-debug-toolbar&quot;</span>
+</span><span data-line="3"><span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;async-debug-toolbar&gt;=1.0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;litestar&gt;=2.0&quot;</span><span class="p">]</span>
+</span></pre></div>
+</div>
+</section>
+<section id="abstract-adapter-pattern">
+<h3>Abstract Adapter Pattern<a class="headerlink" href="#abstract-adapter-pattern" title="Link to this heading">¶</a></h3>
+<p>The core defines an abstract <code class="docutils literal notranslate"><span class="pre">ASGIAdapter</span></code> that framework plugins implement:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># async_debug_toolbar/adapters/base.py</span>
+</span><span data-line="2"><span class="k">class</span><span class="w"> </span><span class="nc">ASGIAdapter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span data-line="3">    <span class="nd">@abstractmethod</span>
+</span><span data-line="4">    <span class="k">def</span><span class="w"> </span><span class="nf">get_routes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span> <span class="o">...</span>
+</span><span data-line="5">
+</span><span data-line="6">    <span class="nd">@abstractmethod</span>
+</span><span data-line="7">    <span class="k">def</span><span class="w"> </span><span class="nf">should_inject_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
+</span><span data-line="8">
+</span><span data-line="9">    <span class="nd">@abstractmethod</span>
+</span><span data-line="10">    <span class="k">def</span><span class="w"> </span><span class="nf">inject_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span> <span class="o">...</span>
+</span></pre></div>
+</div>
+<p>Framework plugins provide concrete implementations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># litestar_debug_toolbar/adapter.py</span>
+</span><span data-line="2"><span class="k">class</span><span class="w"> </span><span class="nc">LitestarAdapter</span><span class="p">(</span><span class="n">ASGIAdapter</span><span class="p">):</span>
+</span><span data-line="3">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span> <span class="n">Litestar</span><span class="p">):</span> <span class="o">...</span>
+</span><span data-line="4">    <span class="k">def</span><span class="w"> </span><span class="nf">get_routes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+</span><span data-line="5">        <span class="c1"># Litestar-specific route extraction</span>
+</span><span data-line="6">        <span class="o">...</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="related-decisions">
+<h2>Related Decisions<a class="headerlink" href="#related-decisions" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>ADR-002: Panel Architecture (TBD)</p></li>
+<li><p>ADR-003: Storage Backend Selection (TBD)</p></li>
+<li><p>ADR-004: Security Model (TBD)</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://django-debug-toolbar.readthedocs.io/">Django Debug Toolbar Architecture</a></p></li>
+<li><p><a class="reference external" href="https://github.com/mongkok/fastapi-debug-toolbar">FastAPI Debug Toolbar</a></p></li>
+<li><p><a class="reference external" href="https://flask-debugtoolbar.readthedocs.io/">Flask Debug Toolbar</a></p></li>
+<li><p><a class="reference external" href="https://docs.litestar.dev/latest/usage/middleware/">Litestar Middleware Documentation</a></p></li>
+<li><p><a class="reference external" href="https://docs.litestar.dev/latest/usage/plugins/">Litestar Plugin Documentation</a></p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../ARCHITECTURE.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Async Python Debug Toolbar - Architecture Document</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="ADR-002-panel-system-design.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">ADR-002: Panel System Design</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/async-python-debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../../_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
