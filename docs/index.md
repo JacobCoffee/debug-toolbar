@@ -79,7 +79,7 @@ poetry add debug-toolbar[all]
 :link: getting-started
 :link-type: doc
 
-New to async-debug-toolbar? Start here for installation and your first integration.
+New to debug-toolbar? Start here for installation and your first integration.
 :::
 
 :::{grid-item-card} Configuration
