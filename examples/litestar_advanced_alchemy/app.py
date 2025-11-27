@@ -218,7 +218,12 @@ toolbar_config = LitestarDebugToolbarConfig(
     exclude_paths=["/_debug_toolbar", "/favicon.ico"],
     show_on_errors=True,
     max_request_history=100,
-    extra_panels=["debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel"],
+    extra_panels=[
+        "debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel",
+        "debug_toolbar.core.panels.headers.HeadersPanel",
+        "debug_toolbar.core.panels.settings.SettingsPanel",
+        "debug_toolbar.core.panels.profiling.ProfilingPanel",
+    ],
 )
 
 app = Litestar(
