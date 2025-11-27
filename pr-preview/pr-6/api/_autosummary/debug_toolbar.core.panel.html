@@ -2,7 +2,7 @@
 <html lang="en" data-accent-color="violet" data-content_root="../../">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>debug_toolbar.core.panel - Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="debug_toolbar.core.panels" href="debug_toolbar.core.panels.html" /><link rel="prev" title="debug_toolbar.core.context" href="debug_toolbar.core.context.html" /><script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>debug_toolbar.core.panel - Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="debug_toolbar.core.context" href="debug_toolbar.core.context.html" /><link rel="prev" title="debug_toolbar.core.config" href="debug_toolbar.core.config.html" /><script>
     function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
     setColorMode(localStorage._theme||"auto");
   </script><link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=e1a1ceaf" />
@@ -75,30 +75,14 @@ data-aria-dark="Switch to auto color mode">
 <p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="debug_toolbar.html">debug_toolbar</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="debug_toolbar.core.html">debug_toolbar.core</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">debug_toolbar.core.panel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="debug_toolbar.litestar.routes.html">debug_toolbar.litestar.routes</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../comparison.html">Debug Toolbar Comparison</a></li>
@@ -165,16 +149,8 @@ data-aria-dark="Switch to auto color mode">
         <span>/</span>
         <meta itemprop="position" content="2" />
       </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-        <a itemprop="item" href="debug_toolbar.html"><span itemprop="name">debug_toolbar</span></a>
-        <span>/</span>
-        <meta itemprop="position" content="3" />
-      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-        <a itemprop="item" href="debug_toolbar.core.html"><span itemprop="name">debug_toolbar.core</span></a>
-        <span>/</span>
-        <meta itemprop="position" content="4" />
-      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
         <strong itemprop="name">debug_toolbar.core.panel</strong>
-        <meta itemprop="position" content="5" />
+        <meta itemprop="position" content="3" />
       </li></ol>
     <div class="xl:hidden ml-1">
       <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
@@ -193,7 +169,7 @@ data-aria-dark="Switch to auto color mode">
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Panel</span></code></a>(toolbar)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../index.html#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Panel</span></code></a>(toolbar)</p></td>
 <td><p>Abstract base class for debug toolbar panels.</p></td>
 </tr>
 </tbody>
@@ -283,7 +259,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <p>This method is called during request processing to collect data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
@@ -301,7 +277,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <p>Override this to perform actions at the start of request processing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -316,7 +292,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <p>Override this to perform actions at the end of request processing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -330,7 +306,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <dd><p>Get stored stats from context.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
@@ -348,7 +324,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p></li>
 <li><p><strong>stats</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Dictionary of stats to store.</p></li>
 </ul>
 </dd>
@@ -365,7 +341,7 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
 <p>Override this to contribute to the Server-Timing header.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="debug_toolbar.core.context.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
+<dd class="field-odd"><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../index.html#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a></span>) – The current request context.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span></p>
@@ -414,16 +390,16 @@ nav_subtitle: Subtitle shown in the toolbar navigation.</p>
   </svg>
   <span>Back to top</span>
 </button><div class="navigation flex print:hidden"><div class="navigation-prev">
-    <a href="debug_toolbar.core.context.html">
+    <a href="debug_toolbar.core.config.html">
       <i class="i-lucide chevron-left"></i>
       <div class="page-info">
-        <span>Previous</span><div class="title">debug_toolbar.core.context</div></div>
+        <span>Previous</span><div class="title">debug_toolbar.core.config</div></div>
     </a>
   </div><div class="navigation-next">
-    <a href="debug_toolbar.core.panels.html">
+    <a href="debug_toolbar.core.context.html">
       <div class="page-info">
         <span>Next</span>
-        <div class="title">debug_toolbar.core.panels</div>
+        <div class="title">debug_toolbar.core.context</div>
       </div>
       <i class="i-lucide chevron-right"></i>
     </a>

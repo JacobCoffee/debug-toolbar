@@ -75,30 +75,14 @@ data-aria-dark="Switch to auto color mode">
 <p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.html">debug_toolbar</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.html">debug_toolbar.core</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.routes.html">debug_toolbar.litestar.routes</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../comparison.html">Debug Toolbar Comparison</a></li>
@@ -170,7 +154,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="11">
 </span><span data-line="12">
 <div class="viewcode-block" id="DebugToolbarConfig">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.config.html#debug_toolbar.DebugToolbarConfig">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.config.html#debug_toolbar.core.config.DebugToolbarConfig">[docs]</a>
 </span><span data-line="13"><span class="nd">@dataclass</span>
 </span><span data-line="14"><span class="k">class</span><span class="w"> </span><span class="nc">DebugToolbarConfig</span><span class="p">:</span>
 </span><span data-line="15"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for the debug toolbar.</span>
@@ -216,7 +200,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="55">    <span class="n">panel_display_max_string</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
 </span><span data-line="56">
 <div class="viewcode-block" id="DebugToolbarConfig.get_all_panels">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.config.html#debug_toolbar.DebugToolbarConfig.get_all_panels">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.config.html#debug_toolbar.core.config.DebugToolbarConfig.get_all_panels">[docs]</a>
 </span><span data-line="57">    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_panels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">type</span><span class="p">[</span><span class="n">Panel</span><span class="p">]]:</span>
 </span><span data-line="58"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all panels including extras, excluding excluded panels.&quot;&quot;&quot;</span>
 </span><span data-line="59">        <span class="n">all_panels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panels</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_panels</span><span class="p">)</span>

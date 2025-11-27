@@ -75,30 +75,14 @@ data-aria-dark="Switch to auto color mode">
 <p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.html">debug_toolbar</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.html">debug_toolbar.core</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.extras.html">debug_toolbar.extras</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.extras.advanced_alchemy.html">debug_toolbar.extras.advanced_alchemy</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.html">debug_toolbar.litestar</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.routes.html">debug_toolbar.litestar.routes</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../comparison.html">Debug Toolbar Comparison</a></li>
@@ -171,7 +155,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="12">
 </span><span data-line="13">
 <div class="viewcode-block" id="ToolbarStorage">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage">[docs]</a>
 </span><span data-line="14"><span class="k">class</span><span class="w"> </span><span class="nc">ToolbarStorage</span><span class="p">:</span>
 </span><span data-line="15"><span class="w">    </span><span class="sd">&quot;&quot;&quot;Thread-safe LRU storage for toolbar request history.</span>
 </span><span data-line="16">
@@ -185,7 +169,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="24">    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;_lock&quot;</span><span class="p">,</span> <span class="s2">&quot;_store&quot;</span><span class="p">,</span> <span class="s2">&quot;max_size&quot;</span><span class="p">)</span>
 </span><span data-line="25">
 <div class="viewcode-block" id="ToolbarStorage.__init__">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.__init__">[docs]</a>
 </span><span data-line="26">    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="27"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the storage.</span>
 </span><span data-line="28">
@@ -198,7 +182,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="35">
 <div class="viewcode-block" id="ToolbarStorage.store">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.store">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.store">[docs]</a>
 </span><span data-line="36">    <span class="k">def</span><span class="w"> </span><span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="37"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store request data.</span>
 </span><span data-line="38">
@@ -216,7 +200,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="50">
 <div class="viewcode-block" id="ToolbarStorage.get">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.get">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.get">[docs]</a>
 </span><span data-line="51">    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="52"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve request data.</span>
 </span><span data-line="53">
@@ -231,7 +215,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="62">
 <div class="viewcode-block" id="ToolbarStorage.get_all">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.get_all">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.get_all">[docs]</a>
 </span><span data-line="63">    <span class="k">def</span><span class="w"> </span><span class="nf">get_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">UUID</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
 </span><span data-line="64"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all stored requests.</span>
 </span><span data-line="65">
@@ -243,7 +227,7 @@ data-aria-dark="Switch to auto color mode">
 
 </span><span data-line="71">
 <div class="viewcode-block" id="ToolbarStorage.clear">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.clear">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.clear">[docs]</a>
 </span><span data-line="72">    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="73"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear all stored requests.&quot;&quot;&quot;</span>
 </span><span data-line="74">        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
@@ -256,7 +240,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="80">            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_store</span><span class="p">)</span>
 </span><span data-line="81">
 <div class="viewcode-block" id="ToolbarStorage.store_from_context">
-<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.ToolbarStorage.store_from_context">[docs]</a>
+<a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.core.storage.html#debug_toolbar.core.storage.ToolbarStorage.store_from_context">[docs]</a>
 </span><span data-line="82">    <span class="k">def</span><span class="w"> </span><span class="nf">store_from_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">RequestContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span data-line="83"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Store data from a request context.</span>
 </span><span data-line="84">

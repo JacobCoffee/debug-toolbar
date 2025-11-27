@@ -1,4 +1,4 @@
-debug\_toolbar.core.panel
+﻿debug\_toolbar.core.panel
 =========================
 
 .. automodule:: debug_toolbar.core.panel
