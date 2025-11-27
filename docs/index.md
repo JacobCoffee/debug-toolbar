@@ -107,7 +107,7 @@ Build your own debug panels with the extensible panel system.
 :link: comparison
 :link-type: doc
 
-See how async-debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
+See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
 :::
 
 :::{grid-item-card} API Reference
