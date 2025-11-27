@@ -118,6 +118,33 @@ Complete API documentation for all public classes and functions.
 :::
 ::::
 
+## Quick Start
+
+```python
+from litestar import Litestar, get
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+
+@get("/")
+async def index() -> dict[str, str]:
+    return {"message": "Hello, World!"}
+
+config = LitestarDebugToolbarConfig(enabled=True)
+app = Litestar(
+    route_handlers=[index],
+    plugins=[DebugToolbarPlugin(config)],
+)
+```
+
+## Features
+
+- **Async-Native**: Built from the ground up for async/await patterns
+- **Framework-Agnostic Core**: Works with any ASGI framework
+- **Litestar Integration**: First-class plugin support
+- **Pluggable Panels**: Easy to add, remove, or customize
+- **Dark/Light Themes**: Toggle between themes
+- **Flexible Positioning**: Left, right, top, or bottom
+- **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
+
 ## Screenshots
 
 ::::{grid} 1
@@ -154,33 +181,6 @@ Browse past requests
 :::
 
 ::::
-
-## Features
-
-- **Async-Native**: Built from the ground up for async/await patterns
-- **Framework-Agnostic Core**: Works with any ASGI framework
-- **Litestar Integration**: First-class plugin support
-- **Pluggable Panels**: Easy to add, remove, or customize
-- **Dark/Light Themes**: Toggle between themes
-- **Flexible Positioning**: Left, right, top, or bottom
-- **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
-
-## Quick Start
-
-```python
-from litestar import Litestar, get
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-
-@get("/")
-async def index() -> dict[str, str]:
-    return {"message": "Hello, World!"}
-
-config = LitestarDebugToolbarConfig(enabled=True)
-app = Litestar(
-    route_handlers=[index],
-    plugins=[DebugToolbarPlugin(config)],
-)
-```
 
 ```{toctree}
 :maxdepth: 2
