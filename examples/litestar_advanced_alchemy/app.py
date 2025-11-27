@@ -28,8 +28,9 @@ from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, delete, get, post
+
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
 from .models import Post, User
 

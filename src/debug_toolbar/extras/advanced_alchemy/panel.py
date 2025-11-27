@@ -25,12 +25,10 @@ class ExplainExecutor:
     """Executes EXPLAIN queries for different database dialects."""
 
     DIALECT_EXPLAIN_PREFIX: ClassVar[dict[str, str]] = {
-        "postgresql": "EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)",
+        "postgresql": "EXPLAIN (BUFFERS, FORMAT TEXT)",
         "sqlite": "EXPLAIN QUERY PLAN",
         "mysql": "EXPLAIN",
         "mariadb": "EXPLAIN",
-        "oracle": "EXPLAIN PLAN FOR",
-        "mssql": "SET SHOWPLAN_TEXT ON;",
     }
 
     SUPPORTED_DIALECTS: ClassVar[set[str]] = {
@@ -136,7 +134,6 @@ class QueryTracker:
         self.queries: list[dict[str, Any]] = []
         self._query_start_times: dict[int, float] = {}
         self._enabled = False
-        self._dialect_name: str = ""
 
     def start(self) -> None:
         """Start tracking queries."""
@@ -166,7 +163,6 @@ class QueryTracker:
         if not self._enabled:
             return
         self._query_start_times[id(cursor)] = time.perf_counter()
-        self._dialect_name = conn.dialect.name
 
     def after_cursor_execute(
         self,
