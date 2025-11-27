@@ -21,7 +21,7 @@ if TYPE_CHECKING:
         Jinja2Template = Any  # type: ignore[misc]
 
     try:
-        from mako.template import Template as MakoTemplate
+        from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
     except ImportError:
         MakoTemplate = Any  # type: ignore[misc]
 
@@ -107,7 +107,7 @@ class TemplateRenderTracker:
             return
 
         try:
-            from mako.template import Template as MakoTemplate
+            from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
         except ImportError:
             return
 
@@ -161,7 +161,7 @@ class TemplateRenderTracker:
             return
 
         try:
-            from mako.template import Template as MakoTemplate
+            from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
         except ImportError:
             return
 
