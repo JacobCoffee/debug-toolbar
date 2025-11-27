@@ -23,3 +23,9 @@ def toolbar(config: DebugToolbarConfig) -> DebugToolbar:
 def context() -> RequestContext:
     """Create a request context."""
     return RequestContext()
+
+
+@pytest.fixture
+def request_context() -> RequestContext:
+    """Create a request context (alias for context)."""
+    return RequestContext()
