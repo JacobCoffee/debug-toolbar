@@ -100,12 +100,34 @@ class QueryTracker:
 
 
 _tracker = QueryTracker()
+_global_listeners_attached = False
 
 
 def _setup_event_listeners(engine: Engine) -> None:
     """Set up SQLAlchemy event listeners on an engine."""
     event.listen(engine, "before_cursor_execute", _tracker.before_cursor_execute)
     event.listen(engine, "after_cursor_execute", _tracker.after_cursor_execute)
+
+
+def _setup_global_listeners() -> bool:
+    """Set up global event listeners for all SQLAlchemy engines.
+
+    Returns:
+        True if listeners were attached, False otherwise.
+    """
+    global _global_listeners_attached  # noqa: PLW0603
+    if _global_listeners_attached:
+        return True
+
+    try:
+        from sqlalchemy.engine import Engine as SAEngine
+
+        event.listen(SAEngine, "before_cursor_execute", _tracker.before_cursor_execute)
+        event.listen(SAEngine, "after_cursor_execute", _tracker.after_cursor_execute)
+        _global_listeners_attached = True
+        return True
+    except Exception:
+        return False
 
 
 def _remove_event_listeners(engine: Engine) -> None:
@@ -153,7 +175,7 @@ class SQLAlchemyPanel(Panel):
     has_content: ClassVar[bool] = True
     nav_title: ClassVar[str] = "SQL"
 
-    __slots__ = ("_engine", "_slow_threshold_ms")
+    __slots__ = ("_engine", "_listeners_attached", "_slow_threshold_ms")
 
     def __init__(
         self,
@@ -171,12 +193,16 @@ class SQLAlchemyPanel(Panel):
         super().__init__(toolbar)
         self._engine = engine
         self._slow_threshold_ms = slow_threshold_ms
+        self._listeners_attached = False
 
         if engine is not None:
             _setup_event_listeners(engine)
+            self._listeners_attached = True
 
     async def process_request(self, context: RequestContext) -> None:
         """Start tracking queries."""
+        if not self._listeners_attached:
+            self._listeners_attached = _setup_global_listeners()
         _tracker.start()
 
     async def process_response(self, context: RequestContext) -> None:
