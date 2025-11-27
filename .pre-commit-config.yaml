@@ -1,0 +1,62 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  # ==================================================================================== #
+  # GENERAL PRE-COMMIT HOOKS
+  # ==================================================================================== #
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+      - id: end-of-file-fixer
+        name: Ensure files end with newline
+      - id: check-yaml
+        name: Check YAML syntax
+        args: [--unsafe]
+      - id: check-toml
+        name: Check TOML syntax
+      - id: check-ast
+        name: Check Python AST
+      - id: check-added-large-files
+        name: Check for large files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: check-case-conflict
+        name: Check for case conflicts
+      - id: detect-private-key
+        name: Detect private keys
+
+  # ==================================================================================== #
+  # RUFF - LINTING AND FORMATTING
+  # ==================================================================================== #
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        name: Run ruff linter
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+        name: Run ruff formatter
+
+  # ==================================================================================== #
+  # CODESPELL - SPELL CHECKING
+  # ==================================================================================== #
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        name: Check spelling
+        args:
+          - --ignore-words-list=crate,nd,sav,afterall,asend
+          - --skip="*.svg,*.lock,*.json"
+        exclude: ^(tests/|docs/_build/)
+
+# Configuration for pre-commit.ci
+ci:
+  autofix_prs: true
+  autofix_commit_msg: '[pre-commit.ci] auto fixes from pre-commit hooks'
+  autoupdate_schedule: weekly
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'

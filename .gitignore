@@ -1,0 +1,162 @@
+# ==================================================================================== #
+# PYTHON
+# ==================================================================================== #
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# ==================================================================================== #
+# VIRTUAL ENVIRONMENTS
+# ==================================================================================== #
+.venv/
+venv/
+ENV/
+env/
+.env
+.envrc
+
+# ==================================================================================== #
+# TESTING & COVERAGE
+# ==================================================================================== #
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+*.log
+.tox/
+.nox/
+
+# ==================================================================================== #
+# TYPE CHECKING & LINTING
+# ==================================================================================== #
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytype/
+.pyre/
+
+# ==================================================================================== #
+# DOCUMENTATION
+# ==================================================================================== #
+docs/_build/
+docs/_autosummary/
+.sphinx-build/
+site/
+
+# ==================================================================================== #
+# JUPYTER NOTEBOOKS
+# ==================================================================================== #
+.ipynb_checkpoints
+*.ipynb
+
+# ==================================================================================== #
+# IDEs & EDITORS
+# ==================================================================================== #
+# PyCharm
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# ==================================================================================== #
+# OPERATING SYSTEM
+# ==================================================================================== #
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ==================================================================================== #
+# PROJECT SPECIFIC
+# ==================================================================================== #
+# Local development files
+*.local
+local/
+tmp/
+temp/
+
+# Claude Code / AI agent artifacts
+.claude-flow/
+.hive-mind/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+logs/
+
+# Environment variables
+.env.local
+.env.*.local
+
+# ==================================================================================== #
+# MISC
+# ==================================================================================== #
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar

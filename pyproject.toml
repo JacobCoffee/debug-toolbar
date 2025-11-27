@@ -1,0 +1,342 @@
+[build-system]
+build-backend = "uv_build"
+requires = ["uv_build>=0.7.5"]
+
+[dependency-groups]
+docs = [
+    "linkify-it-py>=2.0.0",
+    "myst-parser>=4.0.0",
+    "shibuya>=2024.0.0",
+    "sphinx>=7.0.0",
+    "sphinx-autobuild>=2024.0.0",
+    "sphinx-autodoc-typehints>=2.0.0",
+    "sphinx-copybutton>=0.5.0",
+    "sphinx-design>=0.5.0",
+]
+lint = [
+    "codespell>=2.2.6",
+    "prek>=0.2.18",
+    "ruff>=0.9.0",
+    "ty>=0.0.1a7",
+]
+test = [
+    "httpx>=0.27.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.12.0",
+    "pytest-rerunfailures>=16.1",
+    "pytest-socket>=0.7.0",
+    "pytest-sugar>=1.1.1",
+    "pytest-timeout>=2.2.0",
+    "pytest-xdist>=3.5.0",
+]
+dev = [
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "test"},
+]
+
+[project]
+authors = [
+    {name = "Jacob Coffee", email = "jacob@z7x.org"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Debuggers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "jinja2>=3.1.0",
+    "markupsafe>=2.1.0",
+]
+description = "Async-native debug toolbar for Python ASGI frameworks with optional Litestar integration"
+keywords = [
+    "async",
+    "asgi",
+    "debug",
+    "toolbar",
+    "profiling",
+    "litestar",
+    "fastapi",
+    "starlette",
+]
+license = {text = "MIT"}
+name = "debug-toolbar"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+version = "0.1.0"
+
+[project.optional-dependencies]
+advanced-alchemy = [
+    "advanced-alchemy>=0.10.0",
+    "aiosqlite>=0.19.0",
+    "sqlalchemy>=2.0.0",
+]
+all = [
+    "debug-toolbar[litestar,advanced-alchemy]",
+]
+litestar = [
+    "litestar>=2.0.0",
+]
+
+[project.urls]
+Changelog = "https://github.com/JacobCoffee/async-python-debug-toolbar/releases/"
+Discord = "https://discord.gg/litestar-919193495116337154"
+Documentation = "https://jacobcoffee.github.io/async-python-debug-toolbar"
+Homepage = "https://github.com/JacobCoffee/async-python-debug-toolbar"
+"Issue Tracker" = "https://github.com/JacobCoffee/async-python-debug-toolbar/issues"
+Repository = "https://github.com/JacobCoffee/async-python-debug-toolbar"
+
+[tool.codespell]
+skip = "uv.lock"
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "@abstractmethod",
+    "@abc.abstractmethod",
+    "@overload",
+    "if __name__ == .__main__.:",
+    "\\.\\.\\.",
+]
+fail_under = 0
+
+[tool.coverage.run]
+branch = true
+concurrency = ["multiprocessing", "thread"]
+omit = ["*/tests/*"]
+parallel = true
+source = ["debug_toolbar"]
+
+[tool.git-cliff.changelog]
+header = """
+# Changelog
+
+All notable changes to this project will be documented in this file.
+"""
+body = """
+---
+{% if version %}\
+    {% if previous.version %}\
+        ## [{{ version | trim_start_matches(pat="v") }}]($REPO/compare/{{ previous.version }}..{{ version }}) - {{ timestamp | date(format="%Y-%m-%d") }}
+    {% else %}\
+        ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+    {% endif %}\
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits
+    | filter(attribute="scope")
+    | sort(attribute="scope") %}
+        - **({{commit.scope}})**{% if commit.breaking %} [**breaking**]{% endif %} \
+            {{ commit.message }} - ([{{ commit.id | truncate(length=7, end="") }}]($REPO/commit/{{ commit.id }})) - {{ commit.author.name }}
+    {%- endfor -%}
+    {% raw %}\n{% endraw %}\
+    {%- for commit in commits %}
+        {%- if commit.scope -%}
+        {% else -%}
+            - {% if commit.breaking %} [**breaking**]{% endif %}\
+                {{ commit.message }} - ([{{ commit.id | truncate(length=7, end="") }}]($REPO/commit/{{ commit.id }})) - {{ commit.author.name }}
+        {% endif -%}
+    {% endfor -%}
+{% endfor %}\n
+"""
+footer = """
+``debug-toolbar`` Changelog
+"""
+postprocessors = [
+    {pattern = '\$REPO', replace = "https://github.com/JacobCoffee/async-python-debug-toolbar"},
+]
+trim = true
+
+[tool.git-cliff.git]
+commit_parsers = [
+    {message = "^feat", group = "Features"},
+    {message = "^fix", group = "Bug Fixes"},
+    {message = "^doc", group = "Documentation"},
+    {message = "^perf", group = "Performance"},
+    {message = "^refactor", group = "Refactoring"},
+    {message = "^style", group = "Style"},
+    {message = "^revert", group = "Revert"},
+    {message = "^test", group = "Tests"},
+    {message = "^chore\\(version\\):", skip = true},
+    {message = "^chore", group = "Miscellaneous Chores"},
+    {body = ".*security", group = "Security"},
+]
+commit_preprocessors = []
+conventional_commits = true
+filter_commits = false
+filter_unconventional = true
+ignore_tags = ""
+protect_breaking_commits = false
+skip_tags = ""
+sort_commits = "oldest"
+split_commits = false
+tag_pattern = "v[0-9].*"
+topo_order = false
+
+[tool.pytest.ini_options]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--strict-config",
+    "--tb=short",
+    "-p", "no:pastebin",
+    "-p", "no:nose",
+    "-p", "no:doctest",
+    "-ra",
+]
+asyncio_mode = "auto"
+norecursedirs = [
+    ".*",
+    "build",
+    "dist",
+    "*.egg",
+    "venv",
+    ".venv",
+    "node_modules",
+    "_build",
+    "docs",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::pytest.PytestUnraisableExceptionWarning",
+    "ignore::RuntimeWarning",
+]
+markers = [
+    "unit: Unit tests (fast, isolated)",
+    "integration: Integration tests (may use mocked external services)",
+    "e2e: End-to-end tests (full application workflow)",
+    "slow: Tests that take more than 1 second",
+    "requires_network: Tests requiring network access (should be mocked in CI)",
+]
+minversion = "8.0"
+python_classes = ["Test*"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
+timeout = 60
+timeout_method = "thread"
+
+[tool.ruff]
+exclude = ["examples/", "docs/"]
+fix = true
+line-length = 120
+src = ["src/debug_toolbar", "tests"]
+target-version = "py310"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 88
+indent-style = "space"
+quote-style = "double"
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+ignore = [
+    "A005",     # module-shadowing-builtin (types.py is intentional)
+    "ANN401",   # any-type (needed for generic data storage)
+    "ARG002",   # unused-method-argument (panel interface has optional overrides)
+    "B027",     # empty-method-in-abstract-base-class (optional hooks in Panel base class)
+    "BLE001",   # blind-except (sometimes needed for robust error handling)
+    "COM812",   # missing-trailing-comma (conflicts with formatter)
+    "D",        # pydocstyle (too strict for now)
+    "EM",       # flake8-errmsg (too strict)
+    "ERA001",   # commented-out-code
+    "FIX002",   # line-contains-fixme
+    "ISC001",   # single-line-implicit-string-concatenation (conflicts with formatter)
+    "PERF401",  # manual-list-comprehension (async comprehensions are less readable)
+    "PLC0415",  # import-outside-toplevel (allow lazy imports)
+    "PLR0913",  # too-many-arguments
+    "PLR0915",  # too-many-statements (middleware __call__ is complex but necessary)
+    "RUF005",   # collection-literal-concatenation (explicit is clearer here)
+    "RUF012",   # mutable-class-default (Litestar middleware protocol)
+    "RUF022",   # unsorted-all (we organize __all__ by category)
+    "SIM108",   # if-else-block-instead-of-if-exp (explicit is clearer)
+    "TC003",    # move-import-into-type-checking (breaks runtime imports)
+    "TD",       # flake8-todos
+    "TRY003",   # raise-vanilla-args
+    "TRY300",   # try-consider-else (sometimes cleaner in try block)
+]
+select = ["ALL"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["debug_toolbar", "tests"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.*" = [
+    "A",
+    "ANN",
+    "ARG",
+    "ASYNC230",
+    "B",
+    "BLE",
+    "C901",
+    "D",
+    "DTZ",
+    "EM",
+    "ERA001",
+    "FBT",
+    "G",
+    "N",
+    "PGH",
+    "PIE",
+    "PLR",
+    "PLW",
+    "PT011",
+    "PT012",
+    "PTH",
+    "RSE",
+    "S",
+    "S101",
+    "SIM",
+    "SLF001",
+    "TCH",
+    "TRY",
+    "UP006",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ty]
+
+[tool.ty.rules]
+deprecated = "warn"
+not-iterable = "warn"
+
+[tool.ty.src]
+exclude = [
+    "docs/conf.py",
+    "tests/",
+]
+
+[tool.uv]
+default-groups = ["dev"]
