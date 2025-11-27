@@ -288,9 +288,10 @@ def get_toolbar_css() -> str:
 
     The inline toolbar supports 4 positions: right (default), left, top, bottom.
     Position is controlled via data-position attribute on #debug-toolbar element.
+    Theme is controlled via data-theme attribute (dark/light).
     """
     return """
-:root {
+:root, [data-theme="dark"] {
     --dt-bg-primary: #1e1e1e;
     --dt-bg-secondary: #2d2d2d;
     --dt-bg-tertiary: #3d3d3d;
@@ -305,6 +306,21 @@ def get_toolbar_css() -> str:
     --dt-border: #404040;
     --dt-font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
     --dt-font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme="light"] {
+    --dt-bg-primary: #ffffff;
+    --dt-bg-secondary: #f5f5f5;
+    --dt-bg-tertiary: #e8e8e8;
+    --dt-text-primary: #1e1e1e;
+    --dt-text-secondary: #555555;
+    --dt-text-muted: #888888;
+    --dt-accent: #0066cc;
+    --dt-accent-hover: #0052a3;
+    --dt-success: #2e7d32;
+    --dt-warning: #f57c00;
+    --dt-error: #c62828;
+    --dt-border: #d0d0d0;
 }
 
 * { box-sizing: border-box; }
@@ -537,6 +553,18 @@ body {
     padding: 16px;
     border-top: 1px solid var(--dt-border);
     background: var(--dt-bg-primary);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.25s ease-out, opacity 0.2s ease-out, padding 0.25s ease-out;
+    padding: 0 16px;
+}
+
+.panel-content.expanded {
+    max-height: 500px;
+    overflow-y: auto;
+    opacity: 1;
+    padding: 16px;
 }
 
 .panel-table {
@@ -754,12 +782,19 @@ body {
     text-align: left;
 }
 
+.toolbar-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .toolbar-position-controls {
     display: flex;
     gap: 4px;
 }
 
-.toolbar-position-btn {
+.toolbar-position-btn,
+.toolbar-theme-btn {
     background: var(--dt-bg-tertiary);
     border: none;
     width: 24px;
@@ -771,9 +806,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.15s, color 0.15s;
 }
 
-.toolbar-position-btn:hover {
+.toolbar-position-btn:hover,
+.toolbar-theme-btn:hover {
     background: var(--dt-accent);
     color: white;
 }
@@ -781,6 +818,10 @@ body {
 .toolbar-position-btn.active {
     background: var(--dt-accent);
     color: white;
+}
+
+.toolbar-theme-btn {
+    font-size: 14px;
 }
 
 .toolbar-brand {
@@ -839,11 +880,20 @@ body {
 }
 
 .toolbar-details {
-    max-height: 300px;
-    overflow-y: auto;
+    max-height: 0;
+    overflow: hidden;
     border-top: 1px solid var(--dt-border);
-    padding: 16px;
+    padding: 0 16px;
     background: var(--dt-bg-secondary);
+    opacity: 0;
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out, padding 0.3s ease-out;
+}
+
+.toolbar-details.expanded {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 16px;
+    opacity: 1;
 }
 """
 
@@ -856,12 +906,13 @@ function togglePanel(panelId) {
     if (!panel) return;
     const content = panel.querySelector('.panel-content');
     const toggle = panel.querySelector('.panel-toggle');
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        toggle.textContent = '-';
-    } else {
-        content.style.display = 'none';
+    const isExpanded = content.classList.contains('expanded');
+    if (isExpanded) {
+        content.classList.remove('expanded');
         toggle.textContent = '+';
+    } else {
+        content.classList.add('expanded');
+        toggle.textContent = '-';
     }
 }
 
@@ -871,6 +922,7 @@ class DebugToolbar {
         this.isCollapsed = false;
         this.activePanel = null;
         this.position = localStorage.getItem('debug-toolbar-position') || 'right';
+        this.theme = localStorage.getItem('debug-toolbar-theme') || 'dark';
         this.size = parseInt(localStorage.getItem('debug-toolbar-size') || '400', 10);
         this.isResizing = false;
         this.init();
@@ -878,8 +930,10 @@ class DebugToolbar {
 
     init() {
         this.setPosition(this.position);
+        this.setTheme(this.theme);
         this.applySize();
         this.addPositionControls();
+        this.addThemeToggle();
         this.addResizeHandle();
 
         const brand = this.element.querySelector('.toolbar-brand');
@@ -892,6 +946,35 @@ class DebugToolbar {
                 this.showPanel(btn.dataset.panelId);
             });
         });
+    }
+
+    addThemeToggle() {
+        const bar = this.element.querySelector('.toolbar-bar');
+        if (!bar) return;
+
+        const btn = document.createElement('button');
+        btn.className = 'toolbar-theme-btn';
+        btn.title = 'Toggle theme';
+        btn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
+            btn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
+        });
+
+        const controls = bar.querySelector('.toolbar-position-controls');
+        if (controls && controls.parentNode) {
+            controls.parentNode.insertBefore(btn, controls);
+        } else {
+            bar.appendChild(btn);
+        }
+    }
+
+    setTheme(theme) {
+        this.theme = theme;
+        this.element.dataset.theme = theme;
+        document.documentElement.dataset.theme = theme;
+        localStorage.setItem('debug-toolbar-theme', theme);
     }
 
     addResizeHandle() {
@@ -1013,7 +1096,7 @@ class DebugToolbar {
 
         if (this.activePanel === panelId) {
             this.activePanel = null;
-            if (details) details.style.display = 'none';
+            if (details) details.classList.remove('expanded');
             return;
         }
 
@@ -1026,7 +1109,7 @@ class DebugToolbar {
                     const panelData = data.panel_data && data.panel_data[panelId];
                     if (panelData) {
                         details.innerHTML = this.renderPanelData(panelData);
-                        details.style.display = 'block';
+                        details.classList.add('expanded');
                     }
                 })
                 .catch(err => console.error('Failed to load panel data:', err));
