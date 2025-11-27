@@ -8,15 +8,15 @@ from uuid import UUID
 from litestar.exceptions import NotFoundException
 from litestar.response import Response
 
-from litestar import Router, get
+from litestar import Request, Router, get, post
 
 if TYPE_CHECKING:
     from debug_toolbar.core.storage import ToolbarStorage
 
 
-MAX_STRING_LENGTH = 200
-MAX_ITEMS_DISPLAY = 10
-MAX_VALUE_PREVIEW = 100
+DEFAULT_DISPLAY_DEPTH = 10
+DEFAULT_MAX_ITEMS = 100
+DEFAULT_MAX_STRING = 1000
 
 
 def _escape_html(text: str) -> str:
@@ -30,7 +30,12 @@ def _escape_html(text: str) -> str:
     )
 
 
-def _format_value(value: Any, max_depth: int = 3) -> str:  # noqa: PLR0911
+def _format_value(  # noqa: PLR0911, PLR0912, C901
+    value: Any,
+    max_depth: int = DEFAULT_DISPLAY_DEPTH,
+    max_items: int = DEFAULT_MAX_ITEMS,
+    max_string: int = DEFAULT_MAX_STRING,
+) -> str:
     """Format a value for HTML display."""
     if value is None:
         return "<span class='null'>null</span>"
@@ -41,22 +46,30 @@ def _format_value(value: Any, max_depth: int = 3) -> str:  # noqa: PLR0911
             return f"<span class='number'>{value:.4f}</span>"
         return f"<span class='number'>{value}</span>"
     if isinstance(value, str):
-        if len(value) > MAX_STRING_LENGTH:
-            return f"<span class='string'>{_escape_html(value[:MAX_STRING_LENGTH])}...</span>"
+        if len(value) > max_string:
+            return f"<span class='string'>{_escape_html(value[:max_string])}...</span>"
         return f"<span class='string'>{_escape_html(value)}</span>"
     if isinstance(value, list | tuple):
-        if max_depth <= 0 or len(value) > MAX_ITEMS_DISPLAY:
+        if max_depth <= 0:
             return f"<span class='array'>[{len(value)} items]</span>"
-        items = ", ".join(_format_value(v, max_depth - 1) for v in value[:MAX_ITEMS_DISPLAY])
+        shown = value[:max_items]
+        items = ", ".join(_format_value(v, max_depth - 1, max_items, max_string) for v in shown)
+        if len(value) > max_items:
+            return f"<span class='array'>[{items}, ...{len(value) - max_items} more]</span>"
         return f"<span class='array'>[{items}]</span>"
     if isinstance(value, dict):
-        if max_depth <= 0 or len(value) > MAX_ITEMS_DISPLAY:
-            return f"<span class='object'>{{'{len(value)} keys'}}</span>"
+        if max_depth <= 0:
+            return f"<span class='object'>{{{len(value)} keys}}</span>"
         items = []
-        for k, v in list(value.items())[:MAX_ITEMS_DISPLAY]:
-            items.append(f"<strong>{_escape_html(str(k))}</strong>: {_format_value(v, max_depth - 1)}")
-        return f"<span class='object'>{{'{', '.join(items)}'}}</span>"
-    return f"<span class='unknown'>{_escape_html(str(value)[:MAX_VALUE_PREVIEW])}</span>"
+        dict_items = list(value.items())[:max_items]
+        for k, v in dict_items:
+            items.append(
+                f"<strong>{_escape_html(str(k))}</strong>: {_format_value(v, max_depth - 1, max_items, max_string)}"
+            )
+        if len(value) > max_items:
+            items.append(f"...{len(value) - max_items} more")
+        return f"<span class='object'>{{{', '.join(items)}}}</span>"
+    return f"<span class='unknown'>{_escape_html(str(value)[:max_string])}</span>"
 
 
 def _render_panel_content(stats: dict[str, Any]) -> str:
@@ -95,7 +108,7 @@ def _render_request_row(request_id: UUID, data: dict[str, Any]) -> str:
     """
 
 
-def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
+def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C901
     """Create the debug toolbar router with routes.
 
     Args:
@@ -278,6 +291,25 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
             raise NotFoundException(f"Request {request_id} not found")
         return {"request_id": str(request_id), **data}
 
+    async def post_explain(request: Request, data: dict[str, Any]) -> dict[str, Any]:
+        """Execute EXPLAIN for a SQL query.
+
+        Expects JSON body with 'sql' and optional 'parameters'.
+        Requires app.state.db_engine to be set.
+        """
+        from debug_toolbar.extras.advanced_alchemy.panel import ExplainExecutor
+
+        sql = data.get("sql")
+        parameters = data.get("parameters")
+        if not sql:
+            return {"error": "Missing 'sql' in request body"}
+
+        engine = getattr(request.app.state, "db_engine", None)
+        if not engine:
+            return {"error": "No database engine available for EXPLAIN"}
+
+        return await ExplainExecutor.execute_explain(engine, sql, parameters)
+
     async def get_static_css() -> Response[str]:
         """Serve the toolbar CSS."""
         css = get_toolbar_css()
@@ -292,6 +324,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
     detail_handler = get("/{request_id:uuid}")(get_request_detail)
     api_requests_handler = get("/api/requests")(get_requests_json)
     api_request_handler = get("/api/requests/{request_id:uuid}")(get_request_json)
+    api_explain_handler = post("/api/explain")(post_explain)
     css_handler = get("/static/toolbar.css")(get_static_css)
     js_handler = get("/static/toolbar.js")(get_static_js)
 
@@ -302,6 +335,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
             detail_handler,
             api_requests_handler,
             api_request_handler,
+            api_explain_handler,
             css_handler,
             js_handler,
         ],
@@ -809,6 +843,21 @@ body {
     flex-wrap: wrap;
 }
 
+/* Horizontal layout for top/bottom positions */
+#debug-toolbar[data-position="top"] .toolbar-bar,
+#debug-toolbar[data-position="bottom"] .toolbar-bar {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+#debug-toolbar[data-position="top"] .toolbar-panels,
+#debug-toolbar[data-position="bottom"] .toolbar-panels {
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
 /* Vertical layout for side positions */
 #debug-toolbar[data-position="right"] .toolbar-bar,
 #debug-toolbar[data-position="left"] .toolbar-bar {
@@ -936,10 +985,172 @@ body {
 }
 
 .toolbar-details.expanded {
-    max-height: 400px;
+    max-height: 60vh;
     overflow-y: auto;
     padding: 16px;
     opacity: 1;
+}
+
+.sql-query-container {
+    margin-bottom: 16px;
+    background: var(--dt-bg-tertiary);
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.sql-query-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sql-query-title {
+    font-weight: 600;
+    color: var(--dt-text-primary);
+}
+
+.sql-query-code {
+    background: var(--dt-bg-primary);
+    padding: 10px;
+    border-radius: 4px;
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-warning);
+    overflow-x: auto;
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.sql-query-params {
+    font-size: 11px;
+    color: var(--dt-text-secondary);
+    margin-bottom: 8px;
+}
+
+.sql-explain-btn {
+    background: var(--dt-accent);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--dt-font-mono);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.sql-explain-btn:hover {
+    background: var(--dt-accent-hover);
+}
+
+.sql-explain-btn:disabled {
+    background: var(--dt-bg-tertiary);
+    color: var(--dt-text-muted);
+    cursor: not-allowed;
+}
+
+.explain-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.explain-modal-content {
+    background: var(--dt-bg-primary);
+    border: 2px solid var(--dt-accent);
+    border-radius: 8px;
+    max-width: 900px;
+    max-height: 80vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.explain-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--dt-border);
+}
+
+.explain-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dt-accent);
+    margin: 0;
+}
+
+.explain-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--dt-text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.explain-modal-close:hover {
+    background: var(--dt-bg-tertiary);
+    color: var(--dt-text-primary);
+}
+
+.explain-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.explain-result {
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+}
+
+.explain-result pre {
+    background: var(--dt-bg-secondary);
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 0;
+}
+
+.explain-error {
+    color: var(--dt-error);
+    padding: 12px;
+    background: rgba(241, 76, 76, 0.1);
+    border-radius: 4px;
+    border-left: 3px solid var(--dt-error);
+}
+
+.toolbar-controls-separator {
+    color: var(--dt-text-muted);
+    margin: 0 4px;
+    font-size: 14px;
+}
+
+.toolbar-request-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--dt-text-secondary);
 }
 """
 
@@ -982,11 +1193,12 @@ class DebugToolbar {
     }
 
     init() {
+        window.debugToolbar = this;
         this.setPosition(this.position);
         this.setTheme(this.theme);
         this.applySize();
-        this.addPositionControls();
         this.addThemeToggle();
+        this.addPositionControls();
         this.addResizeHandle();
 
         const brand = this.element.querySelector('.toolbar-brand');
@@ -1002,25 +1214,15 @@ class DebugToolbar {
     }
 
     addThemeToggle() {
-        const bar = this.element.querySelector('.toolbar-bar');
-        if (!bar) return;
-
-        const btn = document.createElement('button');
-        btn.className = 'toolbar-theme-btn';
-        btn.title = 'Toggle theme';
-        btn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
-        btn.addEventListener('click', (e) => {
+        this.themeBtn = document.createElement('button');
+        this.themeBtn.className = 'toolbar-theme-btn';
+        this.themeBtn.title = 'Toggle theme';
+        this.themeBtn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
+        this.themeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
-            btn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
+            this.themeBtn.innerHTML = this.theme === 'dark' ? '\u2600' : '\u263e';
         });
-
-        const controls = bar.querySelector('.toolbar-position-controls');
-        if (controls && controls.parentNode) {
-            controls.parentNode.insertBefore(btn, controls);
-        } else {
-            bar.appendChild(btn);
-        }
     }
 
     setTheme(theme) {
@@ -1094,28 +1296,42 @@ class DebugToolbar {
         const bar = this.element.querySelector('.toolbar-bar');
         if (!bar) return;
 
-        const controls = document.createElement('div');
-        controls.className = 'toolbar-position-controls';
-        controls.innerHTML = [
+        const controlsWrapper = document.createElement('div');
+        controlsWrapper.className = 'toolbar-controls';
+
+        const positionControls = document.createElement('div');
+        positionControls.className = 'toolbar-position-controls';
+
+        const positions = [
             { pos: 'left', label: '\u25c0' },
             { pos: 'top', label: '\u25b2' },
             { pos: 'bottom', label: '\u25bc' },
             { pos: 'right', label: '\u25b6' }
-        ].map(p => {
-            const active = p.pos === this.position ? ' active' : '';
-            return '<button class="toolbar-position-btn' + active + '" ' +
-                   'data-position="' + p.pos + '" title="Move to ' + p.pos + '">' +
-                   p.label + '</button>';
-        }).join('');
+        ];
 
-        controls.querySelectorAll('.toolbar-position-btn').forEach(btn => {
+        positions.forEach(p => {
+            const btn = document.createElement('button');
+            btn.className = 'toolbar-position-btn' + (p.pos === this.position ? ' active' : '');
+            btn.dataset.position = p.pos;
+            btn.title = 'Move to ' + p.pos;
+            btn.textContent = p.label;
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.setPosition(btn.dataset.position);
+                this.setPosition(p.pos);
             });
+            positionControls.appendChild(btn);
         });
 
-        bar.appendChild(controls);
+        const separator = document.createElement('span');
+        separator.className = 'toolbar-controls-separator';
+        separator.textContent = '|';
+
+        controlsWrapper.appendChild(positionControls);
+        controlsWrapper.appendChild(separator);
+        if (this.themeBtn) {
+            controlsWrapper.appendChild(this.themeBtn);
+        }
+        bar.appendChild(controlsWrapper);
     }
 
     setPosition(position) {
@@ -1161,7 +1377,11 @@ class DebugToolbar {
                 .then(data => {
                     const panelData = data.panel_data && data.panel_data[panelId];
                     if (panelData) {
-                        details.innerHTML = this.renderPanelData(panelData);
+                        if (this.isSqlPanel(panelData)) {
+                            details.innerHTML = this.renderSqlPanel(panelData);
+                        } else {
+                            details.innerHTML = this.renderPanelData(panelData);
+                        }
                         details.classList.add('expanded');
                     }
                 })
@@ -1186,9 +1406,9 @@ class DebugToolbar {
 
     formatValue(value, depth) {
         depth = depth || 0;
-        const maxDepth = 3;
-        const maxItems = 20;
-        const maxStringLen = 500;
+        const maxDepth = 10;
+        const maxItems = 100;
+        const maxStringLen = 1000;
 
         if (value === null || value === undefined) {
             return '<span class="null">null</span>';
@@ -1247,6 +1467,111 @@ class DebugToolbar {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    isSqlPanel(data) {
+        return data && (data.queries !== undefined || data.total_queries !== undefined);
+    }
+
+    renderSqlPanel(data) {
+        if (!data || !data.queries || data.queries.length === 0) {
+            return '<p class="empty">No SQL queries</p>';
+        }
+
+        let html = '<div class="sql-panel">';
+        html += '<h3>Total Queries: ' + (data.total_queries || data.queries.length) + '</h3>';
+
+        data.queries.forEach((query, index) => {
+            const supportsExplain = query.supports_explain !== false;
+            const sql = query.sql || query.query || '';
+            const params = query.raw_parameters || query.parameters || {};
+            const hasParams = params && Object.keys(params).length > 0;
+            const sqlEncoded = btoa(unescape(encodeURIComponent(sql)));
+            const paramsEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
+
+            html += '<div class="sql-query-container">';
+            html += '<div class="sql-query-header">';
+            html += '<span class="sql-query-title">Query #' + (index + 1) + '</span>';
+            if (supportsExplain) {
+                html += '<button class="sql-explain-btn" data-sql="' + sqlEncoded +
+                        '" data-params="' + paramsEncoded + '">EXPLAIN</button>';
+            } else {
+                html += '<button class="sql-explain-btn" disabled>EXPLAIN (not supported)</button>';
+            }
+            html += '</div>';
+            html += '<div class="sql-query-code">' + this.escapeHtml(sql) + '</div>';
+            if (hasParams) {
+                html += '<div class="sql-query-params"><strong>Parameters:</strong> ' +
+                        this.escapeHtml(JSON.stringify(params)) + '</div>';
+            }
+            if (query.duration !== undefined) {
+                html += '<div class="sql-query-params"><strong>Duration:</strong> ' +
+                        query.duration.toFixed(2) + 'ms</div>';
+            }
+            html += '</div>';
+        });
+
+        html += '</div>';
+
+        setTimeout(() => {
+            document.querySelectorAll('.sql-explain-btn[data-sql]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const sql = decodeURIComponent(escape(atob(btn.dataset.sql)));
+                    const params = JSON.parse(decodeURIComponent(escape(atob(btn.dataset.params))));
+                    this.runExplain(sql, params);
+                });
+            });
+        }, 0);
+
+        return html;
+    }
+
+    async runExplain(sql, parameters) {
+        const modal = document.createElement('div');
+        modal.className = 'explain-modal';
+        modal.innerHTML = `
+            <div class="explain-modal-content">
+                <div class="explain-modal-header">
+                    <h3 class="explain-modal-title">Query Execution Plan</h3>
+                    <button class="explain-modal-close"
+                            onclick="this.closest('.explain-modal').remove()">&times;</button>
+                </div>
+                <div class="explain-modal-body">
+                    <div class="explain-result">Loading...</div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        try {
+            const response = await fetch('/_debug_toolbar/api/explain', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sql: sql, parameters: parameters })
+            });
+
+            const result = await response.json();
+            const resultDiv = modal.querySelector('.explain-result');
+
+            if (result.error) {
+                resultDiv.innerHTML = '<div class="explain-error">' + this.escapeHtml(result.error) + '</div>';
+            } else if (result.plan) {
+                resultDiv.innerHTML = '<pre>' + this.escapeHtml(JSON.stringify(result.plan, null, 2)) + '</pre>';
+            } else {
+                resultDiv.innerHTML = '<pre>' + this.escapeHtml(JSON.stringify(result, null, 2)) + '</pre>';
+            }
+        } catch (err) {
+            const resultDiv = modal.querySelector('.explain-result');
+            resultDiv.innerHTML = '<div class="explain-error">Failed to execute EXPLAIN: ' +
+                                this.escapeHtml(err.message) + '</div>';
+        }
     }
 }
 

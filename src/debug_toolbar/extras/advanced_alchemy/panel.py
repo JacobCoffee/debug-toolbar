@@ -211,7 +211,7 @@ class QueryTracker:
 
     def _make_serializable(self, value: Any) -> Any:
         """Make a value JSON-serializable."""
-        if isinstance(value, (str, int, float, bool, type(None))):
+        if isinstance(value, str | int | float | bool | type(None)):
             return value
         if isinstance(value, bytes):
             return value.decode("utf-8", errors="replace")

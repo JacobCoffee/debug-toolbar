@@ -244,6 +244,12 @@ toolbar_config = LitestarDebugToolbarConfig(
     ],
 )
 
+
+async def on_startup(app: Litestar) -> None:
+    """Store the database engine in app state for EXPLAIN queries."""
+    app.state.db_engine = db_config.get_engine()
+
+
 app = Litestar(
     route_handlers=[
         index,
@@ -263,5 +269,6 @@ app = Litestar(
         "user_repo": Provide(provide_user_repo),
         "post_repo": Provide(provide_post_repo),
     },
+    on_startup=[on_startup],
     debug=True,
 )
