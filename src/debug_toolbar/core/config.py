@@ -47,6 +47,9 @@ class DebugToolbarConfig:
     allowed_hosts: Sequence[str] = field(default_factory=list)
     extra_panels: Sequence[str | type[Panel]] = field(default_factory=list)
     exclude_panels: Sequence[str] = field(default_factory=list)
+    panel_display_depth: int = 10
+    panel_display_max_items: int = 100
+    panel_display_max_string: int = 1000
 
     def get_all_panels(self) -> list[str | type[Panel]]:
         """Get all panels including extras, excluding excluded panels."""
