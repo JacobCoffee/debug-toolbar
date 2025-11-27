@@ -95,12 +95,12 @@ litestar = [
 ]
 
 [project.urls]
-Changelog = "https://github.com/JacobCoffee/async-python-debug-toolbar/releases/"
+Changelog = "https://github.com/JacobCoffee/debug-toolbar/releases/"
 Discord = "https://discord.gg/litestar-919193495116337154"
-Documentation = "https://jacobcoffee.github.io/async-python-debug-toolbar"
-Homepage = "https://github.com/JacobCoffee/async-python-debug-toolbar"
-"Issue Tracker" = "https://github.com/JacobCoffee/async-python-debug-toolbar/issues"
-Repository = "https://github.com/JacobCoffee/async-python-debug-toolbar"
+Documentation = "https://jacobcoffee.github.io/debug-toolbar"
+Homepage = "https://github.com/JacobCoffee/debug-toolbar"
+"Issue Tracker" = "https://github.com/JacobCoffee/debug-toolbar/issues"
+Repository = "https://github.com/JacobCoffee/debug-toolbar"
 
 [tool.codespell]
 skip = "uv.lock"
@@ -168,7 +168,7 @@ footer = """
 ``debug-toolbar`` Changelog
 """
 postprocessors = [
-    {pattern = '\$REPO', replace = "https://github.com/JacobCoffee/async-python-debug-toolbar"},
+    {pattern = '\$REPO', replace = "https://github.com/JacobCoffee/debug-toolbar"},
 ]
 trim = true
 

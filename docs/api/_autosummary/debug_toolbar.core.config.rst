@@ -1,4 +1,4 @@
-debug\_toolbar.core.config
+﻿debug\_toolbar.core.config
 ==========================
 
 .. automodule:: debug_toolbar.core.config

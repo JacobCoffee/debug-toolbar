@@ -10,8 +10,8 @@ Getting Started
 1. Fork the repository on GitHub
 2. Clone your fork locally::
 
-    git clone https://github.com/YOUR_USERNAME/async-python-debug-toolbar.git
-    cd async-python-debug-toolbar
+    git clone https://github.com/YOUR_USERNAME/debug-toolbar.git
+    cd debug-toolbar
 
 3. Install uv (if not already installed)::
 
@@ -195,9 +195,9 @@ The CD workflow automatically:
 Questions?
 ----------
 
-- Open a `GitHub Discussion <https://github.com/JacobCoffee/async-python-debug-toolbar/discussions>`_
+- Open a `GitHub Discussion <https://github.com/JacobCoffee/debug-toolbar/discussions>`_
 - Join the `Litestar Discord <https://discord.gg/litestar-919193495116337154>`_
-- Check existing `Issues <https://github.com/JacobCoffee/async-python-debug-toolbar/issues>`_
+- Check existing `Issues <https://github.com/JacobCoffee/debug-toolbar/issues>`_
 
 License
 -------

@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml">
-    <img src="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml/badge.svg" alt="Tests And Linting">
+  <a href="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/ci.yml">
+    <img src="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/ci.yml/badge.svg" alt="Tests And Linting">
   </a>
-  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/publish.yml">
-    <img src="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/publish.yml/badge.svg" alt="Latest Release">
+  <a href="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/publish.yml">
+    <img src="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/publish.yml/badge.svg" alt="Latest Release">
   </a>
   <a href="https://pypi.org/project/debug-toolbar/">
     <img src="https://img.shields.io/pypi/v/debug-toolbar.svg" alt="PyPI Version">
@@ -17,16 +17,16 @@
   <a href="https://pypi.org/project/debug-toolbar/">
     <img src="https://img.shields.io/pypi/pyversions/debug-toolbar.svg" alt="Python Versions">
   </a>
-  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/JacobCoffee/async-python-debug-toolbar.svg" alt="License">
+  <a href="https://github.com/JacobCoffee/debug-toolbar/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/JacobCoffee/debug-toolbar.svg" alt="License">
   </a>
 </p>
 
 ---
 
-**Documentation**: [https://jacobcoffee.github.io/async-python-debug-toolbar](https://jacobcoffee.github.io/async-python-debug-toolbar)
+**Documentation**: [https://jacobcoffee.github.io/debug-toolbar](https://jacobcoffee.github.io/debug-toolbar)
 
-**Source Code**: [https://github.com/JacobCoffee/async-python-debug-toolbar](https://github.com/JacobCoffee/async-python-debug-toolbar)
+**Source Code**: [https://github.com/JacobCoffee/debug-toolbar](https://github.com/JacobCoffee/debug-toolbar)
 
 ---
 
@@ -190,8 +190,8 @@ class MyCustomPanel(Panel):
 
 ```bash
 # Clone the repository
-git clone https://github.com/JacobCoffee/async-python-debug-toolbar.git
-cd async-python-debug-toolbar
+git clone https://github.com/JacobCoffee/debug-toolbar.git
+cd debug-toolbar
 
 # Install dependencies
 make dev

@@ -1,4 +1,4 @@
-debug\_toolbar.litestar.middleware
+﻿debug\_toolbar.litestar.middleware
 ==================================
 
 .. automodule:: debug_toolbar.litestar.middleware

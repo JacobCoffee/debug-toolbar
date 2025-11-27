@@ -58,7 +58,7 @@ The Async Python Debug Toolbar provides real-time debugging and profiling capabi
 ### 2.1 Repository Layout
 
 ```
-async-python-debug-toolbar/
+debug-toolbar/
 ├── src/
 │   ├── async_debug_toolbar/          # Core package
 │   │   ├── __init__.py
