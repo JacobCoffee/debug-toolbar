@@ -26,6 +26,9 @@ class DebugToolbarConfig:
         allowed_hosts: List of allowed hosts. Empty list means all hosts.
         extra_panels: Additional panels to add beyond defaults.
         exclude_panels: Panel names to exclude from defaults.
+        panel_display_depth: Max depth for nested data rendering. Defaults to 10.
+        panel_display_max_items: Max items to show in arrays/objects. Defaults to 100.
+        panel_display_max_string: Max string length before truncation. Defaults to 1000.
     """
 
     enabled: bool = True
@@ -47,6 +50,9 @@ class DebugToolbarConfig:
     allowed_hosts: Sequence[str] = field(default_factory=list)
     extra_panels: Sequence[str | type[Panel]] = field(default_factory=list)
     exclude_panels: Sequence[str] = field(default_factory=list)
+    panel_display_depth: int = 10
+    panel_display_max_items: int = 100
+    panel_display_max_string: int = 1000
 
     def get_all_panels(self) -> list[str | type[Panel]]:
         """Get all panels including extras, excluding excluded panels."""

@@ -22,8 +22,9 @@ from datetime import datetime, timezone
 
 from jinja2 import Template
 
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, get
+
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

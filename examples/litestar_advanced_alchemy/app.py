@@ -28,8 +28,9 @@ from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, delete, get, post
+
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
 from .models import Post, User
 
@@ -244,6 +245,12 @@ toolbar_config = LitestarDebugToolbarConfig(
     ],
 )
 
+
+async def on_startup(app: Litestar) -> None:
+    """Store the database engine in app state for EXPLAIN queries."""
+    app.state.db_engine = db_config.get_engine()
+
+
 app = Litestar(
     route_handlers=[
         index,
@@ -263,5 +270,6 @@ app = Litestar(
         "user_repo": Provide(provide_user_repo),
         "post_repo": Provide(provide_post_repo),
     },
+    on_startup=[on_startup],
     debug=True,
 )
