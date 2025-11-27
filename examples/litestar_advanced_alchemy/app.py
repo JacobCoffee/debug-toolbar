@@ -3,6 +3,11 @@
 This example demonstrates using debug-toolbar with Advanced-Alchemy
 for SQLAlchemy integration and query tracking.
 
+UI Features:
+- Toolbar position: Click the arrow buttons to move the toolbar (left/right/top/bottom)
+- Request history: Visit /_debug_toolbar/ to see all recorded requests
+- Panel details: Click panel buttons to expand and view detailed data
+
 Run with: litestar --app examples.litestar_advanced_alchemy.app:app run --reload
 """
 
@@ -83,6 +88,11 @@ async def index() -> str:
         <li>DELETE /api/users/{id} - Delete user</li>
     </ul>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
+    <h2>Toolbar Controls</h2>
+    <ul>
+        <li>Use arrow buttons (&lt; &gt; ^ v) to move the toolbar to different positions</li>
+        <li><a href="/_debug_toolbar/">View Request History</a></li>
+    </ul>
 </body>
 </html>"""
 

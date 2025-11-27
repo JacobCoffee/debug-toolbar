@@ -7,6 +7,11 @@ with a simple Litestar application, including the new Phase 10 panels:
 - Profiling Panel: Request profiling (optional)
 - Templates Panel: Template rendering tracking (with Jinja2)
 
+UI Features:
+- Toolbar position: Click the arrow buttons to move the toolbar (left/right/top/bottom)
+- Request history: Visit /_debug_toolbar/ to see all recorded requests
+- Panel details: Click panel buttons to expand and view detailed data
+
 Run with: litestar --app examples.litestar_basic.app:app run --reload
 """
 
@@ -43,7 +48,9 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Templates Panel</strong> - Track Jinja2 template render times</li>
         <li><strong>Profiling Panel</strong> - Profile request execution (optional)</li>
     </ul>
-    <p>The debug toolbar should appear at the bottom of this page.</p>
+    <p>The debug toolbar should appear on the right side of this page (default position).</p>
+    <p>Use the arrow buttons in the toolbar to move it to left/right/top/bottom.</p>
+    <p><a href="/_debug_toolbar/">View Request History</a></p>
 </body>
 </html>""")
 
