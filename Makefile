@@ -157,7 +157,7 @@ wt-j: worktree-jump ## Alias for worktree-jump
 worktree-jump: ## Jump to a worktree (Usage: cd $(make wt-j NAME=foo) or make wt-j to list)
 	@if [ -z "$(NAME)" ]; then \
 		echo "Available worktrees:"; \
-		git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2; \
+		@git worktree list --porcelain | grep "^worktree" | cut -d' ' -f2; \
 		echo ""; \
 		echo "Usage: cd \$$(make wt-j NAME=<name>)"; \
 	else \
