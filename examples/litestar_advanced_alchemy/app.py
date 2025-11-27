@@ -24,17 +24,16 @@ from advanced_alchemy.extensions.litestar import (
 )
 from advanced_alchemy.filters import LimitOffset
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
-from litestar import Litestar, MediaType, delete, get, post
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+from litestar import Litestar, MediaType, delete, get, post
 
 from .models import Post, User
 
 if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
 
     from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -102,7 +101,7 @@ async def index() -> str:
 async def users_page(user_repo: UserRepository) -> str:
     """Users HTML page."""
     logger.info("Users page accessed")
-    users = await user_repo.list(LimitOffset(limit=100, offset=0))
+    users = await user_repo.list(LimitOffset(limit=100, offset=0), load=[User.posts])
 
     rows = "".join(
         f"<tr><td>{u.id}</td><td>{u.name}</td><td>{u.email}</td><td>{len(u.posts)} posts</td></tr>" for u in users
@@ -132,7 +131,7 @@ async def users_page(user_repo: UserRepository) -> str:
 async def posts_page(post_repo: PostRepository) -> str:
     """Posts HTML page."""
     logger.info("Posts page accessed")
-    posts = await post_repo.list(LimitOffset(limit=100, offset=0))
+    posts = await post_repo.list(LimitOffset(limit=100, offset=0), load=[Post.author])
 
     rows = "".join(
         f"<tr><td>{p.id}</td><td>{p.title}</td><td>{p.author.name if p.author else 'N/A'}</td>"
@@ -174,7 +173,6 @@ async def create_user(
     """Create a new user from form submission."""
     logger.info("Creating user: %s", data.get("name"))
     user = await user_repo.add(User(name=data["name"], email=data["email"]))
-    await user_repo.session.commit()
     return f"""<!DOCTYPE html>
 <html>
 <head><title>User Created</title></head>
@@ -191,7 +189,6 @@ async def delete_user(user_repo: UserRepository, user_id: UUID) -> None:
     """Delete a user."""
     logger.info("Deleting user: %s", user_id)
     await user_repo.delete(user_id)
-    await user_repo.session.commit()
 
 
 @get("/api/posts")
@@ -202,7 +199,7 @@ async def list_posts(
 ) -> list[dict]:
     """List all posts."""
     logger.info("Listing posts with limit=%d, offset=%d", limit, offset)
-    posts = await post_repo.list(LimitOffset(limit=limit, offset=offset))
+    posts = await post_repo.list(LimitOffset(limit=limit, offset=offset), load=[Post.author])
     return [
         {
             "id": str(p.id),
@@ -225,7 +222,6 @@ async def create_post(
     author_id = UUID(data["author_id"])
     await user_repo.get(author_id)
     post = await post_repo.add(Post(title=data["title"], content=data["content"], author_id=author_id))
-    await post_repo.session.commit()
     return {"id": str(post.id), "title": post.title}
 
 
