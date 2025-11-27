@@ -570,6 +570,23 @@ body {
 .object { color: #9cdcfe; }
 .unknown { color: var(--dt-text-secondary); }
 
+.array-items, .object-items {
+    padding-left: 16px;
+    border-left: 2px solid var(--dt-border);
+    margin: 4px 0;
+}
+
+.array-item, .object-item {
+    padding: 2px 0;
+    font-size: 12px;
+}
+
+.array-more, .object-more {
+    color: var(--dt-text-muted);
+    font-style: italic;
+    padding: 2px 0;
+}
+
 #debug-toolbar {
     position: fixed;
     background: var(--dt-bg-primary);
@@ -1023,7 +1040,7 @@ class DebugToolbar {
         let html = '<table class="panel-table"><tbody>';
         for (const [key, value] of Object.entries(data)) {
             const escapedKey = this.escapeHtml(key);
-            const formattedValue = this.formatValue(value);
+            const formattedValue = this.formatValue(value, 0);
             html += '<tr><td class="key">' + escapedKey + '</td>';
             html += '<td class="value">' + formattedValue + '</td></tr>';
         }
@@ -1033,6 +1050,10 @@ class DebugToolbar {
 
     formatValue(value, depth) {
         depth = depth || 0;
+        const maxDepth = 3;
+        const maxItems = 20;
+        const maxStringLen = 500;
+
         if (value === null || value === undefined) {
             return '<span class="null">null</span>';
         }
@@ -1043,25 +1064,45 @@ class DebugToolbar {
             return '<span class="number">' + value + '</span>';
         }
         if (typeof value === 'string') {
-            const truncated = value.length > 100 ? value.substring(0, 100) + '...' : value;
+            const truncated = value.length > maxStringLen ? value.substring(0, maxStringLen) + '...' : value;
             return '<span class="string">' + this.escapeHtml(truncated) + '</span>';
         }
         if (Array.isArray(value)) {
-            if (depth > 1 || value.length > 5) {
+            if (value.length === 0) {
+                return '<span class="array">[]</span>';
+            }
+            if (depth >= maxDepth) {
                 return '<span class="array">[' + value.length + ' items]</span>';
             }
-            const items = value.slice(0, 5).map(v => this.formatValue(v, depth + 1)).join(', ');
-            return '<span class="array">[' + items + ']</span>';
+            const items = value.slice(0, maxItems).map(v => this.formatValue(v, depth + 1));
+            let html = '<div class="array-items">';
+            items.forEach((item, i) => {
+                html += '<div class="array-item">' + item + '</div>';
+            });
+            if (value.length > maxItems) {
+                html += '<div class="array-more">... and ' + (value.length - maxItems) + ' more</div>';
+            }
+            html += '</div>';
+            return html;
         }
         if (typeof value === 'object') {
             const keys = Object.keys(value);
-            if (depth > 1 || keys.length > 5) {
+            if (keys.length === 0) {
+                return '<span class="object">{}</span>';
+            }
+            if (depth >= maxDepth) {
                 return '<span class="object">{' + keys.length + ' keys}</span>';
             }
-            const items = keys.slice(0, 5).map(k => {
-                return '<strong>' + this.escapeHtml(k) + '</strong>: ' + this.formatValue(value[k], depth + 1);
-            }).join(', ');
-            return '<span class="object">{' + items + '}</span>';
+            let html = '<div class="object-items">';
+            keys.slice(0, maxItems).forEach(k => {
+                html += '<div class="object-item"><strong>' + this.escapeHtml(k) + ':</strong> ';
+                html += this.formatValue(value[k], depth + 1) + '</div>';
+            });
+            if (keys.length > maxItems) {
+                html += '<div class="object-more">... and ' + (keys.length - maxItems) + ' more</div>';
+            }
+            html += '</div>';
+            return html;
         }
         return '<span class="unknown">' + this.escapeHtml(String(value)) + '</span>';
     }

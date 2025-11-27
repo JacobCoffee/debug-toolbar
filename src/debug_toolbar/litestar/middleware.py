@@ -179,6 +179,41 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             context.metadata["client_host"] = request.client.host
             context.metadata["client_port"] = request.client.port
 
+        self._populate_routes_metadata(request, context)
+
+    def _populate_routes_metadata(self, request: Request, context: RequestContext) -> None:
+        """Populate route information from the Litestar app.
+
+        Args:
+            request: The Litestar request.
+            context: The request context to populate.
+        """
+        try:
+            app = request.app
+            routes_info = []
+
+            for route in app.routes:
+                route_data = {
+                    "path": route.path,
+                    "methods": sorted(getattr(route, "methods", [])),
+                    "name": getattr(route, "name", None),
+                }
+                handler = getattr(route, "route_handler", None)
+                if handler:
+                    route_data["handler"] = getattr(handler, "fn", handler).__name__
+                    route_data["tags"] = list(getattr(handler, "tags", []))
+                routes_info.append(route_data)
+
+            context.metadata["routes"] = routes_info
+
+            scope = request.scope
+            route_handler = scope.get("route_handler")
+            if route_handler:
+                context.metadata["matched_route"] = getattr(route_handler, "path", request.url.path)
+        except Exception:
+            context.metadata["routes"] = []
+            context.metadata["matched_route"] = ""
+
     def _inject_toolbar(self, body: bytes, context: RequestContext) -> bytes:
         """Inject the toolbar HTML into the response body.
 
