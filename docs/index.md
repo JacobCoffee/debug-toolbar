@@ -51,6 +51,7 @@ getting-started
 configuration
 panels
 custom-panels
+comparison
 ```
 
 ```{toctree}
