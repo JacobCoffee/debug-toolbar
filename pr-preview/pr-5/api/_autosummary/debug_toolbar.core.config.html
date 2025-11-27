@@ -132,6 +132,9 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.allowed_hosts"><code class="docutils literal notranslate">allowed_hosts</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.extra_panels"><code class="docutils literal notranslate">extra_panels</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.exclude_panels"><code class="docutils literal notranslate">exclude_panels</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
 <li><a class="reference internal" href="#id0"><code class="docutils literal notranslate">enabled</span></code></a></li>
 <li><a class="reference internal" href="#id1"><code class="docutils literal notranslate">panels</span></code></a></li>
 <li><a class="reference internal" href="#id2"><code class="docutils literal notranslate">intercept_redirects</span></code></a></li>
@@ -143,9 +146,9 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#id8"><code class="docutils literal notranslate">allowed_hosts</span></code></a></li>
 <li><a class="reference internal" href="#id9"><code class="docutils literal notranslate">extra_panels</span></code></a></li>
 <li><a class="reference internal" href="#id10"><code class="docutils literal notranslate">exclude_panels</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
+<li><a class="reference internal" href="#id11"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
+<li><a class="reference internal" href="#id12"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
+<li><a class="reference internal" href="#id13"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.get_all_panels"><code class="docutils literal notranslate">get_all_panels()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig.__init__"><code class="docutils literal notranslate">__init__()</span></code></a></li>
 </ul>
@@ -276,6 +279,24 @@ data-aria-dark="Switch to auto color mode">
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth">
+<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth" title="Link to this definition">¶</a></dt>
+<dd><p>Max depth for nested data rendering. Defaults to 10.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items">
+<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items" title="Link to this definition">¶</a></dt>
+<dd><p>Max items to show in arrays/objects. Defaults to 100.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string">
+<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string" title="Link to this definition">¶</a></dt>
+<dd><p>Max string length before truncation. Defaults to 1000.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
 <span class="sig-name descname"><span class="pre">enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -331,18 +352,18 @@ data-aria-dark="Switch to auto color mode">
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth">
-<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_depth" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items">
-<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_items" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string">
-<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig.panel_display_max_string" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#id13" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

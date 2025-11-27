@@ -145,6 +145,9 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.allowed_hosts"><code class="docutils literal notranslate">allowed_hosts</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.extra_panels"><code class="docutils literal notranslate">extra_panels</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.exclude_panels"><code class="docutils literal notranslate">exclude_panels</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_depth"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_items"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_string"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.__init__"><code class="docutils literal notranslate">__init__()</span></code></a></li>
 <li><a class="reference internal" href="#id0"><code class="docutils literal notranslate">api_path</span></code></a></li>
 <li><a class="reference internal" href="#id1"><code class="docutils literal notranslate">enabled</span></code></a></li>
@@ -152,15 +155,15 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#id2"><code class="docutils literal notranslate">insert_before</span></code></a></li>
 <li><a class="reference internal" href="#id3"><code class="docutils literal notranslate">intercept_redirects</span></code></a></li>
 <li><a class="reference internal" href="#id4"><code class="docutils literal notranslate">max_request_history</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_depth"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_items"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
-<li><a class="reference internal" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_string"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
-<li><a class="reference internal" href="#id5"><code class="docutils literal notranslate">show_toolbar_callback</span></code></a></li>
-<li><a class="reference internal" href="#id6"><code class="docutils literal notranslate">static_path</span></code></a></li>
-<li><a class="reference internal" href="#id7"><code class="docutils literal notranslate">panels</span></code></a></li>
-<li><a class="reference internal" href="#id8"><code class="docutils literal notranslate">allowed_hosts</span></code></a></li>
-<li><a class="reference internal" href="#id9"><code class="docutils literal notranslate">extra_panels</span></code></a></li>
-<li><a class="reference internal" href="#id10"><code class="docutils literal notranslate">exclude_panels</span></code></a></li>
+<li><a class="reference internal" href="#id5"><code class="docutils literal notranslate">panel_display_depth</span></code></a></li>
+<li><a class="reference internal" href="#id6"><code class="docutils literal notranslate">panel_display_max_items</span></code></a></li>
+<li><a class="reference internal" href="#id7"><code class="docutils literal notranslate">panel_display_max_string</span></code></a></li>
+<li><a class="reference internal" href="#id8"><code class="docutils literal notranslate">show_toolbar_callback</span></code></a></li>
+<li><a class="reference internal" href="#id9"><code class="docutils literal notranslate">static_path</span></code></a></li>
+<li><a class="reference internal" href="#id10"><code class="docutils literal notranslate">panels</span></code></a></li>
+<li><a class="reference internal" href="#id11"><code class="docutils literal notranslate">allowed_hosts</span></code></a></li>
+<li><a class="reference internal" href="#id12"><code class="docutils literal notranslate">extra_panels</span></code></a></li>
+<li><a class="reference internal" href="#id13"><code class="docutils literal notranslate">exclude_panels</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#debug_toolbar.Panel"><code class="docutils literal notranslate"><span class="pre">Panel</span></code></a><ul>
@@ -193,15 +196,15 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#debug_toolbar.RequestContext.get_timing"><code class="docutils literal notranslate">get_timing()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.RequestContext.record_timing"><code class="docutils literal notranslate">record_timing()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.RequestContext.store_panel_data"><code class="docutils literal notranslate">store_panel_data()</span></code></a></li>
-<li><a class="reference internal" href="#id11"><code class="docutils literal notranslate">request_id</span></code></a></li>
-<li><a class="reference internal" href="#id12"><code class="docutils literal notranslate">panel_data</span></code></a></li>
-<li><a class="reference internal" href="#id13"><code class="docutils literal notranslate">timing_data</span></code></a></li>
-<li><a class="reference internal" href="#id14"><code class="docutils literal notranslate">metadata</span></code></a></li>
+<li><a class="reference internal" href="#id14"><code class="docutils literal notranslate">request_id</span></code></a></li>
+<li><a class="reference internal" href="#id15"><code class="docutils literal notranslate">panel_data</span></code></a></li>
+<li><a class="reference internal" href="#id16"><code class="docutils literal notranslate">timing_data</span></code></a></li>
+<li><a class="reference internal" href="#id17"><code class="docutils literal notranslate">metadata</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#debug_toolbar.ToolbarStorage"><code class="docutils literal notranslate"><span class="pre">ToolbarStorage</span></code></a><ul>
 <li><a class="reference internal" href="#debug_toolbar.ToolbarStorage.max_size"><code class="docutils literal notranslate">max_size</span></code></a></li>
-<li><a class="reference internal" href="#id15"><code class="docutils literal notranslate">max_size</span></code></a></li>
+<li><a class="reference internal" href="#id18"><code class="docutils literal notranslate">max_size</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.ToolbarStorage.__init__"><code class="docutils literal notranslate">__init__()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.ToolbarStorage.clear"><code class="docutils literal notranslate">clear()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.ToolbarStorage.get"><code class="docutils literal notranslate">get()</span></code></a></li>
@@ -454,6 +457,24 @@ for popular frameworks like Litestar.</p>
 <dd><p>Panel names to exclude from defaults.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_depth">
+<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_depth" title="Link to this definition">¶</a></dt>
+<dd><p>Max depth for nested data rendering. Defaults to 10.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_max_items">
+<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_items" title="Link to this definition">¶</a></dt>
+<dd><p>Max items to show in arrays/objects. Defaults to 100.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_max_string">
+<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_string" title="Link to this definition">¶</a></dt>
+<dd><p>Max string length before truncation. Defaults to 1000.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">panels=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intercept_redirects=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_toolbar_callback=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_before='&lt;/body&gt;'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_request_history=50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_path='/_debug_toolbar'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_path='/_debug_toolbar/static'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_hosts=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_panels=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_panels=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">panel_display_depth=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">panel_display_max_items=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">panel_display_max_string=1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.__init__" title="Link to this definition">¶</a></dt>
@@ -496,48 +517,48 @@ for popular frameworks like Litestar.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_depth">
-<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_depth" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_max_items">
-<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_items" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="debug_toolbar.DebugToolbarConfig.panel_display_max_string">
-<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#debug_toolbar.DebugToolbarConfig.panel_display_max_string" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">show_toolbar_callback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">]</span> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">panel_display_depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">static_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/_debug_toolbar/static'</span></em><a class="headerlink" href="#id6" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">panel_display_max_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#id6" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a><span class="pre">[</span><a class="reference internal" href="debug_toolbar.core.panel.html#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Panel</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id7" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">panel_display_max_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#id7" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">allowed_hosts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id8" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">show_toolbar_callback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">]</span> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id8" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id9">
-<span class="sig-name descname"><span class="pre">extra_panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a><span class="pre">[</span><a class="reference internal" href="debug_toolbar.core.panel.html#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Panel</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">static_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/_debug_toolbar/static'</span></em><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">exclude_panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a><span class="pre">[</span><a class="reference internal" href="debug_toolbar.core.panel.html#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Panel</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">allowed_hosts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">extra_panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a><span class="pre">[</span><a class="reference internal" href="debug_toolbar.core.panel.html#debug_toolbar.core.panel.Panel" title="debug_toolbar.core.panel.Panel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Panel</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id13">
+<span class="sig-name descname"><span class="pre">exclude_panels</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id13" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -854,23 +875,23 @@ request lifecycle without passing it explicitly through the call stack.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id11">
-<span class="sig-name descname"><span class="pre">request_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">panel_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id13">
-<span class="sig-name descname"><span class="pre">timing_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id13" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id14" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">request_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></em><a class="headerlink" href="#id14" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id15">
+<span class="sig-name descname"><span class="pre">panel_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#id15" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id16">
+<span class="sig-name descname"><span class="pre">timing_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id16" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id17">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#id17" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -888,8 +909,8 @@ evicting the oldest entries when the maximum size is reached.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-name descname"><span class="pre">max_size</span></span><a class="headerlink" href="#id15" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id18">
+<span class="sig-name descname"><span class="pre">max_size</span></span><a class="headerlink" href="#id18" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
