@@ -4,15 +4,19 @@ from __future__ import annotations
 
 import threading
 import time
+from contextvars import ContextVar
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from debug_toolbar.core.panel import Panel
 
 _patch_lock = threading.Lock()
+_active_tracker: ContextVar[TemplateRenderTracker | None] = ContextVar("_active_tracker", default=None)
+_original_jinja2_render: Any = None
+_original_mako_render: Any = None
+_jinja2_patched = False
+_mako_patched = False
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from debug_toolbar.core.context import RequestContext
     from debug_toolbar.core.toolbar import DebugToolbar
 
@@ -30,13 +34,10 @@ if TYPE_CHECKING:
 class TemplateRenderTracker:
     """Thread-safe tracker for template renders during a request."""
 
-    __slots__ = ("_original_jinja2_render", "_original_mako_render", "_patched", "renders")
+    __slots__ = ("renders",)
 
     def __init__(self) -> None:
         self.renders: list[dict[str, Any]] = []
-        self._original_jinja2_render: Callable[..., Any] | None = None
-        self._original_mako_render: Callable[..., Any] | None = None
-        self._patched: set[str] = set()
 
     def track_render(
         self,
@@ -62,133 +63,99 @@ class TemplateRenderTracker:
             }
         )
 
-    def patch_jinja2(self) -> None:
-        """Patch Jinja2 template rendering to track renders."""
-        if "jinja2" in self._patched:
+    def clear(self) -> None:
+        """Clear all tracked renders."""
+        self.renders = []
+
+
+def _patch_jinja2() -> None:
+    """Patch Jinja2 template rendering to track renders via ContextVar."""
+    global _original_jinja2_render, _jinja2_patched  # noqa: PLW0603
+
+    try:
+        from jinja2 import Template as Jinja2Template
+    except ImportError:
+        return
+
+    with _patch_lock:
+        if _jinja2_patched:
             return
 
-        try:
-            from jinja2 import Template as Jinja2Template
-        except ImportError:
-            return
+        _original_jinja2_render = Jinja2Template.render
 
-        with _patch_lock:
-            if hasattr(Jinja2Template, "_debug_toolbar_patched"):
-                self._patched.add("jinja2")
-                return
+        def tracked_render(template_self: Jinja2Template, *args: Any, **kwargs: Any) -> str:
+            tracker = _active_tracker.get()
 
-            if self._original_jinja2_render is None:
-                self._original_jinja2_render = Jinja2Template.render
+            start_time = time.perf_counter()
 
-            def tracked_render(template_self: Jinja2Template, *args: Any, **kwargs: Any) -> str:
-                start_time = time.perf_counter()
+            context_keys = None
+            if args and isinstance(args[0], dict):
+                context_keys = list(args[0].keys())
+            elif kwargs:
+                context_keys = list(kwargs.keys())
 
-                context_keys = None
-                if args and isinstance(args[0], dict):
-                    context_keys = list(args[0].keys())
-                elif kwargs:
-                    context_keys = list(kwargs.keys())
+            result = _original_jinja2_render(template_self, *args, **kwargs)
 
-                result = self._original_jinja2_render(template_self, *args, **kwargs)  # type: ignore[misc]
+            render_time = time.perf_counter() - start_time
 
-                render_time = time.perf_counter() - start_time
-
+            if tracker is not None:
                 template_name = getattr(template_self, "name", None) or getattr(template_self, "filename", "<string>")
-
-                self.track_render(
+                tracker.track_render(
                     template_name=template_name,
                     engine="jinja2",
                     render_time=render_time,
                     context_keys=context_keys,
                 )
 
-                return result
+            return result
 
-            Jinja2Template.render = tracked_render  # type: ignore[method-assign]
-            Jinja2Template._debug_toolbar_patched = True  # type: ignore[attr-defined]  # noqa: SLF001
-            self._patched.add("jinja2")
+        Jinja2Template.render = tracked_render  # type: ignore[method-assign]
+        _jinja2_patched = True
 
-    def patch_mako(self) -> None:
-        """Patch Mako template rendering to track renders."""
-        if "mako" in self._patched:
+
+def _patch_mako() -> None:
+    """Patch Mako template rendering to track renders via ContextVar."""
+    global _original_mako_render, _mako_patched  # noqa: PLW0603
+
+    try:
+        from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
+    except ImportError:
+        return
+
+    with _patch_lock:
+        if _mako_patched:
             return
 
-        try:
-            from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
-        except ImportError:
-            return
+        _original_mako_render = MakoTemplate.render
 
-        with _patch_lock:
-            if hasattr(MakoTemplate, "_debug_toolbar_patched"):
-                self._patched.add("mako")
-                return
+        def tracked_render(template_self: MakoTemplate, *args: Any, **kwargs: Any) -> str:
+            tracker = _active_tracker.get()
 
-            if self._original_mako_render is None:
-                self._original_mako_render = MakoTemplate.render
+            start_time = time.perf_counter()
 
-            def tracked_render(template_self: MakoTemplate, *args: Any, **kwargs: Any) -> str:
-                start_time = time.perf_counter()
+            context_keys = None
+            if args and isinstance(args[0], dict):
+                context_keys = list(args[0].keys())
+            elif kwargs:
+                context_keys = list(kwargs.keys())
 
-                context_keys = None
-                if args and isinstance(args[0], dict):
-                    context_keys = list(args[0].keys())
-                elif kwargs:
-                    context_keys = list(kwargs.keys())
+            result = _original_mako_render(template_self, *args, **kwargs)
 
-                result = self._original_mako_render(template_self, *args, **kwargs)  # type: ignore[misc]
+            render_time = time.perf_counter() - start_time
 
-                render_time = time.perf_counter() - start_time
-
+            if tracker is not None:
                 template_name = getattr(template_self, "filename", None) or getattr(template_self, "uri", "<string>")
-
-                self.track_render(
+                tracker.track_render(
                     template_name=template_name,
                     engine="mako",
                     render_time=render_time,
                     context_keys=context_keys,
                 )
 
-                return result
+            return result
 
-            MakoTemplate.render = tracked_render  # type: ignore[method-assign]
-            MakoTemplate._debug_toolbar_patched = True  # type: ignore[attr-defined]  # noqa: SLF001
-            self._patched.add("mako")
-
-    def unpatch_jinja2(self) -> None:
-        """Restore original Jinja2 render method."""
-        if "jinja2" not in self._patched:
-            return
-
-        try:
-            from jinja2 import Template as Jinja2Template
-        except ImportError:
-            return
-
-        with _patch_lock:
-            if self._original_jinja2_render is not None and hasattr(Jinja2Template, "_debug_toolbar_patched"):
-                Jinja2Template.render = self._original_jinja2_render  # type: ignore[method-assign]
-                delattr(Jinja2Template, "_debug_toolbar_patched")
-            self._patched.discard("jinja2")
-
-    def unpatch_mako(self) -> None:
-        """Restore original Mako render method."""
-        if "mako" not in self._patched:
-            return
-
-        try:
-            from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
-        except ImportError:
-            return
-
-        with _patch_lock:
-            if self._original_mako_render is not None and hasattr(MakoTemplate, "_debug_toolbar_patched"):
-                MakoTemplate.render = self._original_mako_render  # type: ignore[method-assign]
-                delattr(MakoTemplate, "_debug_toolbar_patched")
-            self._patched.discard("mako")
-
-    def clear(self) -> None:
-        """Clear all tracked renders."""
-        self.renders = []
+        MakoTemplate.render = tracked_render  # type: ignore[method-assign]
+        _mako_patched = True
 
 
 class TemplatesPanel(Panel):
@@ -222,16 +189,16 @@ class TemplatesPanel(Panel):
         Patches Jinja2 and Mako template engines to track renders.
         """
         self._tracker.clear()
-        self._tracker.patch_jinja2()
-        self._tracker.patch_mako()
+        _active_tracker.set(self._tracker)
+        _patch_jinja2()
+        _patch_mako()
 
     async def process_response(self, context: RequestContext) -> None:
         """Remove template rendering hooks.
 
-        Restores original template rendering methods.
+        Clears the active tracker to stop recording renders.
         """
-        self._tracker.unpatch_jinja2()
-        self._tracker.unpatch_mako()
+        _active_tracker.set(None)
 
     async def generate_stats(self, context: RequestContext) -> dict[str, Any]:
         """Generate template rendering statistics.

@@ -6,7 +6,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from debug_toolbar.core.panels.templates import TemplateRenderTracker, TemplatesPanel
+from debug_toolbar.core.panels.templates import (
+    TemplateRenderTracker,
+    TemplatesPanel,
+    _active_tracker,
+    _patch_jinja2,
+    _patch_mako,
+)
 
 if TYPE_CHECKING:
     from debug_toolbar.core.context import RequestContext
@@ -64,65 +70,43 @@ class TestTemplateRenderTracker:
         tracker.clear()
         assert len(tracker.renders) == 0
 
-    def test_patch_jinja2(self, tracker: TemplateRenderTracker) -> None:
-        """Test patching Jinja2 templates."""
+
+class TestTemplatePatchFunctions:
+    """Tests for module-level patch functions."""
+
+    def test_patch_jinja2_sets_flag(self) -> None:
+        """Test that patching Jinja2 sets the global flag."""
         try:
-            from jinja2 import Template
+            import jinja2  # noqa: F401
         except ImportError:
             pytest.skip("Jinja2 not installed")
 
-        original_render = Template.render
-        tracker.patch_jinja2()
+        _patch_jinja2()
+        from debug_toolbar.core.panels.templates import _jinja2_patched
 
-        assert "jinja2" in tracker._patched
-        assert Template.render != original_render
+        assert _jinja2_patched is True
 
-        tracker.unpatch_jinja2()
-
-        assert "jinja2" not in tracker._patched
-        assert Template.render == original_render
-
-    def test_patch_mako(self, tracker: TemplateRenderTracker) -> None:
-        """Test patching Mako templates."""
+    def test_patch_mako_sets_flag(self) -> None:
+        """Test that patching Mako sets the global flag."""
         try:
-            from mako.template import Template
+            import mako  # noqa: F401
         except ImportError:
             pytest.skip("Mako not installed")
 
-        original_render = Template.render
-        tracker.patch_mako()
+        _patch_mako()
+        from debug_toolbar.core.panels.templates import _mako_patched
 
-        assert "mako" in tracker._patched
-        assert Template.render != original_render
-
-        tracker.unpatch_mako()
-
-        assert "mako" not in tracker._patched
-        assert Template.render == original_render
-
-    def test_patch_jinja2_idempotent(self, tracker: TemplateRenderTracker) -> None:
-        """Test that patching Jinja2 multiple times is safe."""
-        try:
-            from jinja2 import Template
-        except ImportError:
-            pytest.skip("Jinja2 not installed")
-
-        tracker.patch_jinja2()
-        first_render = Template.render
-        tracker.patch_jinja2()
-        second_render = Template.render
-
-        assert first_render == second_render
-        tracker.unpatch_jinja2()
+        assert _mako_patched is True
 
     def test_jinja2_template_render_tracking(self, tracker: TemplateRenderTracker) -> None:
-        """Test that Jinja2 template renders are tracked."""
+        """Test that Jinja2 template renders are tracked via ContextVar."""
         try:
             from jinja2 import Template
         except ImportError:
             pytest.skip("Jinja2 not installed")
 
-        tracker.patch_jinja2()
+        _patch_jinja2()
+        _active_tracker.set(tracker)
 
         try:
             template = Template("Hello {{ name }}!")
@@ -136,16 +120,17 @@ class TestTemplateRenderTracker:
             assert render_info["render_time"] > 0
             assert "name" in (render_info.get("context_keys") or [])
         finally:
-            tracker.unpatch_jinja2()
+            _active_tracker.set(None)
 
     def test_mako_template_render_tracking(self, tracker: TemplateRenderTracker) -> None:
-        """Test that Mako template renders are tracked."""
+        """Test that Mako template renders are tracked via ContextVar."""
         try:
             from mako.template import Template
         except ImportError:
             pytest.skip("Mako not installed")
 
-        tracker.patch_mako()
+        _patch_mako()
+        _active_tracker.set(tracker)
 
         try:
             template = Template("Hello ${name}!")
@@ -159,7 +144,22 @@ class TestTemplateRenderTracker:
             assert render_info["render_time"] > 0
             assert "name" in (render_info.get("context_keys") or [])
         finally:
-            tracker.unpatch_mako()
+            _active_tracker.set(None)
+
+    def test_renders_not_tracked_without_active_tracker(self) -> None:
+        """Test that renders are not tracked when no active tracker is set."""
+        try:
+            from jinja2 import Template
+        except ImportError:
+            pytest.skip("Jinja2 not installed")
+
+        _patch_jinja2()
+        _active_tracker.set(None)
+
+        template = Template("Hello {{ name }}!")
+        result = template.render(name="World")
+
+        assert result == "Hello World!"
 
 
 class TestTemplatesPanel:
@@ -173,23 +173,15 @@ class TestTemplatesPanel:
         assert templates_panel.has_content is True
 
     @pytest.mark.asyncio
-    async def test_process_request_patches_engines(
+    async def test_process_request_sets_active_tracker(
         self,
         templates_panel: TemplatesPanel,
         context: RequestContext,
     ) -> None:
-        """Test that process_request patches template engines."""
-        try:
-            from jinja2 import Template as Jinja2Template
-        except ImportError:
-            pytest.skip("Jinja2 not installed")
-
-        original_jinja2_render = Jinja2Template.render
-
+        """Test that process_request sets the active tracker."""
         try:
             await templates_panel.process_request(context)
-            assert "jinja2" in templates_panel._tracker._patched
-            assert Jinja2Template.render != original_jinja2_render
+            assert _active_tracker.get() is templates_panel._tracker
         finally:
             await templates_panel.process_response(context)
 
@@ -203,27 +195,24 @@ class TestTemplatesPanel:
         templates_panel._tracker.track_render("old.html", "jinja2", 0.1)
         assert len(templates_panel._tracker.renders) == 1
 
-        await templates_panel.process_request(context)
-        assert len(templates_panel._tracker.renders) == 0
+        try:
+            await templates_panel.process_request(context)
+            assert len(templates_panel._tracker.renders) == 0
+        finally:
+            await templates_panel.process_response(context)
 
     @pytest.mark.asyncio
-    async def test_process_response_unpatches_engines(
+    async def test_process_response_clears_active_tracker(
         self,
         templates_panel: TemplatesPanel,
         context: RequestContext,
     ) -> None:
-        """Test that process_response unpatches template engines."""
-        try:
-            from jinja2 import Template as Jinja2Template
-        except ImportError:
-            pytest.skip("Jinja2 not installed")
-
-        original_render = Jinja2Template.render
+        """Test that process_response clears the active tracker."""
         await templates_panel.process_request(context)
-        await templates_panel.process_response(context)
+        assert _active_tracker.get() is not None
 
-        assert "jinja2" not in templates_panel._tracker._patched
-        assert Jinja2Template.render == original_render
+        await templates_panel.process_response(context)
+        assert _active_tracker.get() is None
 
     @pytest.mark.asyncio
     async def test_generate_stats_empty(self, templates_panel: TemplatesPanel, context: RequestContext) -> None:
@@ -321,12 +310,41 @@ class TestTemplatesPanel:
         result = template.render(name="World")
         assert result == "Hello World!"
 
-        await templates_panel.process_response(context)
-
         stats = await templates_panel.generate_stats(context)
+
+        await templates_panel.process_response(context)
 
         assert stats["total_renders"] == 1
         assert stats["total_time"] > 0
         assert "jinja2" in stats["engines_used"]
         assert len(stats["renders"]) == 1
         assert stats["renders"][0]["engine"] == "jinja2"
+
+    @pytest.mark.asyncio
+    async def test_parallel_trackers_isolated(self, toolbar: DebugToolbar, context: RequestContext) -> None:
+        """Test that parallel panel instances have isolated tracking."""
+        try:
+            from jinja2 import Template
+        except ImportError:
+            pytest.skip("Jinja2 not installed")
+
+        panel1 = TemplatesPanel(toolbar)
+        panel2 = TemplatesPanel(toolbar)
+
+        await panel1.process_request(context)
+
+        template = Template("Hello {{ name }}!")
+        template.render(name="Panel1")
+
+        stats1 = await panel1.generate_stats(context)
+        await panel1.process_response(context)
+
+        await panel2.process_request(context)
+
+        template.render(name="Panel2")
+
+        stats2 = await panel2.generate_stats(context)
+        await panel2.process_response(context)
+
+        assert stats1["total_renders"] == 1
+        assert stats2["total_renders"] == 1
