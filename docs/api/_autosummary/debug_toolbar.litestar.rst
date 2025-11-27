@@ -1,4 +1,4 @@
-debug\_toolbar.litestar
+﻿debug\_toolbar.litestar
 =======================
 
 .. automodule:: debug_toolbar.litestar
@@ -14,3 +14,4 @@ debug\_toolbar.litestar
    middleware
    panels
    plugin
+   routes

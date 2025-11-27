@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from litestar.plugins import InitPluginProtocol
 
+from debug_toolbar.core.toolbar import DebugToolbar
 from debug_toolbar.litestar.config import LitestarDebugToolbarConfig
 from debug_toolbar.litestar.middleware import DebugToolbarMiddleware
 
@@ -36,7 +37,7 @@ class DebugToolbarPlugin(InitPluginProtocol):
 
     """
 
-    __slots__ = ("_config",)
+    __slots__ = ("_config", "_toolbar")
 
     def __init__(self, config: LitestarDebugToolbarConfig | None = None) -> None:
         """Initialize the plugin.
@@ -45,11 +46,17 @@ class DebugToolbarPlugin(InitPluginProtocol):
             config: Toolbar configuration. Uses defaults if not provided.
         """
         self._config = config or LitestarDebugToolbarConfig()
+        self._toolbar: DebugToolbar | None = None
 
     @property
     def config(self) -> LitestarDebugToolbarConfig:
         """Get the plugin configuration."""
         return self._config
+
+    @property
+    def toolbar(self) -> DebugToolbar | None:
+        """Get the toolbar instance."""
+        return self._toolbar
 
     def on_app_init(self, app_config: AppConfig) -> AppConfig:
         """Configure the application with the debug toolbar.
@@ -63,13 +70,27 @@ class DebugToolbarPlugin(InitPluginProtocol):
         if not self._config.enabled:
             return app_config
 
+        from debug_toolbar.litestar.routes import create_debug_toolbar_router
         from litestar.middleware import DefineMiddleware
 
-        middleware = DefineMiddleware(DebugToolbarMiddleware, config=self._config)
+        self._toolbar = DebugToolbar(self._config)
+
+        middleware = DefineMiddleware(
+            DebugToolbarMiddleware,
+            config=self._config,
+            toolbar=self._toolbar,
+        )
 
         if app_config.middleware is None:
             app_config.middleware = [middleware]
         else:
             app_config.middleware = list(app_config.middleware) + [middleware]
+
+        router = create_debug_toolbar_router(self._toolbar.storage)
+
+        if app_config.route_handlers is None:
+            app_config.route_handlers = [router]
+        else:
+            app_config.route_handlers = list(app_config.route_handlers) + [router]
 
         return app_config
