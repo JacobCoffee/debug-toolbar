@@ -79,7 +79,7 @@ poetry add debug-toolbar[all]
 :link: getting-started
 :link-type: doc
 
-New to async-debug-toolbar? Start here for installation and your first integration.
+New to debug-toolbar? Start here for installation and your first integration.
 :::
 
 :::{grid-item-card} Configuration
@@ -107,7 +107,7 @@ Build your own debug panels with the extensible panel system.
 :link: comparison
 :link-type: doc
 
-See how async-debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
+See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
 :::
 
 :::{grid-item-card} API Reference
