@@ -2,6 +2,149 @@
 
 An async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.
 
+## Installation
+
+`````{tab-set}
+````{tab-item} uv
+```bash
+# Core package only
+uv add debug-toolbar
+
+# With Litestar integration
+uv add debug-toolbar[litestar]
+
+# With Advanced-Alchemy SQLAlchemy panel
+uv add debug-toolbar[advanced-alchemy]
+
+# Everything
+uv add debug-toolbar[all]
+```
+````
+
+````{tab-item} pip
+```bash
+# Core package only
+pip install debug-toolbar
+
+# With Litestar integration
+pip install debug-toolbar[litestar]
+
+# With Advanced-Alchemy SQLAlchemy panel
+pip install debug-toolbar[advanced-alchemy]
+
+# Everything
+pip install debug-toolbar[all]
+```
+````
+
+````{tab-item} pdm
+```bash
+# Core package only
+pdm add debug-toolbar
+
+# With Litestar integration
+pdm add debug-toolbar[litestar]
+
+# With Advanced-Alchemy SQLAlchemy panel
+pdm add debug-toolbar[advanced-alchemy]
+
+# Everything
+pdm add debug-toolbar[all]
+```
+````
+
+````{tab-item} poetry
+```bash
+# Core package only
+poetry add debug-toolbar
+
+# With Litestar integration
+poetry add debug-toolbar[litestar]
+
+# With Advanced-Alchemy SQLAlchemy panel
+poetry add debug-toolbar[advanced-alchemy]
+
+# Everything
+poetry add debug-toolbar[all]
+```
+````
+`````
+
+---
+
+::::{grid} 1 2 2 2
+:gutter: 3
+
+:::{grid-item-card} Getting Started
+:link: getting-started
+:link-type: doc
+
+New to debug-toolbar? Start here for installation and your first integration.
+:::
+
+:::{grid-item-card} Configuration
+:link: configuration
+:link-type: doc
+
+Learn how to configure panels, themes, positioning, and behavior.
+:::
+
+:::{grid-item-card} Built-in Panels
+:link: panels
+:link-type: doc
+
+Explore the built-in panels: Timer, Request, Response, SQL, Logging, and more.
+:::
+
+:::{grid-item-card} Creating Custom Panels
+:link: custom-panels
+:link-type: doc
+
+Build your own debug panels with the extensible panel system.
+:::
+
+:::{grid-item-card} Debug Toolbar Comparison
+:link: comparison
+:link-type: doc
+
+See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
+:::
+
+:::{grid-item-card} API Reference
+:link: api/index
+:link-type: doc
+
+Complete API documentation for all public classes and functions.
+:::
+::::
+
+## Quick Start
+
+```python
+from litestar import Litestar, get
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+
+@get("/")
+async def index() -> dict[str, str]:
+    return {"message": "Hello, World!"}
+
+config = LitestarDebugToolbarConfig(enabled=True)
+app = Litestar(
+    route_handlers=[index],
+    plugins=[DebugToolbarPlugin(config)],
+)
+```
+
+## Features
+
+- **Async-Native**: Built from the ground up for async/await patterns
+- **Framework-Agnostic Core**: Works with any ASGI framework
+- **Litestar Integration**: First-class plugin support
+- **Pluggable Panels**: Easy to add, remove, or customize
+- **Dark/Light Themes**: Toggle between themes
+- **Flexible Positioning**: Left, right, top, or bottom
+- **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
+
 ## Screenshots
 
 ::::{grid} 1
@@ -38,45 +181,6 @@ Browse past requests
 :::
 
 ::::
-
-## Key Features
-
-- **Async-Native**: Built from the ground up for async/await patterns
-- **Framework-Agnostic Core**: Works with any ASGI framework
-- **Litestar Integration**: First-class plugin support
-- **Pluggable Panels**: Easy to add, remove, or customize
-- **Dark/Light Themes**: Toggle between themes
-- **Flexible Positioning**: Left, right, top, or bottom
-- **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
-
-## Quick Start
-
-```python
-from litestar import Litestar, get
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-
-@get("/")
-async def index() -> dict[str, str]:
-    return {"message": "Hello, World!"}
-
-config = LitestarDebugToolbarConfig(enabled=True)
-app = Litestar(
-    route_handlers=[index],
-    plugins=[DebugToolbarPlugin(config)],
-)
-```
-
-## Installation
-
-```bash
-pip install debug-toolbar[litestar]
-
-# With SQLAlchemy panel
-pip install debug-toolbar[advanced-alchemy]
-
-# Everything
-pip install debug-toolbar[all]
-```
 
 ```{toctree}
 :maxdepth: 2
