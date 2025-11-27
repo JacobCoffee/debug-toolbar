@@ -1,4 +1,4 @@
-debug\_toolbar.core.panels
+﻿debug\_toolbar.core.panels
 ==========================
 
 .. automodule:: debug_toolbar.core.panels
@@ -10,8 +10,13 @@ debug\_toolbar.core.panels
    :toctree:
    :recursive:
 
+   cache
+   headers
    logging
+   profiling
    request
    response
+   settings
+   templates
    timer
    versions
