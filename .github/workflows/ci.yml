@@ -174,7 +174,7 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests with coverage
-        run: uv run pytest --cov=async_debug_toolbar --cov=litestar_debug_toolbar --cov-report=term-missing --cov-report=xml -n auto --reruns 2 --reruns-delay 1
+        run: uv run pytest --cov=debug_toolbar --cov-report=term-missing --cov-report=xml -n auto --reruns 2 --reruns-delay 1
         shell: bash
         env:
           PYTHONDONTWRITEBYTECODE: 1

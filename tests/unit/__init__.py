@@ -1,1 +1,1 @@
-"""Unit tests for async-debug-toolbar."""
+"""Unit tests for debug-toolbar."""

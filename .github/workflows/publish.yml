@@ -95,7 +95,7 @@ jobs:
     needs: [draft-release]
     environment:
       name: pypi
-      url: https://pypi.org/project/async-debug-toolbar/
+      url: https://pypi.org/project/debug-toolbar/
     steps:
       - name: Download dist artifacts (unsigned)
         uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4

@@ -1,1 +1,1 @@
-"""Integration tests for async-debug-toolbar."""
+"""Integration tests for debug-toolbar."""

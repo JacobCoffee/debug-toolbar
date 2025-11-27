@@ -22,7 +22,7 @@ class DebugToolbarPlugin(InitPluginProtocol):
     Example::
 
         from litestar import Litestar
-        from litestar_debug_toolbar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+        from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
         config = LitestarDebugToolbarConfig(
             enabled=True,

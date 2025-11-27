@@ -144,8 +144,8 @@ worktree: ## Create a new git worktree (Usage: make worktree NAME=my-feature)
 		echo "Error: NAME variable is required. Usage: make worktree NAME=feature-name"; \
 		exit 1; \
 	fi
-	git worktree add -b $(NAME) ../async-debug-toolbar-$(NAME) main
-	@echo "Created worktree at ../async-debug-toolbar-$(NAME)"
+	git worktree add -b $(NAME) ../debug-toolbar-$(NAME) main
+	@echo "Created worktree at ../debug-toolbar-$(NAME)"
 
 worktree-list: ## List all git worktrees
 	git worktree list

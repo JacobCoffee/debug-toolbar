@@ -1,4 +1,4 @@
-"""Sphinx configuration for async-debug-toolbar documentation."""
+"""Sphinx configuration for debug-toolbar documentation."""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ html_theme_options = {
     "github_url": "https://github.com/JacobCoffee/async-python-debug-toolbar",
     "nav_links": [
         {"title": "Litestar", "url": "https://litestar.dev"},
-        {"title": "PyPI", "url": "https://pypi.org/project/async-debug-toolbar"},
+        {"title": "PyPI", "url": "https://pypi.org/project/debug-toolbar"},
     ],
 }
 

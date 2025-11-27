@@ -1,6 +1,6 @@
-"""Basic ASGI application with async-debug-toolbar.
+"""Basic ASGI application with debug-toolbar.
 
-This example demonstrates using the core async-debug-toolbar
+This example demonstrates using the core debug-toolbar
 with a plain ASGI application, without any framework.
 
 Run with: uvicorn examples.asgi_basic.app:app --reload
@@ -128,7 +128,7 @@ async def application(scope: dict, receive: Callable, send: Callable) -> None:  
 <head><title>ASGI Debug Toolbar Example</title></head>
 <body>
     <h1>ASGI Debug Toolbar Example</h1>
-    <p>This is a basic ASGI app with the async-debug-toolbar.</p>
+    <p>This is a basic ASGI app with the debug-toolbar.</p>
     <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/about">About</a></li>
@@ -150,7 +150,7 @@ async def application(scope: dict, receive: Callable, send: Callable) -> None:  
 <head><title>About</title></head>
 <body>
     <h1>About</h1>
-    <p>This example shows the framework-agnostic core of async-debug-toolbar.</p>
+    <p>This example shows the framework-agnostic core of debug-toolbar.</p>
     <a href="/">Back to Home</a>
 </body>
 </html>"""

@@ -1,6 +1,6 @@
 """Litestar + Advanced-Alchemy application with debug toolbar.
 
-This example demonstrates using litestar-debug-toolbar with Advanced-Alchemy
+This example demonstrates using debug-toolbar with Advanced-Alchemy
 for SQLAlchemy integration and query tracking.
 
 Run with: litestar --app examples.litestar_advanced_alchemy.app:app run --reload
