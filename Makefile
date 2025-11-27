@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa act act-ci act-test
+.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa act act-ci act-test
 
 # ==================================================================================== #
 # VARIABLES
