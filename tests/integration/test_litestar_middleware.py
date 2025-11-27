@@ -97,7 +97,7 @@ class TestToolbarPanels:
 
     def test_toolbar_shows_request_id(self, client: TestClient) -> None:
         response = client.get("/")
-        assert b"Request ID:" in response.content
+        assert b"data-request-id=" in response.content
 
 
 class TestToolbarDisabled:

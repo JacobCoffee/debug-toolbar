@@ -1,1 +1,1 @@
-"""Unit tests for debug-toolbar."""
+"""Unit tests."""
