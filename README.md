@@ -30,6 +30,32 @@
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="assets/toolbar-right-position.png" alt="Debug Toolbar - Right Position" width="100%">
+</p>
+
+<details>
+<summary>More Screenshots</summary>
+
+### Full-Width Top Position
+<img src="assets/toolbar-top-position.png" alt="Debug Toolbar - Top Position" width="100%">
+
+### SQL Queries with EXPLAIN
+<img src="assets/toolbar-users-queries.png" alt="Debug Toolbar - SQL Queries" width="100%">
+
+### EXPLAIN Query Plan Modal
+<img src="assets/toolbar-explain-modal.png" alt="Debug Toolbar - EXPLAIN Modal" width="100%">
+
+### Light Theme
+<img src="assets/toolbar-light-theme.png" alt="Debug Toolbar - Light Theme" width="100%">
+
+### Request History
+<img src="assets/toolbar-request-history.png" alt="Debug Toolbar - Request History" width="100%">
+
+</details>
+
 ## Features
 
 - **Async-Native**: Built from the ground up for async/await patterns
@@ -38,6 +64,9 @@
 - **Pluggable Panels**: Easy to add, remove, or customize debug panels
 - **Minimal Overhead**: Negligible performance impact when disabled
 - **Type-Safe**: Full type annotations with strict type checking
+- **Dark/Light Themes**: Toggle between dark and light themes
+- **Flexible Positioning**: Place toolbar on any edge (left, right, top, bottom)
+- **SQL Query Analysis**: EXPLAIN query plans for PostgreSQL, SQLite, MySQL, MariaDB
 
 ## Installation
 

@@ -738,12 +738,14 @@ body {
     left: 0;
     right: 0;
     bottom: auto;
-    width: auto;
-    height: 300px;
-    min-height: 100px;
+    width: 100vw;
+    max-width: 100vw;
+    height: auto;
+    min-height: 40px;
     max-height: 60vh;
     border-bottom: 2px solid var(--dt-accent);
     border-left: none;
+    border-right: none;
     flex-direction: column;
 }
 
@@ -752,12 +754,14 @@ body {
     left: 0;
     right: 0;
     top: auto;
-    width: auto;
-    height: 300px;
-    min-height: 100px;
+    width: 100vw;
+    max-width: 100vw;
+    height: auto;
+    min-height: 40px;
     max-height: 60vh;
     border-top: 2px solid var(--dt-accent);
     border-left: none;
+    border-right: none;
     flex-direction: column;
 }
 
