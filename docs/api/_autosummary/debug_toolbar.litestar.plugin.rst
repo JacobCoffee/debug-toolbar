@@ -1,4 +1,4 @@
-debug\_toolbar.litestar.plugin
+﻿debug\_toolbar.litestar.plugin
 ==============================
 
 .. automodule:: debug_toolbar.litestar.plugin

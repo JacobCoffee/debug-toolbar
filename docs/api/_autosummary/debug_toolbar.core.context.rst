@@ -1,4 +1,4 @@
-debug\_toolbar.core.context
+﻿debug\_toolbar.core.context
 ===========================
 
 .. automodule:: debug_toolbar.core.context
