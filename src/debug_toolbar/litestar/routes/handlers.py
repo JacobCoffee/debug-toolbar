@@ -115,11 +115,17 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debug Toolbar - Request History</title>
     <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
+    <script>document.documentElement.dataset.theme=localStorage.getItem('debug-toolbar-theme')||'dark';</script>
 </head>
 <body>
     <div class="toolbar-page">
         <header class="toolbar-header">
-            <h1>Debug Toolbar</h1>
+            <div class="header-row">
+                <h1>Debug Toolbar</h1>
+                <button class="toolbar-theme-btn page-theme-btn" onclick="togglePageTheme(this)" title="Toggle theme">
+                    <span class="theme-icon"></span>
+                </button>
+            </div>
             <p>Request History ({len(requests)} requests)</p>
         </header>
 
@@ -185,12 +191,18 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Debug Toolbar - Request {str(request_id)[:8]}</title>
     <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
+    <script>document.documentElement.dataset.theme=localStorage.getItem('debug-toolbar-theme')||'dark';</script>
 </head>
 <body>
     <div class="toolbar-page">
         <header class="toolbar-header">
             <a href="/_debug_toolbar/" class="back-link">&larr; Back to History</a>
-            <h1>Request Details</h1>
+            <div class="header-row">
+                <h1>Request Details</h1>
+                <button class="toolbar-theme-btn page-theme-btn" onclick="togglePageTheme(this)" title="Toggle theme">
+                    <span class="theme-icon"></span>
+                </button>
+            </div>
             <div class="request-summary">
                 <span class="method method-{method.lower()}">{method}</span>
                 <span class="path">{path}</span>
@@ -346,11 +358,31 @@ body {
     border-bottom: 2px solid var(--dt-accent);
 }
 
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .toolbar-header h1 {
     margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: 600;
     color: var(--dt-accent);
+}
+
+.page-theme-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+}
+
+.theme-icon::before {
+    content: '\u2600';
+}
+
+[data-theme="light"] .theme-icon::before {
+    content: '\u263e';
 }
 
 .toolbar-header p {
@@ -901,6 +933,13 @@ body {
 def get_toolbar_js() -> str:
     """Get the toolbar JavaScript."""
     return """
+function togglePageTheme(btn) {
+    const current = document.documentElement.dataset.theme || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem('debug-toolbar-theme', next);
+}
+
 function togglePanel(panelId) {
     const panel = document.getElementById('panel-' + panelId);
     if (!panel) return;
