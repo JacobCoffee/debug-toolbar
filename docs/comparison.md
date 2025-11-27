@@ -1,10 +1,10 @@
 # Debug Toolbar Comparison
 
-A comprehensive comparison of async-python-debug-toolbar against other popular Python debug toolbars and observability tools.
+A comprehensive comparison of debug-toolbar against other popular Python debug toolbars and observability tools.
 
 ## Quick Comparison Matrix
 
-| Feature | async-python-debug-toolbar | Django Debug Toolbar | Flask Debug Toolbar | FastAPI Debug Toolbar | Sentry Spotlight |
+| Feature | debug-toolbar | Django Debug Toolbar | Flask Debug Toolbar | FastAPI Debug Toolbar | Sentry Spotlight |
 |---------|---------------------------|---------------------|--------------------|--------------------|-----------------|
 | **Async-First** | **Yes** | No (experimental) | No | Partial | Yes |
 | **ASGI Native** | **Yes** | No (WSGI) | No (WSGI) | Yes | N/A |
@@ -93,7 +93,7 @@ A comprehensive comparison of async-python-debug-toolbar against other popular P
 
 ## Unique Strengths by Tool
 
-### async-python-debug-toolbar (Ours)
+### debug-toolbar (Ours)
 
 **Strengths:**
 - **True async-first design** using `contextvars` for request-scoped data
@@ -233,7 +233,7 @@ Added: CachePanel, TemplatesPanel, HeadersPanel (categorized), ProfilingPanel
 
 ## Conclusion
 
-**async-python-debug-toolbar** excels in:
+**debug-toolbar** excels in:
 - Modern async Python applications
 - Security-conscious debugging
 - Performance analysis with W3C Server-Timing

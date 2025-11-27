@@ -1,87 +1,48 @@
-# Async Debug Toolbar
+# Debug Toolbar
 
 An async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.
 
 ## Screenshots
 
 ```{image} ../assets/toolbar-right-position.png
-:alt: Debug Toolbar - Right Position
+:alt: Debug Toolbar
 :width: 100%
 ```
 
-````{dropdown} More Screenshots
-:open:
+::::{grid} 2
+:gutter: 2
 
-### Full-Width Top Position
-```{image} ../assets/toolbar-top-position.png
-:alt: Debug Toolbar - Top Position
-:width: 100%
-```
+:::{grid-item-card} Top Position
+:img-top: ../assets/toolbar-top-position.png
+Full-width horizontal layout
+:::
 
-### SQL Queries with EXPLAIN
-```{image} ../assets/toolbar-users-queries.png
-:alt: Debug Toolbar - SQL Queries
-:width: 100%
-```
+:::{grid-item-card} SQL Queries
+:img-top: ../assets/toolbar-users-queries.png
+Query tracking with EXPLAIN
+:::
 
-### EXPLAIN Query Plan Modal
-```{image} ../assets/toolbar-explain-modal.png
-:alt: Debug Toolbar - EXPLAIN Modal
-:width: 100%
-```
+:::{grid-item-card} Light Theme
+:img-top: ../assets/toolbar-light-theme.png
+Toggle dark/light themes
+:::
 
-### Light Theme
-```{image} ../assets/toolbar-light-theme.png
-:alt: Debug Toolbar - Light Theme
-:width: 100%
-```
+:::{grid-item-card} Request History
+:img-top: ../assets/toolbar-request-history.png
+Browse past requests
+:::
 
-### Request History
-```{image} ../assets/toolbar-request-history.png
-:alt: Debug Toolbar - Request History
-:width: 100%
-```
-````
+::::
 
-```{toctree}
-:maxdepth: 2
-:caption: Contents
-
-getting-started
-configuration
-panels
-custom-panels
-comparison
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: API Reference
-
-api/index
-```
-
-```{toctree}
-:maxdepth: 1
-:caption: Architecture
-
-architecture/ARCHITECTURE
-architecture/adr/ADR-001-dual-package-architecture
-architecture/adr/ADR-002-panel-system-design
-architecture/adr/ADR-003-storage-and-context
-```
-
-## Features
+## Key Features
 
 - **Async-Native**: Built from the ground up for async/await patterns
-- **Framework-Agnostic Core**: Core package works with any ASGI framework
-- **Litestar Integration**: First-class plugin support for Litestar applications
-- **Pluggable Panels**: Easy to add, remove, or customize debug panels
-- **Minimal Overhead**: Negligible performance impact when disabled
-- **Type-Safe**: Full type annotations with strict type checking
-- **Dark/Light Themes**: Toggle between dark and light themes
-- **Flexible Positioning**: Place toolbar on any edge (left, right, top, bottom)
-- **SQL Query Analysis**: EXPLAIN query plans for PostgreSQL, SQLite, MySQL, MariaDB
+- **Framework-Agnostic Core**: Works with any ASGI framework
+- **Litestar Integration**: First-class plugin support
+- **Pluggable Panels**: Easy to add, remove, or customize
+- **Dark/Light Themes**: Toggle between themes
+- **Flexible Positioning**: Left, right, top, or bottom
+- **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
 
 ## Quick Start
 
@@ -103,17 +64,41 @@ app = Litestar(
 ## Installation
 
 ```bash
-# Core package only
-pip install debug-toolbar
-
-# With Litestar integration
 pip install debug-toolbar[litestar]
 
-# With Advanced-Alchemy SQLAlchemy panel
+# With SQLAlchemy panel
 pip install debug-toolbar[advanced-alchemy]
 
 # Everything
 pip install debug-toolbar[all]
+```
+
+```{toctree}
+:maxdepth: 2
+:hidden:
+:caption: Learn
+
+getting-started
+configuration
+panels
+custom-panels
+```
+
+```{toctree}
+:maxdepth: 2
+:hidden:
+:caption: Reference
+
+API Reference <api/index>
+comparison
+```
+
+```{toctree}
+:maxdepth: 1
+:hidden:
+:caption: Architecture
+
+architecture/index
 ```
 
 ## Indices and tables

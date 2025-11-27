@@ -32,7 +32,7 @@ html_static_path = ["_static"]
 
 html_theme_options = {
     "accent_color": "violet",
-    "github_url": "https://github.com/JacobCoffee/async-python-debug-toolbar",
+    "github_url": "https://github.com/JacobCoffee/debug-toolbar",
     "nav_links": [
         {"title": "Litestar", "url": "https://litestar.dev"},
         {"title": "PyPI", "url": "https://pypi.org/project/debug-toolbar"},
