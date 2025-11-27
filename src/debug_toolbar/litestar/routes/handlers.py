@@ -578,6 +578,8 @@ body {
     font-size: 12px;
     z-index: 99999;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    overflow: hidden;
 }
 
 /* Default position: right */
@@ -586,7 +588,9 @@ body {
     top: 0;
     right: 0;
     bottom: 0;
-    width: 320px;
+    width: 400px;
+    min-width: 250px;
+    max-width: 80vw;
     border-left: 2px solid var(--dt-accent);
     flex-direction: column;
 }
@@ -596,9 +600,12 @@ body {
     left: 0;
     bottom: 0;
     right: auto;
-    width: 320px;
+    width: 400px;
+    min-width: 250px;
+    max-width: 80vw;
     border-right: 2px solid var(--dt-accent);
     border-left: none;
+    flex-direction: column;
 }
 
 #debug-toolbar[data-position="top"] {
@@ -607,8 +614,12 @@ body {
     right: 0;
     bottom: auto;
     width: auto;
+    height: 300px;
+    min-height: 100px;
+    max-height: 60vh;
     border-bottom: 2px solid var(--dt-accent);
     border-left: none;
+    flex-direction: column;
 }
 
 #debug-toolbar[data-position="bottom"] {
@@ -617,24 +628,86 @@ body {
     right: 0;
     top: auto;
     width: auto;
+    height: 300px;
+    min-height: 100px;
+    max-height: 60vh;
     border-top: 2px solid var(--dt-accent);
     border-left: none;
+    flex-direction: column;
 }
 
 #debug-toolbar.collapsed .toolbar-panels,
-#debug-toolbar.collapsed .toolbar-details {
+#debug-toolbar.collapsed .toolbar-details,
+#debug-toolbar.collapsed .toolbar-content {
     display: none;
 }
 
 /* Collapsed state for side positions */
 #debug-toolbar.collapsed[data-position="right"],
-#debug-toolbar[data-position="right"].collapsed {
-    width: auto;
-}
-
+#debug-toolbar[data-position="right"].collapsed,
 #debug-toolbar.collapsed[data-position="left"],
 #debug-toolbar[data-position="left"].collapsed {
     width: auto;
+    min-width: 0;
+}
+
+#debug-toolbar.collapsed[data-position="top"],
+#debug-toolbar[data-position="top"].collapsed,
+#debug-toolbar.collapsed[data-position="bottom"],
+#debug-toolbar[data-position="bottom"].collapsed {
+    height: auto;
+    min-height: 0;
+}
+
+/* Resize handle */
+.toolbar-resize-handle {
+    position: absolute;
+    background: transparent;
+    z-index: 10;
+}
+
+#debug-toolbar[data-position="right"] .toolbar-resize-handle {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: ew-resize;
+}
+
+#debug-toolbar[data-position="left"] .toolbar-resize-handle {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: ew-resize;
+}
+
+#debug-toolbar[data-position="top"] .toolbar-resize-handle {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    cursor: ns-resize;
+}
+
+#debug-toolbar[data-position="bottom"] .toolbar-resize-handle {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6px;
+    cursor: ns-resize;
+}
+
+.toolbar-resize-handle:hover {
+    background: var(--dt-accent);
+    opacity: 0.5;
+}
+
+/* Toolbar content area */
+.toolbar-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .toolbar-bar {
@@ -781,12 +854,16 @@ class DebugToolbar {
         this.isCollapsed = false;
         this.activePanel = null;
         this.position = localStorage.getItem('debug-toolbar-position') || 'right';
+        this.size = parseInt(localStorage.getItem('debug-toolbar-size') || '400', 10);
+        this.isResizing = false;
         this.init();
     }
 
     init() {
         this.setPosition(this.position);
+        this.applySize();
         this.addPositionControls();
+        this.addResizeHandle();
 
         const brand = this.element.querySelector('.toolbar-brand');
         if (brand) {
@@ -798,6 +875,66 @@ class DebugToolbar {
                 this.showPanel(btn.dataset.panelId);
             });
         });
+    }
+
+    addResizeHandle() {
+        const handle = document.createElement('div');
+        handle.className = 'toolbar-resize-handle';
+        this.element.appendChild(handle);
+
+        handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            this.isResizing = true;
+            document.body.style.cursor = this.isHorizontal() ? 'ew-resize' : 'ns-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!this.isResizing) return;
+            this.handleResize(e);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (this.isResizing) {
+                this.isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                localStorage.setItem('debug-toolbar-size', String(this.size));
+            }
+        });
+    }
+
+    isHorizontal() {
+        return this.position === 'left' || this.position === 'right';
+    }
+
+    handleResize(e) {
+        const minSize = this.isHorizontal() ? 250 : 100;
+        const maxSize = this.isHorizontal() ? window.innerWidth * 0.8 : window.innerHeight * 0.6;
+        let newSize;
+
+        if (this.position === 'right') {
+            newSize = window.innerWidth - e.clientX;
+        } else if (this.position === 'left') {
+            newSize = e.clientX;
+        } else if (this.position === 'bottom') {
+            newSize = window.innerHeight - e.clientY;
+        } else {
+            newSize = e.clientY;
+        }
+
+        this.size = Math.max(minSize, Math.min(maxSize, newSize));
+        this.applySize();
+    }
+
+    applySize() {
+        if (this.isHorizontal()) {
+            this.element.style.width = this.size + 'px';
+            this.element.style.height = '';
+        } else {
+            this.element.style.height = this.size + 'px';
+            this.element.style.width = '';
+        }
     }
 
     addPositionControls() {
@@ -829,6 +966,7 @@ class DebugToolbar {
     }
 
     setPosition(position) {
+        const wasHorizontal = this.isHorizontal();
         this.position = position;
         this.element.dataset.position = position;
         localStorage.setItem('debug-toolbar-position', position);
@@ -836,6 +974,11 @@ class DebugToolbar {
         this.element.querySelectorAll('.toolbar-position-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.position === position);
         });
+
+        if (wasHorizontal !== this.isHorizontal()) {
+            this.size = this.isHorizontal() ? 400 : 300;
+        }
+        this.applySize();
     }
 
     toggle() {
