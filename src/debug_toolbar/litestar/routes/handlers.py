@@ -65,7 +65,9 @@ def _render_panel_content(stats: dict[str, Any]) -> str:
         return "<p class='empty'>No data</p>"
     rows = []
     for key, value in stats.items():
-        rows.append(f"<tr><td class='key'>{key}</td><td class='value'>{_format_value(value)}</td></tr>")
+        escaped_key = _escape_html(str(key))
+        formatted_value = _format_value(value)
+        rows.append(f"<tr><td class='key'>{escaped_key}</td><td class='value'>{formatted_value}</td></tr>")
     return f"<table class='panel-table'><tbody>{''.join(rows)}</tbody></table>"
 
 
@@ -74,16 +76,18 @@ def _render_request_row(request_id: UUID, data: dict[str, Any]) -> str:
     metadata = data.get("metadata", {})
     timing = data.get("timing_data", {})
     total_time = timing.get("total_time", 0) * 1000
-    method = metadata.get("method", "GET")
-    path = metadata.get("path", "/")
+    method = _escape_html(str(metadata.get("method", "GET")))
+    path = _escape_html(str(metadata.get("path", "/")))
     status = metadata.get("status_code", 200)
     status_class = status // 100
+    # Sanitize method for CSS class (only allow alphanumeric)
+    method_class = "".join(c for c in method.lower() if c.isalnum())
 
     return f"""
         <tr class="request-row" data-request-id="{request_id}"
             onclick="window.location='/_debug_toolbar/{request_id}'">
             <td><code>{str(request_id)[:8]}</code></td>
-            <td><span class="method method-{method.lower()}">{method}</span></td>
+            <td><span class="method method-{method_class}">{method}</span></td>
             <td class="path">{path}</td>
             <td><span class="status status-{status_class}xx">{status}</span></td>
             <td class="time">{total_time:.2f}ms</td>
@@ -162,18 +166,28 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
         panel_data = data.get("panel_data", {})
         total_time = timing.get("total_time", 0) * 1000
 
-        method = metadata.get("method", "GET")
-        path = metadata.get("path", "/")
+        method = _escape_html(str(metadata.get("method", "GET")))
+        path = _escape_html(str(metadata.get("path", "/")))
         status = metadata.get("status_code", 200)
         status_class = status // 100
+        # Sanitize method for CSS class
+        method_class = "".join(c for c in method.lower() if c.isalnum())
+        # Pre-escape metadata values for display
+        query_string = _escape_html(str(metadata.get("query_string", "") or "(none)"))
+        content_type = _escape_html(str(metadata.get("response_content_type", "N/A")))
+        client_host = _escape_html(str(metadata.get("client_host", "N/A")))
+        client_port = _escape_html(str(metadata.get("client_port", "N/A")))
 
         panels_html = []
         for panel_id, stats in panel_data.items():
             panel_content = _render_panel_content(stats)
+            # Sanitize panel_id for use in HTML id and JS (alphanumeric + underscore only)
+            panel_id_class = "".join(c for c in str(panel_id) if c.isalnum() or c == "_")
+            panel_title = _escape_html(str(panel_id).replace("Panel", ""))
             panels_html.append(f"""
-                <div class="panel" id="panel-{panel_id}">
-                    <div class="panel-header" onclick="togglePanel('{panel_id}')">
-                        <span class="panel-title">{panel_id.replace("Panel", "")}</span>
+                <div class="panel" id="panel-{panel_id_class}">
+                    <div class="panel-header" onclick="togglePanel('{panel_id_class}')">
+                        <span class="panel-title">{panel_title}</span>
                         <span class="panel-toggle">+</span>
                     </div>
                     <div class="panel-content">
@@ -204,7 +218,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
                 </button>
             </div>
             <div class="request-summary">
-                <span class="method method-{method.lower()}">{method}</span>
+                <span class="method method-{method_class}">{method}</span>
                 <span class="path">{path}</span>
                 <span class="status status-{status_class}xx">{status}</span>
                 <span class="time">{total_time:.2f}ms</span>
@@ -218,17 +232,17 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
                     <dt>Request ID</dt>
                     <dd><code>{request_id}</code></dd>
                     <dt>Method</dt>
-                    <dd>{metadata.get("method", "N/A")}</dd>
+                    <dd>{method}</dd>
                     <dt>Path</dt>
-                    <dd>{metadata.get("path", "N/A")}</dd>
+                    <dd>{path}</dd>
                     <dt>Query String</dt>
-                    <dd><code>{metadata.get("query_string", "") or "(none)"}</code></dd>
+                    <dd><code>{query_string}</code></dd>
                     <dt>Status Code</dt>
-                    <dd>{metadata.get("status_code", "N/A")}</dd>
+                    <dd>{status}</dd>
                     <dt>Content Type</dt>
-                    <dd>{metadata.get("response_content_type", "N/A")}</dd>
+                    <dd>{content_type}</dd>
                     <dt>Client</dt>
-                    <dd>{metadata.get("client_host", "N/A")}:{metadata.get("client_port", "N/A")}</dd>
+                    <dd>{client_host}:{client_port}</dd>
                 </dl>
             </section>
 
