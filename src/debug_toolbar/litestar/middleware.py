@@ -36,16 +36,22 @@ class DebugToolbarMiddleware(AbstractMiddleware):
     scopes = {"http"}
     exclude = ["_debug_toolbar"]
 
-    def __init__(self, app: ASGIApp, config: LitestarDebugToolbarConfig | None = None) -> None:
+    def __init__(
+        self,
+        app: ASGIApp,
+        config: LitestarDebugToolbarConfig | None = None,
+        toolbar: DebugToolbar | None = None,
+    ) -> None:
         """Initialize the middleware.
 
         Args:
             app: The next ASGI application.
             config: Toolbar configuration. Uses defaults if not provided.
+            toolbar: Optional shared toolbar instance. Creates new if not provided.
         """
         super().__init__(app)
         self.config = config or LitestarDebugToolbarConfig()
-        self.toolbar = DebugToolbar(self.config)
+        self.toolbar = toolbar or DebugToolbar(self.config)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Process an ASGI request."""
@@ -211,42 +217,35 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         """
         panels_html = []
         for panel in data.get("panels", []):
+            subtitle = panel.get("nav_subtitle", "")
+            subtitle_html = f'<span class="panel-subtitle">{subtitle}</span>' if subtitle else ""
             panels_html.append(f"""
-                <div class="debug-panel" data-panel-id="{panel["panel_id"]}">
-                    <div class="panel-header">
-                        <span class="panel-title">{panel["nav_title"]}</span>
-                        <span class="panel-subtitle">{panel.get("nav_subtitle", "")}</span>
-                    </div>
-                </div>
+                <button class="toolbar-panel-btn" data-panel-id="{panel["panel_id"]}">
+                    <span class="panel-title">{panel["nav_title"]}</span>
+                    {subtitle_html}
+                </button>
             """)
 
         timing = data.get("timing", {})
         total_time = timing.get("total_time", 0) * 1000
+        request_id = data.get("request_id", "N/A")
 
         return f"""
-        <div id="debug-toolbar" style="
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1e1e1e;
-            color: #fff;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 99999;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            border-top: 2px solid #007acc;
-        ">
-            <div style="font-weight: bold; color: #007acc;">Debug Toolbar</div>
-            <div style="color: #4ec9b0;">{total_time:.2f}ms</div>
-            <div style="display: flex; gap: 8px;">
-                {"".join(panels_html)}
+        <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
+        <div id="debug-toolbar" data-request-id="{request_id}">
+            <div class="toolbar-bar">
+                <span class="toolbar-brand" title="Click to toggle">Debug Toolbar</span>
+                <span class="toolbar-time">{total_time:.2f}ms</span>
+                <div class="toolbar-panels">
+                    {"".join(panels_html)}
+                </div>
+                <span class="toolbar-request-id">
+                    <a href="/_debug_toolbar/{request_id}" class="toolbar-history-link"
+                       title="View request details">{request_id[:8]}</a>
+                </span>
+                <a href="/_debug_toolbar/" class="toolbar-history-link" title="View request history">History</a>
             </div>
-            <div style="margin-left: auto; color: #666;">
-                Request ID: {data.get("request_id", "N/A")[:8]}
-            </div>
+            <div class="toolbar-details"></div>
         </div>
+        <script src="/_debug_toolbar/static/toolbar.js"></script>
         """
