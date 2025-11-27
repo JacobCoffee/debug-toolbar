@@ -4,10 +4,15 @@ An async-native debug toolbar for Python ASGI frameworks with first-class Litest
 
 ## Screenshots
 
-```{image} ../assets/toolbar-right-position.png
-:alt: Debug Toolbar
-:width: 100%
-```
+::::{grid} 1
+:gutter: 2
+
+:::{grid-item-card} Default View
+:img-top: ../assets/toolbar-right-position.png
+Right-side toolbar with all panels
+:::
+
+::::
 
 ::::{grid} 2
 :gutter: 2
