@@ -95,7 +95,7 @@ async def main() -> None:
 
     print(f"Backend: {stats2['backend']}")
     print(f"Total Time: {stats2['total_time']:.4f}s")
-    print(f"Sort By: time (total time spent in function)")
+    print("Sort By: time (total time spent in function)")
     print()
     print("Top 5 Functions by Total Time:")
     for i, func in enumerate(stats2["top_functions"][:5], 1):
