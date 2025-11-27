@@ -165,7 +165,7 @@ act: ## Run GitHub Actions locally with act
 	act -l
 
 act-ci: ## Run CI workflow locally with act
-	act push -j lint -j format -j type-check -j test-parallel-fast -j docs
+	act push -j lint-format-typecheck -j smoke-test -j test
 
 act-test: ## Run test job locally with act
 	act push -j test --matrix python-version:3.12 --matrix os:ubuntu-latest
