@@ -1,11 +1,34 @@
-# Async Python Debug Toolbar
+# debug-toolbar
 
-[![CI](https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml/badge.svg)](https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml)
-[![PyPI version](https://badge.fury.io/py/async-debug-toolbar.svg)](https://badge.fury.io/py/async-debug-toolbar)
-[![Python Version](https://img.shields.io/pypi/pyversions/async-debug-toolbar)](https://pypi.org/project/async-debug-toolbar/)
-[![License](https://img.shields.io/github/license/JacobCoffee/async-python-debug-toolbar)](https://github.com/JacobCoffee/async-python-debug-toolbar/blob/main/LICENSE)
+<p align="center">
+  <em>Async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.</em>
+</p>
 
-An async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.
+<p align="center">
+  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml">
+    <img src="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/ci.yml/badge.svg" alt="Tests And Linting">
+  </a>
+  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/publish.yml">
+    <img src="https://github.com/JacobCoffee/async-python-debug-toolbar/actions/workflows/publish.yml/badge.svg" alt="Latest Release">
+  </a>
+  <a href="https://pypi.org/project/debug-toolbar/">
+    <img src="https://img.shields.io/pypi/v/debug-toolbar.svg" alt="PyPI Version">
+  </a>
+  <a href="https://pypi.org/project/debug-toolbar/">
+    <img src="https://img.shields.io/pypi/pyversions/debug-toolbar.svg" alt="Python Versions">
+  </a>
+  <a href="https://github.com/JacobCoffee/async-python-debug-toolbar/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/JacobCoffee/async-python-debug-toolbar.svg" alt="License">
+  </a>
+</p>
+
+---
+
+**Documentation**: [https://jacobcoffee.github.io/async-python-debug-toolbar](https://jacobcoffee.github.io/async-python-debug-toolbar)
+
+**Source Code**: [https://github.com/JacobCoffee/async-python-debug-toolbar](https://github.com/JacobCoffee/async-python-debug-toolbar)
+
+---
 
 ## Features
 
@@ -20,22 +43,22 @@ An async-native debug toolbar for Python ASGI frameworks with first-class Litest
 
 ```bash
 # Core package only
-pip install async-debug-toolbar
+pip install debug-toolbar
 
 # With Litestar integration
-pip install async-debug-toolbar[litestar]
+pip install debug-toolbar[litestar]
 
 # With Advanced-Alchemy SQLAlchemy panel
-pip install async-debug-toolbar[advanced-alchemy]
+pip install debug-toolbar[advanced-alchemy]
 
-# Everything
-pip install async-debug-toolbar[all]
+# All extras
+pip install debug-toolbar[all]
 ```
 
 Or with [uv](https://github.com/astral-sh/uv):
 
 ```bash
-uv add async-debug-toolbar[litestar]
+uv add debug-toolbar[litestar]
 ```
 
 ## Quick Start
@@ -44,32 +67,50 @@ uv add async-debug-toolbar[litestar]
 
 ```python
 from litestar import Litestar, get
-from litestar_debug_toolbar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
 @get("/")
 async def index() -> dict[str, str]:
     return {"message": "Hello, World!"}
 
-config = LitestarDebugToolbarConfig(
-    enabled=True,
-    exclude_paths=["/health", "/metrics"],
-)
-
+config = LitestarDebugToolbarConfig(enabled=True)
 app = Litestar(
     route_handlers=[index],
     plugins=[DebugToolbarPlugin(config)],
 )
 ```
 
-### Generic ASGI (Coming Soon)
+### With SQLAlchemy (Advanced-Alchemy)
 
 ```python
-from async_debug_toolbar import DebugToolbar, DebugToolbarConfig
+from litestar import Litestar
+from advanced_alchemy.extensions.litestar import SQLAlchemyPlugin, SQLAlchemyAsyncConfig
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+
+db_config = SQLAlchemyAsyncConfig(connection_string="sqlite+aiosqlite:///app.db")
+toolbar_config = LitestarDebugToolbarConfig(
+    enabled=True,
+    extra_panels=["debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel"],
+)
+
+app = Litestar(
+    plugins=[
+        SQLAlchemyPlugin(config=db_config),
+        DebugToolbarPlugin(toolbar_config),
+    ],
+)
+```
+
+### Generic ASGI
+
+```python
+from debug_toolbar import DebugToolbar, DebugToolbarConfig
 
 config = DebugToolbarConfig(enabled=True)
 toolbar = DebugToolbar(config)
 
-# Use with your ASGI framework's middleware system
+# Wrap your ASGI app
+app = toolbar.wrap(your_asgi_app)
 ```
 
 ## Built-in Panels
@@ -82,32 +123,20 @@ toolbar = DebugToolbar(config)
 | **Logging** | Log records captured during request |
 | **Versions** | Python and package versions |
 | **Routes** | Application routes (Litestar-specific) |
+| **SQLAlchemy** | Query tracking (requires `advanced-alchemy` extra) |
 
-## Configuration Options
+## Configuration
 
 ```python
-from litestar_debug_toolbar import LitestarDebugToolbarConfig
+from debug_toolbar.litestar import LitestarDebugToolbarConfig
 
 config = LitestarDebugToolbarConfig(
-    # Enable/disable the toolbar
     enabled=True,
-
-    # Paths to exclude from toolbar processing
     exclude_paths=["/_debug_toolbar", "/static", "/health"],
-
-    # Maximum requests to keep in history
     max_request_history=50,
-
-    # Whether to intercept redirects
     intercept_redirects=False,
-
-    # Custom callback to determine if toolbar should show
     show_toolbar_callback=lambda request: request.app.debug,
-
-    # Additional panels to include
     extra_panels=["myapp.panels.CustomPanel"],
-
-    # Panels to exclude from defaults
     exclude_panels=["VersionsPanel"],
 )
 ```
@@ -115,9 +144,8 @@ config = LitestarDebugToolbarConfig(
 ## Creating Custom Panels
 
 ```python
-from async_debug_toolbar.panel import Panel
-from async_debug_toolbar.context import RequestContext
 from typing import Any, ClassVar
+from debug_toolbar.core import Panel, RequestContext
 
 class MyCustomPanel(Panel):
     panel_id: ClassVar[str] = "MyCustomPanel"
@@ -126,10 +154,7 @@ class MyCustomPanel(Panel):
     has_content: ClassVar[bool] = True
 
     async def generate_stats(self, context: RequestContext) -> dict[str, Any]:
-        return {
-            "custom_data": "Your debug information here",
-            "metrics": calculate_metrics(),
-        }
+        return {"custom_data": "Your debug information here"}
 ```
 
 ## Development
@@ -149,14 +174,33 @@ make test
 make ci
 ```
 
-## Architecture
+## Package Structure
 
-This project uses a dual-package architecture:
+```
+debug_toolbar/
+├── core/           # Framework-agnostic core
+│   ├── panels/     # Built-in panels (timer, request, response, logging, versions)
+│   ├── config.py   # DebugToolbarConfig
+│   ├── context.py  # RequestContext (contextvars-based)
+│   ├── panel.py    # Panel base class
+│   ├── storage.py  # LRU request history storage
+│   └── toolbar.py  # DebugToolbar manager
+├── litestar/       # Litestar integration
+│   ├── panels/     # Litestar-specific panels (routes)
+│   ├── config.py   # LitestarDebugToolbarConfig
+│   ├── middleware.py
+│   └── plugin.py   # DebugToolbarPlugin
+└── extras/         # Optional integrations
+    └── advanced_alchemy/  # SQLAlchemy panel
+```
 
-- **async-debug-toolbar**: Framework-agnostic core with panels, storage, and context management
-- **litestar-debug-toolbar**: Thin integration layer providing Litestar plugin and middleware
+## Versioning
 
-See [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) for detailed design documentation.
+This project uses [Semantic Versioning](https://semver.org/).
+
+- Major versions introduce breaking changes
+- Major versions support currently supported Litestar versions
+- See the [Litestar Versioning Policy](https://litestar.dev/about/litestar-releases#version-numbering) for details
 
 ## Contributing
 
