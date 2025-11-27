@@ -170,7 +170,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:
                         <span class="panel-title">{panel_id.replace("Panel", "")}</span>
                         <span class="panel-toggle">+</span>
                     </div>
-                    <div class="panel-content" style="display: none;">
+                    <div class="panel-content">
                         {panel_content}
                     </div>
                 </div>
