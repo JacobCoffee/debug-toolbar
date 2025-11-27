@@ -63,7 +63,7 @@ jobs:
 
       - name: Install dependencies
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
-        run: uv sync --group docs
+        run: uv sync --group docs --all-extras
 
       - name: Build documentation
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
