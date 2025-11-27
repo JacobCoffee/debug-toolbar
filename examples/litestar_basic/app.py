@@ -1,7 +1,11 @@
 """Basic Litestar application with debug toolbar.
 
 This example demonstrates using debug-toolbar
-with a simple Litestar application.
+with a simple Litestar application, including the new Phase 10 panels:
+- Headers Panel: HTTP header inspection
+- Settings Panel: Application configuration viewer
+- Profiling Panel: Request profiling (optional)
+- Templates Panel: Template rendering tracking (with Jinja2)
 
 Run with: litestar --app examples.litestar_basic.app:app run --reload
 """
@@ -11,6 +15,7 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timezone
 
+from jinja2 import Template
 from litestar import Litestar, MediaType, get
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
@@ -18,40 +23,45 @@ from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfi
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-
-@get("/", media_type=MediaType.HTML)
-async def index() -> str:
-    """Home page."""
-    logger.info("Home page accessed")
-    return """<!DOCTYPE html>
+INDEX_TEMPLATE = Template("""<!DOCTYPE html>
 <html>
 <head><title>Litestar Debug Toolbar Example</title></head>
 <body>
     <h1>Litestar Debug Toolbar Example</h1>
     <p>Welcome to the Litestar debug toolbar demo!</p>
+    <p>Current time: {{ current_time }}</p>
     <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/users">Users</a></li>
         <li><a href="/api/status">API Status (JSON)</a></li>
     </ul>
+    <h2>New Phase 10 Panels</h2>
+    <ul>
+        <li><strong>Headers Panel</strong> - Inspect request/response headers, security analysis</li>
+        <li><strong>Settings Panel</strong> - View toolbar and app configuration</li>
+        <li><strong>Templates Panel</strong> - Track Jinja2 template render times</li>
+        <li><strong>Profiling Panel</strong> - Profile request execution (optional)</li>
+    </ul>
     <p>The debug toolbar should appear at the bottom of this page.</p>
 </body>
-</html>"""
+</html>""")
 
 
-@get("/about", media_type=MediaType.HTML)
-async def about() -> str:
-    """About page."""
-    logger.info("About page accessed")
-    logger.debug("Debug message from about page")
-    return """<!DOCTYPE html>
+@get("/", media_type=MediaType.HTML)
+async def index() -> str:
+    """Home page - demonstrates Templates Panel tracking Jinja2 renders."""
+    logger.info("Home page accessed")
+    return INDEX_TEMPLATE.render(current_time=datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"))
+
+
+ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
 <html>
 <head><title>About</title></head>
 <body>
     <h1>About</h1>
     <p>This is a simple Litestar application demonstrating the debug toolbar.</p>
-    <p>Features:</p>
+    <h2>Core Panels</h2>
     <ul>
         <li>Timer Panel - Request timing</li>
         <li>Request Panel - Request details</li>
@@ -60,9 +70,25 @@ async def about() -> str:
         <li>Versions Panel - Environment info</li>
         <li>Routes Panel - Litestar routes</li>
     </ul>
+    <h2>Phase 10 Panels (New!)</h2>
+    <ul>
+        <li><strong>Headers Panel</strong> - Detailed HTTP header inspection with security analysis</li>
+        <li><strong>Settings Panel</strong> - Application configuration viewer with sensitive data redaction</li>
+        <li><strong>Templates Panel</strong> - Track Jinja2/Mako template rendering times</li>
+        <li><strong>Profiling Panel</strong> - cProfile/pyinstrument request profiling</li>
+        <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
+    </ul>
     <a href="/">Back to Home</a>
 </body>
-</html>"""
+</html>""")
+
+
+@get("/about", media_type=MediaType.HTML)
+async def about() -> str:
+    """About page - demonstrates Templates Panel with another template."""
+    logger.info("About page accessed")
+    logger.debug("Debug message from about page")
+    return ABOUT_TEMPLATE.render()
 
 
 @get("/users", media_type=MediaType.HTML)
@@ -107,6 +133,11 @@ toolbar_config = LitestarDebugToolbarConfig(
     exclude_paths=["/_debug_toolbar", "/favicon.ico"],
     show_on_errors=True,
     max_request_history=100,
+    extra_panels=[
+        "debug_toolbar.core.panels.headers.HeadersPanel",
+        "debug_toolbar.core.panels.settings.SettingsPanel",
+        "debug_toolbar.core.panels.templates.TemplatesPanel",
+    ],
 )
 
 app = Litestar(

@@ -95,3 +95,42 @@ class TestDebugToolbar:
         assert "timing" in data
 
         set_request_context(None)
+
+    def test_extra_panels_string_import(self) -> None:
+        """Should load extra panels from string import paths."""
+        config = DebugToolbarConfig(
+            extra_panels=["debug_toolbar.core.panels.headers.HeadersPanel"],
+        )
+        toolbar = DebugToolbar(config)
+
+        panel_ids = [p.get_panel_id() for p in toolbar.panels]
+        assert "HeadersPanel" in panel_ids
+
+    def test_extra_panels_multiple_string_imports(self) -> None:
+        """Should load multiple extra panels from string paths."""
+        config = DebugToolbarConfig(
+            extra_panels=[
+                "debug_toolbar.core.panels.headers.HeadersPanel",
+                "debug_toolbar.core.panels.settings.SettingsPanel",
+                "debug_toolbar.core.panels.profiling.ProfilingPanel",
+            ],
+        )
+        toolbar = DebugToolbar(config)
+
+        panel_ids = [p.get_panel_id() for p in toolbar.panels]
+        assert "HeadersPanel" in panel_ids
+        assert "SettingsPanel" in panel_ids
+        assert "ProfilingPanel" in panel_ids
+
+    def test_extra_panels_invalid_import_logged(self, caplog: pytest.LogCaptureFixture) -> None:
+        """Should log warning for invalid panel import paths."""
+        import logging
+
+        with caplog.at_level(logging.WARNING):
+            config = DebugToolbarConfig(
+                extra_panels=["nonexistent.module.FakePanel"],
+            )
+            DebugToolbar(config)
+
+        assert "Failed to import panel" in caplog.text
+        assert "nonexistent.module.FakePanel" in caplog.text
