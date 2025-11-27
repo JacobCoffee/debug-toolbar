@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -33,6 +34,9 @@ class CacheOperationRecord:
     extra: dict[str, Any] = field(default_factory=dict)
 
 
+_patch_lock = threading.Lock()
+
+
 class CacheTracker:
     """Tracks cache operations for Redis and memcached."""
 
@@ -48,16 +52,18 @@ class CacheTracker:
             return
 
         self._tracking_enabled = True
-        self._patch_redis()
-        self._patch_memcache()
+        with _patch_lock:
+            self._patch_redis()
+            self._patch_memcache()
 
     def stop_tracking(self) -> None:
         """Stop tracking and restore original methods."""
         if not self._tracking_enabled:
             return
 
-        self._unpatch_redis()
-        self._unpatch_memcache()
+        with _patch_lock:
+            self._unpatch_redis()
+            self._unpatch_memcache()
         self._tracking_enabled = False
 
     def clear(self) -> None:
@@ -297,12 +303,12 @@ _active_tracker: ContextVar[CacheTracker | None] = ContextVar("_active_tracker",
 
 
 def _get_tracker() -> CacheTracker | None:
-    """Get the currently active cache tracker for the current context."""
+    """Get the currently active cache tracker."""
     return _active_tracker.get()
 
 
 def _set_tracker(tracker: CacheTracker | None) -> None:
-    """Set the active cache tracker for the current context."""
+    """Set the active cache tracker."""
     _active_tracker.set(tracker)
 
 
@@ -317,7 +323,7 @@ class CachePanel(Panel):
     - Aggregate statistics
     """
 
-    panel_id: ClassVar[str] = "CachePanel"
+    panel_id: ClassVar[str] = "cache"
     title: ClassVar[str] = "Cache"
     template: ClassVar[str] = "panels/cache.html"
     has_content: ClassVar[bool] = True

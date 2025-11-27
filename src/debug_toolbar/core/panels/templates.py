@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import threading
 import time
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from debug_toolbar.core.panel import Panel
+
+_patch_lock = threading.Lock()
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -19,7 +22,7 @@ if TYPE_CHECKING:
         Jinja2Template = Any  # type: ignore[misc]
 
     try:
-        from mako.template import Template as MakoTemplate  # type: ignore[import-untyped]
+        from mako.template import Template as MakoTemplate
     except ImportError:
         MakoTemplate = Any  # type: ignore[misc]
 
@@ -69,35 +72,41 @@ class TemplateRenderTracker:
         except ImportError:
             return
 
-        if self._original_jinja2_render is None:
-            self._original_jinja2_render = Jinja2Template.render
+        with _patch_lock:
+            if hasattr(Jinja2Template, "_debug_toolbar_patched"):
+                self._patched.add("jinja2")
+                return
 
-        def tracked_render(template_self: Jinja2Template, *args: Any, **kwargs: Any) -> str:
-            start_time = time.perf_counter()
+            if self._original_jinja2_render is None:
+                self._original_jinja2_render = Jinja2Template.render
 
-            context_keys = None
-            if args and isinstance(args[0], dict):
-                context_keys = list(args[0].keys())
-            elif kwargs:
-                context_keys = list(kwargs.keys())
+            def tracked_render(template_self: Jinja2Template, *args: Any, **kwargs: Any) -> str:
+                start_time = time.perf_counter()
 
-            result = self._original_jinja2_render(template_self, *args, **kwargs)  # type: ignore[misc]
+                context_keys = None
+                if args and isinstance(args[0], dict):
+                    context_keys = list(args[0].keys())
+                elif kwargs:
+                    context_keys = list(kwargs.keys())
 
-            render_time = time.perf_counter() - start_time
+                result = self._original_jinja2_render(template_self, *args, **kwargs)  # type: ignore[misc]
 
-            template_name = getattr(template_self, "name", None) or getattr(template_self, "filename", "<string>")
+                render_time = time.perf_counter() - start_time
 
-            self.track_render(
-                template_name=template_name,
-                engine="jinja2",
-                render_time=render_time,
-                context_keys=context_keys,
-            )
+                template_name = getattr(template_self, "name", None) or getattr(template_self, "filename", "<string>")
 
-            return result
+                self.track_render(
+                    template_name=template_name,
+                    engine="jinja2",
+                    render_time=render_time,
+                    context_keys=context_keys,
+                )
 
-        Jinja2Template.render = tracked_render  # type: ignore[method-assign]
-        self._patched.add("jinja2")
+                return result
+
+            Jinja2Template.render = tracked_render  # type: ignore[method-assign]
+            Jinja2Template._debug_toolbar_patched = True  # type: ignore[attr-defined]  # noqa: SLF001
+            self._patched.add("jinja2")
 
     def patch_mako(self) -> None:
         """Patch Mako template rendering to track renders."""
@@ -109,35 +118,41 @@ class TemplateRenderTracker:
         except ImportError:
             return
 
-        if self._original_mako_render is None:
-            self._original_mako_render = MakoTemplate.render
+        with _patch_lock:
+            if hasattr(MakoTemplate, "_debug_toolbar_patched"):
+                self._patched.add("mako")
+                return
 
-        def tracked_render(template_self: MakoTemplate, *args: Any, **kwargs: Any) -> str:
-            start_time = time.perf_counter()
+            if self._original_mako_render is None:
+                self._original_mako_render = MakoTemplate.render
 
-            context_keys = None
-            if args and isinstance(args[0], dict):
-                context_keys = list(args[0].keys())
-            elif kwargs:
-                context_keys = list(kwargs.keys())
+            def tracked_render(template_self: MakoTemplate, *args: Any, **kwargs: Any) -> str:
+                start_time = time.perf_counter()
 
-            result = self._original_mako_render(template_self, *args, **kwargs)  # type: ignore[misc]
+                context_keys = None
+                if args and isinstance(args[0], dict):
+                    context_keys = list(args[0].keys())
+                elif kwargs:
+                    context_keys = list(kwargs.keys())
 
-            render_time = time.perf_counter() - start_time
+                result = self._original_mako_render(template_self, *args, **kwargs)  # type: ignore[misc]
 
-            template_name = getattr(template_self, "filename", None) or getattr(template_self, "uri", "<string>")
+                render_time = time.perf_counter() - start_time
 
-            self.track_render(
-                template_name=template_name,
-                engine="mako",
-                render_time=render_time,
-                context_keys=context_keys,
-            )
+                template_name = getattr(template_self, "filename", None) or getattr(template_self, "uri", "<string>")
 
-            return result
+                self.track_render(
+                    template_name=template_name,
+                    engine="mako",
+                    render_time=render_time,
+                    context_keys=context_keys,
+                )
 
-        MakoTemplate.render = tracked_render  # type: ignore[method-assign]
-        self._patched.add("mako")
+                return result
+
+            MakoTemplate.render = tracked_render  # type: ignore[method-assign]
+            MakoTemplate._debug_toolbar_patched = True  # type: ignore[attr-defined]  # noqa: SLF001
+            self._patched.add("mako")
 
     def unpatch_jinja2(self) -> None:
         """Restore original Jinja2 render method."""
@@ -149,8 +164,10 @@ class TemplateRenderTracker:
         except ImportError:
             return
 
-        if self._original_jinja2_render is not None:
-            Jinja2Template.render = self._original_jinja2_render  # type: ignore[method-assign]
+        with _patch_lock:
+            if self._original_jinja2_render is not None and hasattr(Jinja2Template, "_debug_toolbar_patched"):
+                Jinja2Template.render = self._original_jinja2_render  # type: ignore[method-assign]
+                delattr(Jinja2Template, "_debug_toolbar_patched")
             self._patched.discard("jinja2")
 
     def unpatch_mako(self) -> None:
@@ -163,8 +180,10 @@ class TemplateRenderTracker:
         except ImportError:
             return
 
-        if self._original_mako_render is not None:
-            MakoTemplate.render = self._original_mako_render  # type: ignore[method-assign]
+        with _patch_lock:
+            if self._original_mako_render is not None and hasattr(MakoTemplate, "_debug_toolbar_patched"):
+                MakoTemplate.render = self._original_mako_render  # type: ignore[method-assign]
+                delattr(MakoTemplate, "_debug_toolbar_patched")
             self._patched.discard("mako")
 
     def clear(self) -> None:
@@ -185,7 +204,7 @@ class TemplatesPanel(Panel):
     capture timing data transparently.
     """
 
-    panel_id: ClassVar[str] = "TemplatesPanel"
+    panel_id: ClassVar[str] = "templates"
     title: ClassVar[str] = "Templates"
     template: ClassVar[str] = "panels/templates.html"
     has_content: ClassVar[bool] = True

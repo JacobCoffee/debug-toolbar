@@ -5,11 +5,6 @@ memcached operations when they occur during a request.
 
 Note: This is a demonstration of the panel's capabilities. In practice, the
 panel is automatically enabled when added to the debug toolbar configuration.
-
-WARNING: This example uses private methods (_record_operation) for educational
-purposes only. Applications should NOT call private methods directly. In normal
-use, the panel automatically patches Redis and memcached clients to track
-operations transparently.
 """
 
 from __future__ import annotations
@@ -17,47 +12,26 @@ from __future__ import annotations
 from debug_toolbar.core.panels.cache import CacheTracker
 
 
-def demo_manual_tracking() -> None:
-    """Demonstrate manual cache tracking using the CacheTracker."""
-    print("=== Manual Cache Tracking Demo ===\n")
+def demo_context_manager_tracking() -> None:
+    """Demonstrate cache tracking using the public context manager API."""
+    print("=== Context Manager Cache Tracking Demo ===\n")
 
     tracker = CacheTracker()
 
     print("1. Recording cache GET operations (hit and miss)...")
-    tracker._record_operation(
-        operation="GET",
-        key="user:123",
-        hit=True,
-        duration=0.001,
-        backend="redis",
-    )
+    with tracker.track_operation("GET", "user:123", "redis") as extra:
+        extra["hit"] = True
 
-    tracker._record_operation(
-        operation="GET",
-        key="user:456",
-        hit=False,
-        duration=0.002,
-        backend="redis",
-    )
+    with tracker.track_operation("GET", "user:456", "redis") as extra:
+        extra["hit"] = False
 
     print("2. Recording cache SET operation...")
-    tracker._record_operation(
-        operation="SET",
-        key="user:456",
-        hit=None,
-        duration=0.003,
-        backend="redis",
-        extra={"ttl": 3600},
-    )
+    with tracker.track_operation("SET", "user:456", "redis") as extra:
+        extra["ttl"] = 3600
 
     print("3. Recording memcached operation...")
-    tracker._record_operation(
-        operation="GET",
-        key="session:abc123",
-        hit=True,
-        duration=0.0015,
-        backend="memcached",
-    )
+    with tracker.track_operation("GET", "session:abc123", "memcached") as extra:
+        extra["hit"] = True
 
     print(f"\nTotal operations tracked: {len(tracker.operations)}")
     print("\nOperations:")
@@ -69,13 +43,13 @@ def demo_manual_tracking() -> None:
         )
 
 
-def demo_context_manager() -> None:
-    """Demonstrate using the track_operation context manager."""
-    print("\n=== Context Manager Demo ===\n")
+def demo_multi_key_operation() -> None:
+    """Demonstrate tracking multi-key operations."""
+    print("\n=== Multi-Key Operation Demo ===\n")
 
     tracker = CacheTracker()
 
-    print("Using context manager to track a custom operation...")
+    print("Using context manager to track a multi-key operation...")
     with tracker.track_operation("MGET", ["key1", "key2", "key3"], "redis") as extra:
         extra["hit"] = True
         extra["keys_found"] = 2
@@ -93,11 +67,16 @@ def demo_statistics() -> None:
 
     tracker = CacheTracker()
 
-    tracker._record_operation("GET", "key1", True, 0.001, "redis")
-    tracker._record_operation("GET", "key2", True, 0.001, "redis")
-    tracker._record_operation("GET", "key3", False, 0.002, "redis")
-    tracker._record_operation("SET", "key4", None, 0.003, "redis")
-    tracker._record_operation("GET", "key5", True, 0.0015, "memcached")
+    with tracker.track_operation("GET", "key1", "redis") as extra:
+        extra["hit"] = True
+    with tracker.track_operation("GET", "key2", "redis") as extra:
+        extra["hit"] = True
+    with tracker.track_operation("GET", "key3", "redis") as extra:
+        extra["hit"] = False
+    with tracker.track_operation("SET", "key4", "redis"):
+        pass
+    with tracker.track_operation("GET", "key5", "memcached") as extra:
+        extra["hit"] = True
 
     total = len(tracker.operations)
     hits = sum(1 for op in tracker.operations if op.hit is True)
@@ -115,8 +94,8 @@ def demo_statistics() -> None:
 
 
 if __name__ == "__main__":
-    demo_manual_tracking()
-    demo_context_manager()
+    demo_context_manager_tracking()
+    demo_multi_key_operation()
     demo_statistics()
 
     print("\n" + "=" * 50)

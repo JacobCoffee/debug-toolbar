@@ -23,7 +23,7 @@ class HeadersPanel(Panel):
     - CORS header analysis
     """
 
-    panel_id: ClassVar[str] = "HeadersPanel"
+    panel_id: ClassVar[str] = "headers"
     title: ClassVar[str] = "Headers"
     template: ClassVar[str] = "panels/headers.html"
     has_content: ClassVar[bool] = True
@@ -254,7 +254,7 @@ class HeadersPanel(Panel):
                 if ":" in decoded:
                     username, _ = decoded.split(":", 1)
                     return f"Basic (username: {username}, password: [REDACTED])"
-            except Exception:
+            except (ValueError, UnicodeDecodeError):
                 return "Basic [REDACTED]"
 
         if auth_type_lower == "bearer":

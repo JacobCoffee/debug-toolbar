@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import cProfile
 import io
+import logging
 import pstats
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from debug_toolbar.core.panel import Panel
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     try:
@@ -91,12 +94,14 @@ class ProfilingPanel(Panel):
                 try:
                     self._profiler.enable()
                 except ValueError:
+                    logger.warning("Failed to enable cProfile profiler - another profiler may be active")
                     self._profiler = None
         else:
             self._profiler = cProfile.Profile()
             try:
                 self._profiler.enable()
             except ValueError:
+                logger.warning("Failed to enable cProfile profiler - another profiler may be active")
                 self._profiler = None
 
         self._profiling_overhead = time.perf_counter() - start

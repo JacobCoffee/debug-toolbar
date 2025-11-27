@@ -29,8 +29,7 @@ def profiling_panel(mock_toolbar: MagicMock) -> ProfilingPanel:
     if panel._profiler is not None and hasattr(panel._profiler, "disable"):
         try:
             panel._profiler.disable()
-        except Exception:
-            # Ignore exceptions during profiler cleanup to avoid interfering with test teardown
+        except (ValueError, RuntimeError):
             pass
 
 
