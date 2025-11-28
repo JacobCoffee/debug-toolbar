@@ -300,8 +300,45 @@ toolbar_config = LitestarDebugToolbarConfig(
 
 
 async def on_startup(app: Litestar) -> None:
-    """Store the database engine in app state for EXPLAIN queries."""
+    """Store the database engine and seed sample data."""
     app.state.db_engine = db_config.get_engine()
+    await seed_sample_data()
+
+
+async def seed_sample_data() -> None:
+    """Seed sample users and posts for demo purposes."""
+    from sqlalchemy import select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    async with db_config.get_engine().begin() as conn:
+        session = AsyncSession(bind=conn)
+
+        result = await session.execute(select(User).limit(1))
+        if result.scalar_one_or_none() is not None:
+            return
+
+        users = [
+            User(name="Alice Johnson", email="alice@example.com"),
+            User(name="Bob Smith", email="bob@example.com"),
+            User(name="Charlie Brown", email="charlie@example.com"),
+            User(name="Diana Ross", email="diana@example.com"),
+            User(name="Eve Wilson", email="eve@example.com"),
+        ]
+        session.add_all(users)
+        await session.flush()
+
+        posts = [
+            Post(title="Getting Started with Litestar", content="Litestar is awesome!", author_id=users[0].id),
+            Post(title="Debug Toolbar Tips", content="Use the SQL panel to find N+1 queries.", author_id=users[0].id),
+            Post(title="Python Best Practices", content="Always use type hints.", author_id=users[1].id),
+            Post(title="Async Programming", content="async/await makes code clean.", author_id=users[1].id),
+            Post(title="SQLAlchemy 2.0", content="The new style is much better.", author_id=users[2].id),
+            Post(title="Testing Strategies", content="Test your N+1 queries!", author_id=users[3].id),
+            Post(title="Performance Tips", content="Eager loading prevents N+1.", author_id=users[4].id),
+        ]
+        session.add_all(posts)
+        await session.commit()
+        logger.info("Seeded %d users and %d posts", len(users), len(posts))
 
 
 app = Litestar(
