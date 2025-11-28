@@ -202,14 +202,28 @@ async def list_users_with_posts_n_plus_one(
 
     return f"""<!DOCTYPE html>
 <html>
-<head><title>Users (N+1 Demo)</title></head>
+<head>
+<title>Users (N+1 Demo)</title>
+<style>
+body {{ background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; padding: 20px; }}
+h1 {{ color: #f5a623; }}
+.warning {{ background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.5);
+    border-left: 4px solid #eab308; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #fbbf24; }}
+.warning strong {{ color: #fcd34d; }}
+table {{ border-collapse: collapse; background: #16213e; }}
+th, td {{ border: 1px solid #334155; padding: 8px 12px; text-align: left; }}
+th {{ background: #1e3a5f; color: #93c5fd; }}
+a {{ color: #60a5fa; }}
+a:hover {{ color: #93c5fd; }}
+</style>
+</head>
 <body>
     <h1>Users with Posts (N+1 Query Demo)</h1>
-    <div style="background: #fee; border: 2px solid #f00; padding: 10px; margin-bottom: 20px;">
+    <div class="warning">
         <strong>Warning:</strong> This page deliberately triggers N+1 queries for demonstration!
         <br>Check the SQL panel in the debug toolbar to see the N+1 detection in action.
     </div>
-    <table border="1">
+    <table>
         <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Post Count</th></tr></thead>
         <tbody>{rows or '<tr><td colspan="4">No users yet. Create some users first!</td></tr>'}</tbody>
     </table>
