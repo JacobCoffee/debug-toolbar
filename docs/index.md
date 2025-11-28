@@ -144,6 +144,7 @@ app = Litestar(
 - **Dark/Light Themes**: Toggle between themes
 - **Flexible Positioning**: Left, right, top, or bottom
 - **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
+- **N+1 Detection**: Automatic detection of N+1 query patterns with fix suggestions
 
 ## Screenshots
 
@@ -168,6 +169,11 @@ Full-width horizontal layout
 :::{grid-item-card} SQL Queries
 :img-top: ../assets/toolbar-users-queries.png
 Query tracking with EXPLAIN
+:::
+
+:::{grid-item-card} N+1 Detection
+:img-top: ../assets/toolbar-n-plus-one-detection.png
+Automatic N+1 query detection with fix suggestions
 :::
 
 :::{grid-item-card} Light Theme
