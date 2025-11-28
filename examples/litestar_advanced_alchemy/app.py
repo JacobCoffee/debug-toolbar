@@ -88,6 +88,11 @@ async def index() -> str:
         <li>POST /api/posts - Create post</li>
         <li>DELETE /api/users/{id} - Delete user</li>
     </ul>
+    <h2>N+1 Query Demo</h2>
+    <p style="background: #fee; padding: 10px; border: 1px solid #f00;">
+        <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
+        This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
+    </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
     <h2>Toolbar Controls</h2>
     <ul>
@@ -164,6 +169,54 @@ async def list_users(
     logger.info("Listing users with limit=%d, offset=%d", limit, offset)
     users = await user_repo.list(LimitOffset(limit=limit, offset=offset))
     return [{"id": str(u.id), "name": u.name, "email": u.email} for u in users]
+
+
+@get("/api/users-with-posts-bad", media_type=MediaType.HTML)
+async def list_users_with_posts_n_plus_one(
+    user_repo: UserRepository,
+    post_repo: PostRepository,
+) -> str:
+    """Deliberately cause N+1 query problem for demo purposes.
+
+    This endpoint fetches users first, then loops through each user to fetch their posts.
+    This is a classic N+1 pattern - 1 query for users + N queries for each user's posts.
+    """
+    logger.warning("N+1 DEMO: This endpoint deliberately causes N+1 queries!")
+
+    users = await user_repo.list(LimitOffset(limit=10, offset=0))
+
+    results = []
+    for user in users:
+        posts = await post_repo.list(LimitOffset(limit=100, offset=0))
+        user_posts = [p for p in posts if p.author_id == user.id]
+        results.append({
+            "user": user,
+            "posts": user_posts,
+        })
+
+    rows = ""
+    for r in results:
+        user = r["user"]
+        post_count = len(r["posts"])
+        rows += f"<tr><td>{user.id}</td><td>{user.name}</td><td>{user.email}</td><td>{post_count}</td></tr>"
+
+    return f"""<!DOCTYPE html>
+<html>
+<head><title>Users (N+1 Demo)</title></head>
+<body>
+    <h1>Users with Posts (N+1 Query Demo)</h1>
+    <div style="background: #fee; border: 2px solid #f00; padding: 10px; margin-bottom: 20px;">
+        <strong>Warning:</strong> This page deliberately triggers N+1 queries for demonstration!
+        <br>Check the SQL panel in the debug toolbar to see the N+1 detection in action.
+    </div>
+    <table border="1">
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Post Count</th></tr></thead>
+        <tbody>{rows or '<tr><td colspan="4">No users yet. Create some users first!</td></tr>'}</tbody>
+    </table>
+    <p><a href="/users">View users (efficient query)</a></p>
+    <a href="/">Back to Home</a>
+</body>
+</html>"""
 
 
 @post("/api/users", media_type=MediaType.HTML)
@@ -257,6 +310,7 @@ app = Litestar(
         users_page,
         posts_page,
         list_users,
+        list_users_with_posts_n_plus_one,
         create_user,
         delete_user,
         list_posts,

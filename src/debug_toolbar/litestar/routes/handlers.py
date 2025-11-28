@@ -1055,6 +1055,202 @@ body {
     cursor: not-allowed;
 }
 
+/* N+1 Detection Styles */
+.sql-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--dt-border);
+}
+
+.sql-summary h3 {
+    margin: 0;
+    color: var(--dt-text-primary);
+}
+
+.sql-total-time {
+    color: var(--dt-text-secondary);
+    font-size: 13px;
+}
+
+.n-plus-one-warning {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.n-plus-one-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: var(--dt-warning);
+    font-size: 14px;
+}
+
+.warning-icon {
+    font-size: 18px;
+}
+
+.n-plus-one-count {
+    margin-left: auto;
+    background: rgba(234, 179, 8, 0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.n-plus-one-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.n-plus-one-group {
+    background: var(--dt-bg-secondary);
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid var(--dt-warning);
+}
+
+.n-plus-one-group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.group-count {
+    background: var(--dt-error);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.group-origin {
+    color: var(--dt-text-primary);
+    font-family: var(--dt-font-mono);
+}
+
+.group-time {
+    margin-left: auto;
+    color: var(--dt-text-secondary);
+}
+
+.n-plus-one-sql {
+    background: var(--dt-bg-primary);
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: var(--dt-font-mono);
+    font-size: 11px;
+    color: var(--dt-warning);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.n-plus-one-suggestion {
+    font-size: 12px;
+    color: var(--dt-text-secondary);
+    background: rgba(34, 197, 94, 0.1);
+    padding: 8px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.n-plus-one-stack {
+    font-size: 11px;
+    color: var(--dt-text-secondary);
+}
+
+.n-plus-one-stack summary {
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+.stack-frames {
+    padding: 8px;
+    background: var(--dt-bg-primary);
+    border-radius: 4px;
+    margin-top: 4px;
+}
+
+.stack-frame {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--dt-border);
+}
+
+.stack-frame:last-child {
+    border-bottom: none;
+}
+
+.frame-location {
+    color: var(--dt-accent);
+    font-family: var(--dt-font-mono);
+}
+
+.frame-function {
+    color: var(--dt-success);
+    font-family: var(--dt-font-mono);
+}
+
+.frame-code {
+    color: var(--dt-text-muted);
+    font-family: var(--dt-font-mono);
+    padding-left: 12px;
+    margin-top: 2px;
+}
+
+/* Query badges */
+.query-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 8px;
+    text-transform: uppercase;
+}
+
+.badge-n-plus-one {
+    background: rgba(234, 179, 8, 0.2);
+    color: var(--dt-warning);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.badge-slow {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--dt-error);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-duplicate {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--dt-accent);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+/* Highlight flagged queries */
+.sql-query-container.is-n-plus-one {
+    border-left: 3px solid var(--dt-warning);
+}
+
+.sql-query-container.is-slow {
+    border-left: 3px solid var(--dt-error);
+}
+
+.sql-query-container.is-duplicate {
+    border-left: 3px solid var(--dt-accent);
+}
+
 .explain-modal {
     position: fixed;
     top: 0;
@@ -1483,8 +1679,64 @@ class DebugToolbar {
         }
 
         let html = '<div class="sql-panel">';
-        html += '<h3>Total Queries: ' + (data.total_queries || data.queries.length) + '</h3>';
 
+        // Summary stats
+        html += '<div class="sql-summary">';
+        html += '<h3>Total Queries: ' + (data.total_queries || data.queries.length) + '</h3>';
+        if (data.total_time_ms !== undefined) {
+            html += '<span class="sql-total-time">Total Time: ' + data.total_time_ms.toFixed(2) + 'ms</span>';
+        }
+        html += '</div>';
+
+        // N+1 Warning Section
+        if (data.n_plus_one_groups && data.n_plus_one_groups.length > 0) {
+            html += '<div class="n-plus-one-warning">';
+            html += '<div class="n-plus-one-header">';
+            html += '<span class="warning-icon">⚠️</span>';
+            html += '<strong>N+1 Query Problem Detected!</strong>';
+            html += '<span class="n-plus-one-count">' + data.n_plus_one_groups.length + ' pattern(s)</span>';
+            html += '</div>';
+            html += '<div class="n-plus-one-groups">';
+
+            data.n_plus_one_groups.forEach((group, idx) => {
+                html += '<div class="n-plus-one-group">';
+                html += '<div class="n-plus-one-group-header">';
+                html += '<span class="group-count">' + group.count + 'x</span>';
+                html += '<span class="group-origin">' + this.escapeHtml(group.origin_display || 'Unknown') + '</span>';
+                html += '<span class="group-time">' + (group.total_duration_ms || 0).toFixed(2) + 'ms total</span>';
+                html += '</div>';
+                html += '<div class="n-plus-one-sql">' + this.escapeHtml(group.normalized_sql || '') + '</div>';
+                if (group.suggestion) {
+                    html += '<div class="n-plus-one-suggestion">';
+                    html += '<strong>💡 Suggestion:</strong> ' + this.escapeHtml(group.suggestion);
+                    html += '</div>';
+                }
+                if (group.stack && group.stack.length > 0) {
+                    html += '<details class="n-plus-one-stack">';
+                    html += '<summary>Call Stack</summary>';
+                    html += '<div class="stack-frames">';
+                    group.stack.forEach(frame => {
+                        const shortFile = (frame.file || '').split('/').pop();
+                        const loc = this.escapeHtml(shortFile) + ':' + frame.line;
+                        const fn = this.escapeHtml(frame.function || '');
+                        html += '<div class="stack-frame">';
+                        html += '<span class="frame-location">' + loc + '</span>';
+                        html += ' in <span class="frame-function">' + fn + '</span>';
+                        if (frame.code) {
+                            html += '<div class="frame-code">' + this.escapeHtml(frame.code) + '</div>';
+                        }
+                        html += '</div>';
+                    });
+                    html += '</div></details>';
+                }
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        }
+
+        // Individual queries
+        html += '<div class="sql-queries">';
         data.queries.forEach((query, index) => {
             const supportsExplain = query.supports_explain !== false;
             const sql = query.sql || query.query || '';
@@ -1493,9 +1745,26 @@ class DebugToolbar {
             const sqlEncoded = btoa(unescape(encodeURIComponent(sql)));
             const paramsEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
 
-            html += '<div class="sql-query-container">';
+            const classes = ['sql-query-container'];
+            if (query.is_slow) classes.push('is-slow');
+            if (query.is_duplicate) classes.push('is-duplicate');
+            if (query.is_n_plus_one) classes.push('is-n-plus-one');
+
+            html += '<div class="' + classes.join(' ') + '">';
             html += '<div class="sql-query-header">';
             html += '<span class="sql-query-title">Query #' + (index + 1) + '</span>';
+
+            // Badges
+            if (query.is_n_plus_one) {
+                html += '<span class="query-badge badge-n-plus-one" title="Part of N+1 pattern">N+1</span>';
+            }
+            if (query.is_slow) {
+                html += '<span class="query-badge badge-slow" title="Slow query">SLOW</span>';
+            }
+            if (query.is_duplicate) {
+                html += '<span class="query-badge badge-duplicate" title="Duplicate query">DUP</span>';
+            }
+
             if (supportsExplain) {
                 html += '<button class="sql-explain-btn" data-sql="' + sqlEncoded +
                         '" data-params="' + paramsEncoded + '">EXPLAIN</button>';
@@ -1508,12 +1777,13 @@ class DebugToolbar {
                 html += '<div class="sql-query-params"><strong>Parameters:</strong> ' +
                         this.escapeHtml(JSON.stringify(params)) + '</div>';
             }
-            if (query.duration !== undefined) {
+            if (query.duration_ms !== undefined) {
                 html += '<div class="sql-query-params"><strong>Duration:</strong> ' +
-                        query.duration.toFixed(2) + 'ms</div>';
+                        query.duration_ms.toFixed(2) + 'ms</div>';
             }
             html += '</div>';
         });
+        html += '</div>';
 
         html += '</div>';
 

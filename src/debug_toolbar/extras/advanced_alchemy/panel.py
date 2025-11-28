@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import time
+import traceback
 from collections.abc import Generator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -19,6 +21,87 @@ if TYPE_CHECKING:
 
     from debug_toolbar.core.context import RequestContext
     from debug_toolbar.core.toolbar import DebugToolbar
+
+
+class SQLNormalizer:
+    """Normalizes SQL queries to detect similar patterns."""
+
+    IGNORED_FRAMES: ClassVar[set[str]] = {
+        "sqlalchemy",
+        "debug_toolbar",
+        "asyncio",
+        "concurrent",
+        "threading",
+        "importlib",
+        "runpy",
+        "_pytest",
+        "pytest",
+        "pluggy",
+    }
+
+    MAX_STACK_FRAMES: ClassVar[int] = 5
+
+    @classmethod
+    def normalize(cls, sql: str) -> str:
+        """Normalize SQL by replacing literal values with placeholders.
+
+        This allows detection of similar queries that only differ in their
+        parameter values (e.g., N+1 queries).
+        """
+        result = sql
+        result = re.sub(r"'[^']*'", "'?'", result)
+        result = re.sub(r'"[^"]*"', '"?"', result)
+        result = re.sub(r"\b\d+\b", "?", result)
+        result = re.sub(r":\w+", ":?", result)
+        return re.sub(r"\s+", " ", result).strip()
+
+    @classmethod
+    def get_pattern_hash(cls, sql: str) -> str:
+        """Get a hash of the normalized SQL pattern."""
+        normalized = cls.normalize(sql)
+        return hashlib.md5(normalized.encode(), usedforsecurity=False).hexdigest()[:12]
+
+    @classmethod
+    def capture_stack(cls, skip_frames: int = 4) -> list[dict[str, Any]]:
+        """Capture the current call stack, filtering out library frames.
+
+        Args:
+            skip_frames: Number of frames to skip from the top of the stack.
+
+        Returns:
+            List of frame info dicts with file, line, function, and code.
+        """
+        frames = []
+        for frame_info in traceback.extract_stack()[:-skip_frames]:
+            if any(ignored in frame_info.filename for ignored in cls.IGNORED_FRAMES):
+                continue
+
+            if "site-packages" in frame_info.filename:
+                continue
+
+            frames.append(
+                {
+                    "file": frame_info.filename,
+                    "line": frame_info.lineno,
+                    "function": frame_info.name,
+                    "code": frame_info.line or "",
+                }
+            )
+
+        max_frames = cls.MAX_STACK_FRAMES
+        return frames[-max_frames:] if len(frames) > max_frames else frames
+
+    @classmethod
+    def get_origin_key(cls, stack: list[dict[str, Any]]) -> str:
+        """Get a unique key representing the origin of a query.
+
+        Uses the most relevant frame (last user code frame) as the origin.
+        """
+        if not stack:
+            return "unknown"
+
+        frame = stack[-1]
+        return f"{frame['file']}:{frame['line']}:{frame['function']}"
 
 
 class ExplainExecutor:
@@ -130,15 +213,18 @@ class ExplainExecutor:
 class QueryTracker:
     """Tracks SQL queries executed during a request."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, capture_stacks: bool = True) -> None:
         self.queries: list[dict[str, Any]] = []
         self._query_start_times: dict[int, float] = {}
+        self._query_stacks: dict[int, list[dict[str, Any]]] = {}
         self._enabled = False
+        self._capture_stacks = capture_stacks
 
     def start(self) -> None:
         """Start tracking queries."""
         self.queries = []
         self._query_start_times = {}
+        self._query_stacks = {}
         self._enabled = True
 
     def stop(self) -> None:
@@ -159,10 +245,13 @@ class QueryTracker:
         context: ExecutionContext | None,
         executemany: bool,  # noqa: FBT001
     ) -> None:
-        """Record query start time."""
+        """Record query start time and capture stack trace."""
         if not self._enabled:
             return
-        self._query_start_times[id(cursor)] = time.perf_counter()
+        cursor_id = id(cursor)
+        self._query_start_times[cursor_id] = time.perf_counter()
+        if self._capture_stacks:
+            self._query_stacks[cursor_id] = SQLNormalizer.capture_stack()
 
     def after_cursor_execute(
         self,
@@ -177,10 +266,14 @@ class QueryTracker:
         if not self._enabled:
             return
 
-        start_time = self._query_start_times.pop(id(cursor), None)
+        cursor_id = id(cursor)
+        start_time = self._query_start_times.pop(cursor_id, None)
         duration = time.perf_counter() - start_time if start_time else 0.0
+        stack = self._query_stacks.pop(cursor_id, [])
 
         query_hash = hashlib.md5(statement.encode(), usedforsecurity=False).hexdigest()[:12]
+        pattern_hash = SQLNormalizer.get_pattern_hash(statement)
+        origin_key = SQLNormalizer.get_origin_key(stack)
         dialect = conn.dialect.name
 
         self.queries.append(
@@ -192,6 +285,9 @@ class QueryTracker:
                 "duration_ms": duration * 1000,
                 "executemany": executemany,
                 "query_hash": query_hash,
+                "pattern_hash": pattern_hash,
+                "origin_key": origin_key,
+                "stack": stack,
                 "dialect": dialect,
                 "supports_explain": ExplainExecutor.supports_explain(dialect),
             }
@@ -341,7 +437,7 @@ class SQLAlchemyPanel(Panel):
         _tracker.stop()
 
     async def generate_stats(self, context: RequestContext) -> dict[str, Any]:
-        """Generate SQL statistics."""
+        """Generate SQL statistics including N+1 detection."""
         queries = list(_tracker.queries)
 
         total_time = sum(q["duration"] for q in queries)
@@ -352,9 +448,13 @@ class SQLAlchemyPanel(Panel):
 
         slow_queries = [q for q in queries if q["duration_ms"] >= self._slow_threshold_ms]
 
+        n_plus_one_groups = self._detect_n_plus_one(queries)
+        n_plus_one_patterns = {g["pattern_hash"] for g in n_plus_one_groups}
+
         for query in queries:
             query["is_slow"] = query["duration_ms"] >= self._slow_threshold_ms
             query["is_duplicate"] = query["sql"] in duplicates
+            query["is_n_plus_one"] = query.get("pattern_hash") in n_plus_one_patterns
 
         return {
             "queries": queries,
@@ -365,7 +465,9 @@ class SQLAlchemyPanel(Panel):
             "duplicates": list(duplicates),
             "slow_count": len(slow_queries),
             "slow_threshold_ms": self._slow_threshold_ms,
-            "has_issues": len(duplicates) > 0 or len(slow_queries) > 0,
+            "n_plus_one_count": len(n_plus_one_groups),
+            "n_plus_one_groups": n_plus_one_groups,
+            "has_issues": len(duplicates) > 0 or len(slow_queries) > 0 or len(n_plus_one_groups) > 0,
         }
 
     def generate_server_timing(self, context: RequestContext) -> dict[str, float]:
@@ -383,6 +485,95 @@ class SQLAlchemyPanel(Panel):
             seen[stmt] = seen.get(stmt, 0) + 1
 
         return {stmt for stmt, count in seen.items() if count > 1}
+
+    def _detect_n_plus_one(self, queries: list[dict[str, Any]], threshold: int = 2) -> list[dict[str, Any]]:
+        """Detect N+1 query patterns.
+
+        Groups queries by their normalized SQL pattern and origin (call stack).
+        If multiple queries with the same pattern originate from the same code
+        location, it's likely an N+1 query problem.
+
+        Args:
+            queries: List of query dictionaries.
+            threshold: Minimum number of similar queries to flag as N+1.
+
+        Returns:
+            List of N+1 pattern groups with details.
+        """
+        groups: dict[str, dict[str, Any]] = {}
+
+        for i, query in enumerate(queries):
+            pattern_hash = query.get("pattern_hash", "")
+            origin_key = query.get("origin_key", "unknown")
+
+            if not pattern_hash:
+                continue
+
+            group_key = f"{pattern_hash}:{origin_key}"
+
+            if group_key not in groups:
+                groups[group_key] = {
+                    "pattern_hash": pattern_hash,
+                    "origin_key": origin_key,
+                    "normalized_sql": SQLNormalizer.normalize(query["sql"]),
+                    "query_indices": [],
+                    "total_duration_ms": 0.0,
+                    "stack": query.get("stack", []),
+                }
+
+            groups[group_key]["query_indices"].append(i)
+            groups[group_key]["total_duration_ms"] += query.get("duration_ms", 0.0)
+
+        n_plus_one_groups = []
+        for group in groups.values():
+            count = len(group["query_indices"])
+            if count >= threshold:
+                origin = group["origin_key"]
+                group["origin_display"] = self._format_origin_display(origin)
+                group["count"] = count
+                group["suggestion"] = self._get_fix_suggestion(group["normalized_sql"], count)
+                n_plus_one_groups.append(group)
+
+        n_plus_one_groups.sort(key=lambda g: g["count"], reverse=True)
+
+        return n_plus_one_groups
+
+    def _format_origin_display(self, origin: str) -> str:
+        """Format origin key for display."""
+        if origin == "unknown":
+            return "Unknown origin"
+
+        parts = origin.rsplit(":", 2)
+        if len(parts) < 2:  # noqa: PLR2004
+            return origin
+
+        file_path = parts[0]
+        short_file = file_path.split("/")[-1] if "/" in file_path else file_path
+        line = parts[1] if len(parts) > 1 else "?"
+        func = parts[2] if len(parts) > 2 else "?"  # noqa: PLR2004
+        return f"{short_file}:{line} in {func}"
+
+    def _get_fix_suggestion(self, normalized_sql: str, count: int) -> str:
+        """Generate a fix suggestion for an N+1 pattern."""
+        sql_upper = normalized_sql.upper()
+        has_where_clause = "WHERE" in sql_upper
+        has_parameter = "= '?'" in normalized_sql or "= ?" in normalized_sql
+        is_select = "SELECT" in sql_upper
+
+        if has_where_clause and has_parameter and is_select:
+            return (
+                f"This query was executed {count} times with different parameters. "
+                "Consider using eager loading (joinedload/selectinload) or "
+                "batching with IN clause to reduce queries."
+            )
+
+        if is_select:
+            return (
+                f"Similar SELECT query executed {count} times. "
+                "Consider using eager loading or fetching related data in a single query."
+            )
+
+        return f"Similar query pattern executed {count} times from the same location."
 
     def get_nav_subtitle(self) -> str:
         """Get navigation subtitle showing query count."""

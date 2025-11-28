@@ -10,6 +10,7 @@ import pytest
 from debug_toolbar.extras.advanced_alchemy.panel import (
     QueryTracker,
     SQLAlchemyPanel,
+    SQLNormalizer,
     _tracker,
     track_queries,
 )
@@ -293,3 +294,243 @@ class TestSQLAlchemyPanel:
     def test_get_nav_subtitle(self, sqlalchemy_panel: SQLAlchemyPanel) -> None:
         """Test get_nav_subtitle."""
         assert sqlalchemy_panel.get_nav_subtitle() == ""
+
+    @pytest.mark.asyncio
+    async def test_generate_stats_with_n_plus_one(
+        self, sqlalchemy_panel: SQLAlchemyPanel, request_context: RequestContext
+    ) -> None:
+        """Test generate_stats detects N+1 patterns."""
+        _tracker.start()
+        _tracker.queries = [
+            {
+                "sql": "SELECT * FROM users WHERE id = 1",
+                "parameters": "",
+                "duration": 0.001,
+                "duration_ms": 1.0,
+                "executemany": False,
+                "pattern_hash": "abc123",
+                "origin_key": "test.py:10:get_users",
+                "stack": [],
+            },
+            {
+                "sql": "SELECT * FROM users WHERE id = 2",
+                "parameters": "",
+                "duration": 0.001,
+                "duration_ms": 1.0,
+                "executemany": False,
+                "pattern_hash": "abc123",
+                "origin_key": "test.py:10:get_users",
+                "stack": [],
+            },
+            {
+                "sql": "SELECT * FROM users WHERE id = 3",
+                "parameters": "",
+                "duration": 0.001,
+                "duration_ms": 1.0,
+                "executemany": False,
+                "pattern_hash": "abc123",
+                "origin_key": "test.py:10:get_users",
+                "stack": [],
+            },
+        ]
+        stats = await sqlalchemy_panel.generate_stats(request_context)
+        assert stats["n_plus_one_count"] == 1
+        assert len(stats["n_plus_one_groups"]) == 1
+        assert stats["n_plus_one_groups"][0]["count"] == 3
+        assert stats["has_issues"]
+        for query in stats["queries"]:
+            assert query["is_n_plus_one"]
+
+    @pytest.mark.asyncio
+    async def test_generate_stats_no_n_plus_one_different_origins(
+        self, sqlalchemy_panel: SQLAlchemyPanel, request_context: RequestContext
+    ) -> None:
+        """Test that same pattern from different origins is not N+1."""
+        _tracker.start()
+        _tracker.queries = [
+            {
+                "sql": "SELECT * FROM users WHERE id = 1",
+                "parameters": "",
+                "duration": 0.001,
+                "duration_ms": 1.0,
+                "executemany": False,
+                "pattern_hash": "abc123",
+                "origin_key": "test.py:10:func_a",
+                "stack": [],
+            },
+            {
+                "sql": "SELECT * FROM users WHERE id = 2",
+                "parameters": "",
+                "duration": 0.001,
+                "duration_ms": 1.0,
+                "executemany": False,
+                "pattern_hash": "abc123",
+                "origin_key": "test.py:20:func_b",
+                "stack": [],
+            },
+        ]
+        stats = await sqlalchemy_panel.generate_stats(request_context)
+        assert stats["n_plus_one_count"] == 0
+
+    def test_detect_n_plus_one_threshold(self, sqlalchemy_panel: SQLAlchemyPanel) -> None:
+        """Test N+1 detection respects threshold."""
+        queries = [
+            {"sql": "SELECT 1", "pattern_hash": "abc", "origin_key": "test:1:f"},
+        ]
+        result = sqlalchemy_panel._detect_n_plus_one(queries, threshold=2)
+        assert len(result) == 0
+
+        queries = [
+            {"sql": "SELECT 1", "pattern_hash": "abc", "origin_key": "test:1:f"},
+            {"sql": "SELECT 2", "pattern_hash": "abc", "origin_key": "test:1:f"},
+        ]
+        result = sqlalchemy_panel._detect_n_plus_one(queries, threshold=2)
+        assert len(result) == 1
+
+    def test_get_fix_suggestion_select_with_where(self, sqlalchemy_panel: SQLAlchemyPanel) -> None:
+        """Test fix suggestion for SELECT with WHERE clause."""
+        suggestion = sqlalchemy_panel._get_fix_suggestion("SELECT * FROM users WHERE id = ?", 5)
+        assert "eager loading" in suggestion.lower() or "joinedload" in suggestion.lower()
+        assert "5 times" in suggestion
+
+    def test_get_fix_suggestion_generic_select(self, sqlalchemy_panel: SQLAlchemyPanel) -> None:
+        """Test fix suggestion for generic SELECT."""
+        suggestion = sqlalchemy_panel._get_fix_suggestion("SELECT * FROM users", 3)
+        assert "3 times" in suggestion
+
+
+class TestSQLNormalizer:
+    """Tests for SQLNormalizer."""
+
+    def test_normalize_string_literals(self) -> None:
+        """Test normalization of string literals."""
+        sql = "SELECT * FROM users WHERE name = 'John'"
+        result = SQLNormalizer.normalize(sql)
+        assert result == "SELECT * FROM users WHERE name = '?'"
+
+    def test_normalize_numeric_literals(self) -> None:
+        """Test normalization of numeric literals."""
+        sql = "SELECT * FROM users WHERE id = 123"
+        result = SQLNormalizer.normalize(sql)
+        assert result == "SELECT * FROM users WHERE id = ?"
+
+    def test_normalize_named_parameters(self) -> None:
+        """Test normalization of named parameters."""
+        sql = "SELECT * FROM users WHERE id = :user_id AND name = :name"
+        result = SQLNormalizer.normalize(sql)
+        assert result == "SELECT * FROM users WHERE id = :? AND name = :?"
+
+    def test_normalize_whitespace(self) -> None:
+        """Test normalization of whitespace."""
+        sql = "SELECT  *   FROM   users   WHERE    id = 1"
+        result = SQLNormalizer.normalize(sql)
+        assert "  " not in result
+
+    def test_normalize_complex_query(self) -> None:
+        """Test normalization of complex query."""
+        sql = """
+            SELECT u.id, u.name
+            FROM users u
+            WHERE u.id = 42
+            AND u.email = 'test@example.com'
+            LIMIT 10
+        """
+        result = SQLNormalizer.normalize(sql)
+        assert "42" not in result
+        assert "test@example.com" not in result
+        assert "?" in result
+
+    def test_get_pattern_hash_same_pattern(self) -> None:
+        """Test that same patterns get same hash."""
+        sql1 = "SELECT * FROM users WHERE id = 1"
+        sql2 = "SELECT * FROM users WHERE id = 2"
+        hash1 = SQLNormalizer.get_pattern_hash(sql1)
+        hash2 = SQLNormalizer.get_pattern_hash(sql2)
+        assert hash1 == hash2
+
+    def test_get_pattern_hash_different_patterns(self) -> None:
+        """Test that different patterns get different hashes."""
+        sql1 = "SELECT * FROM users WHERE id = 1"
+        sql2 = "SELECT * FROM posts WHERE id = 1"
+        hash1 = SQLNormalizer.get_pattern_hash(sql1)
+        hash2 = SQLNormalizer.get_pattern_hash(sql2)
+        assert hash1 != hash2
+
+    def test_get_origin_key_with_stack(self) -> None:
+        """Test get_origin_key with stack frames."""
+        stack = [
+            {"file": "/app/views.py", "line": 42, "function": "get_user", "code": ""},
+        ]
+        result = SQLNormalizer.get_origin_key(stack)
+        assert "views.py" in result
+        assert "42" in result
+        assert "get_user" in result
+
+    def test_get_origin_key_empty_stack(self) -> None:
+        """Test get_origin_key with empty stack."""
+        result = SQLNormalizer.get_origin_key([])
+        assert result == "unknown"
+
+    def test_capture_stack_filters_library_frames(self) -> None:
+        """Test that capture_stack filters out library frames."""
+        stack = SQLNormalizer.capture_stack()
+        for frame in stack:
+            assert "sqlalchemy" not in frame["file"]
+            assert "debug_toolbar" not in frame["file"]
+
+
+class TestQueryTrackerNPlusOne:
+    """Tests for N+1 related QueryTracker functionality."""
+
+    def test_tracker_captures_pattern_hash(self) -> None:
+        """Test that tracker captures pattern hash."""
+        tracker = QueryTracker()
+        tracker._capture_stacks = False
+        tracker.start()
+
+        mock_conn = MagicMock()
+        mock_conn.dialect.name = "postgresql"
+        mock_cursor = MagicMock()
+
+        tracker.before_cursor_execute(mock_conn, mock_cursor, "SELECT * FROM users WHERE id = 1", None, None, False)
+        tracker.after_cursor_execute(mock_conn, mock_cursor, "SELECT * FROM users WHERE id = 1", None, None, False)
+
+        assert len(tracker.queries) == 1
+        assert "pattern_hash" in tracker.queries[0]
+        assert "origin_key" in tracker.queries[0]
+
+    def test_tracker_same_pattern_different_values(self) -> None:
+        """Test that same pattern with different values get same hash."""
+        tracker = QueryTracker()
+        tracker._capture_stacks = False
+        tracker.start()
+
+        mock_conn = MagicMock()
+        mock_conn.dialect.name = "postgresql"
+        mock_cursor1 = MagicMock()
+        mock_cursor2 = MagicMock()
+
+        tracker.before_cursor_execute(mock_conn, mock_cursor1, "SELECT * FROM users WHERE id = 1", None, None, False)
+        tracker.after_cursor_execute(mock_conn, mock_cursor1, "SELECT * FROM users WHERE id = 1", None, None, False)
+
+        tracker.before_cursor_execute(mock_conn, mock_cursor2, "SELECT * FROM users WHERE id = 2", None, None, False)
+        tracker.after_cursor_execute(mock_conn, mock_cursor2, "SELECT * FROM users WHERE id = 2", None, None, False)
+
+        assert len(tracker.queries) == 2
+        assert tracker.queries[0]["pattern_hash"] == tracker.queries[1]["pattern_hash"]
+
+    def test_tracker_captures_stack_when_enabled(self) -> None:
+        """Test that tracker captures stack when enabled."""
+        tracker = QueryTracker()
+        tracker.start()
+
+        mock_conn = MagicMock()
+        mock_conn.dialect.name = "postgresql"
+        mock_cursor = MagicMock()
+
+        tracker.before_cursor_execute(mock_conn, mock_cursor, "SELECT 1", None, None, False)
+        tracker.after_cursor_execute(mock_conn, mock_cursor, "SELECT 1", None, None, False)
+
+        assert len(tracker.queries) == 1
+        assert "stack" in tracker.queries[0]
+        assert isinstance(tracker.queries[0]["stack"], list)
