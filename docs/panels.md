@@ -66,6 +66,23 @@ Litestar-specific panel showing:
 - Handler names
 - Current matched route
 
+## Events Panel (Litestar)
+
+**ID**: `EventsPanel`
+
+Litestar-specific panel showing lifecycle events and handlers:
+
+- **Lifecycle hooks**: `on_startup`, `on_shutdown` handlers
+- **Request hooks**: `before_request`, `after_request`, `after_response` handlers
+- **Exception handlers**: Registered exception handlers with their exception types
+- Handler function details (name, module, file location, line number)
+- Total hook count and execution statistics
+
+This panel helps you understand:
+- What lifecycle hooks are registered in your application
+- Which exception handlers are configured
+- The source location of each handler for easy debugging
+
 ## SQLAlchemy Panel (Extra)
 
 **ID**: `SQLAlchemyPanel`

@@ -186,6 +186,11 @@ Toggle dark/light themes
 Browse past requests
 :::
 
+:::{grid-item-card} Events Panel
+:img-top: ../assets/toolbar-events-panel.png
+Lifecycle hooks and exception handlers
+:::
+
 ::::
 
 ```{toctree}

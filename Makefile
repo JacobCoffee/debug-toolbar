@@ -132,10 +132,10 @@ example-asgi: ## Run ASGI example app (http://localhost:8000)
 	@uv run uvicorn examples.asgi_basic.app:app --reload --port 8000
 
 example-litestar: ## Run Litestar example app (http://localhost:8001)
-	@uv run litestar --app examples.litestar_basic.app:app run --reload --port 8001
+	@uv run --extra litestar litestar --app examples.litestar_basic.app:app run --reload --port 8001
 
 example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
-	@uv run litestar --app examples.litestar_advanced_alchemy.app:app run --reload --port 8002
+	@uv run --extra all litestar --app examples.litestar_advanced_alchemy.app:app run --reload --port 8002
 
 ##@ Git Worktrees
 
