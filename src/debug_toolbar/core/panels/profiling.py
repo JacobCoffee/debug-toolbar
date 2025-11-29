@@ -6,11 +6,46 @@ import cProfile
 import io
 import logging
 import pstats
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from debug_toolbar.core.panel import Panel
 
 logger = logging.getLogger(__name__)
+
+STDLIB_PATTERNS = frozenset(
+    {
+        "threading.py",
+        "_weakrefset.py",
+        "abc.py",
+        "functools.py",
+        "contextlib.py",
+        "typing.py",
+        "weakref.py",
+        "collections",
+        "importlib",
+        "asyncio",
+        "concurrent",
+        "queue.py",
+        "selectors.py",
+        "socket.py",
+        "ssl.py",
+        "urllib",
+        "http",
+        "json",
+        "logging",
+        "re.py",
+        "sre_",
+        "codecs.py",
+        "posixpath.py",
+        "genericpath.py",
+        "pathlib.py",
+        "_bootstrap",
+        "frozen ",
+        "<frozen",
+    }
+)
 
 if TYPE_CHECKING:
     try:
@@ -24,6 +59,32 @@ if TYPE_CHECKING:
 MAX_RECURSION_DEPTH = 100
 CPROFILE_FUNC_TUPLE_LENGTH = 3
 ENABLE_FLAMEGRAPH_DEFAULT = True
+
+
+def _is_stdlib_or_internal(filename: str) -> bool:
+    """Check if a filename belongs to Python stdlib or internal modules."""
+    if not filename:
+        return True
+
+    for pattern in STDLIB_PATTERNS:
+        if pattern in filename:
+            return True
+
+    stdlib_prefixes = (sys.prefix, sys.base_prefix)
+    for prefix in stdlib_prefixes:
+        if prefix and filename.startswith(prefix):
+            lib_path = str(Path(prefix) / "lib")
+            if filename.startswith(lib_path) and "site-packages" not in filename:
+                return True
+
+    return False
+
+
+def _is_user_code(filename: str) -> bool:
+    """Check if a filename is user/application code (not in site-packages)."""
+    if not filename or _is_stdlib_or_internal(filename):
+        return False
+    return "site-packages" not in filename and "dist-packages" not in filename
 
 
 class ProfilingPanel(Panel):
@@ -155,8 +216,10 @@ class ProfilingPanel(Panel):
 
         stats.sort_stats(self._sort_by)
 
-        top_functions = []
-        for func, (cc, nc, tt, ct, _) in list(stats.stats.items())[: self._top_functions]:  # type: ignore[attr-defined]
+        user_funcs: list[dict[str, Any]] = []
+        lib_funcs: list[dict[str, Any]] = []
+
+        for func, (cc, nc, tt, ct, _) in stats.stats.items():  # type: ignore[attr-defined]
             if isinstance(func, tuple) and len(func) == CPROFILE_FUNC_TUPLE_LENGTH:
                 filename, lineno, func_name = func
             else:
@@ -164,20 +227,34 @@ class ProfilingPanel(Panel):
                 lineno = 0
                 func_name = "unknown"
 
+            if _is_stdlib_or_internal(filename):
+                continue
+
             per_call = ct / nc if nc > 0 else 0.0
 
-            top_functions.append(
-                {
-                    "function": func_name,
-                    "filename": filename,
-                    "lineno": lineno,
-                    "calls": nc,
-                    "primitive_calls": cc,
-                    "total_time": tt,
-                    "cumulative_time": ct,
-                    "per_call": per_call,
-                }
-            )
+            func_data = {
+                "function": func_name,
+                "filename": filename,
+                "lineno": lineno,
+                "calls": nc,
+                "primitive_calls": cc,
+                "total_time": tt,
+                "cumulative_time": ct,
+                "per_call": per_call,
+            }
+
+            if _is_user_code(filename):
+                user_funcs.append(func_data)
+            else:
+                lib_funcs.append(func_data)
+
+        user_funcs.sort(key=lambda x: x["cumulative_time"], reverse=True)
+        lib_funcs.sort(key=lambda x: x["cumulative_time"], reverse=True)
+
+        top_functions = user_funcs[: self._top_functions]
+        remaining = self._top_functions - len(top_functions)
+        if remaining > 0:
+            top_functions.extend(lib_funcs[:remaining])
 
         call_tree = self._generate_cprofile_tree(stats)
 
@@ -189,6 +266,8 @@ class ProfilingPanel(Panel):
             "top_functions": top_functions,
             "call_tree": call_tree,
             "profiling_overhead": self._profiling_overhead,
+            "user_function_count": len(user_funcs),
+            "library_function_count": len(lib_funcs),
         }
 
         if self._enable_flamegraph:
