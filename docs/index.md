@@ -195,6 +195,26 @@ Browse past requests
 Lifecycle hooks and exception handlers
 :::
 
+:::{grid-item-card} Alerts Panel
+:img-top: ../assets/panel-alerts-expanded.png
+Proactive security and performance issue detection
+:::
+
+:::{grid-item-card} Memory Panel
+:img-top: ../assets/panel-memory-expanded.png
+Memory allocation tracking (tracemalloc/memray)
+:::
+
+:::{grid-item-card} SQL Panel
+:img-top: ../assets/panel-sql-expanded.png
+Query analysis with N+1 detection and EXPLAIN
+:::
+
+:::{grid-item-card} Profiling Panel
+:img-top: ../assets/panel-profiling-expanded.png
+cProfile with flame graph visualization
+:::
+
 ::::
 
 ```{toctree}
