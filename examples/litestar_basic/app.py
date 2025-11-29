@@ -48,8 +48,15 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Headers Panel</strong> - Inspect request/response headers, security analysis</li>
         <li><strong>Settings Panel</strong> - View toolbar and app configuration</li>
         <li><strong>Templates Panel</strong> - Track Jinja2 template render times</li>
-        <li><strong>Profiling Panel</strong> - Profile request execution (optional)</li>
+        <li><strong>Profiling Panel</strong> - Profile request execution with flame graph support</li>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
+    </ul>
+    <h2>Flame Graph Visualization</h2>
+    <p>The Profiling Panel now supports interactive flame graph generation!</p>
+    <ul>
+        <li>Enable profiling panel to collect cProfile data</li>
+        <li>Access flame graph data via the API endpoint: <code>/_debug_toolbar/api/flamegraph/{request_id}</code></li>
+        <li>Download and visualize at <a href="https://www.speedscope.app/" target="_blank">speedscope.app</a></li>
     </ul>
     <p>The debug toolbar should appear on the right side of this page (default position).</p>
     <p>Use the arrow buttons in the toolbar to move it to left/right/top/bottom.</p>
@@ -85,9 +92,16 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Headers Panel</strong> - Detailed HTTP header inspection with security analysis</li>
         <li><strong>Settings Panel</strong> - Application configuration viewer with sensitive data redaction</li>
         <li><strong>Templates Panel</strong> - Track Jinja2/Mako template rendering times</li>
-        <li><strong>Profiling Panel</strong> - cProfile/pyinstrument request profiling</li>
+        <li><strong>Profiling Panel</strong> - cProfile/pyinstrument request profiling with flame graph visualization</li>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
         <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
+    </ul>
+    <h2>Flame Graph Support</h2>
+    <p>The Profiling Panel generates interactive flame graphs in speedscope format:</p>
+    <ul>
+        <li>Automatically generated when profiling is enabled</li>
+        <li>Access via: <code>/_debug_toolbar/api/flamegraph/{request_id}</code></li>
+        <li>Visualize at <a href="https://www.speedscope.app/" target="_blank">speedscope.app</a></li>
     </ul>
     <a href="/">Back to Home</a>
 </body>
