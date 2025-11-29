@@ -44,6 +44,9 @@ class LitestarDebugToolbarConfig(DebugToolbarConfig):
         if "debug_toolbar.litestar.panels.routes.RoutesPanel" not in default_panels:
             default_panels.append("debug_toolbar.litestar.panels.routes.RoutesPanel")
 
+        if "debug_toolbar.litestar.panels.events.EventsPanel" not in default_panels:
+            default_panels.append("debug_toolbar.litestar.panels.events.EventsPanel")
+
         self.panels = default_panels
 
     def should_show_toolbar(self, request: Request) -> bool:
