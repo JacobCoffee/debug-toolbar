@@ -35,7 +35,7 @@ from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfi
 from .models import Post, User
 
 if TYPE_CHECKING:
-
+    from litestar import Request, Response
     from sqlalchemy.ext.asyncio import AsyncSession
 
 logging.basicConfig(level=logging.DEBUG)
@@ -319,8 +319,25 @@ toolbar_config = LitestarDebugToolbarConfig(
 
 async def on_startup(app: Litestar) -> None:
     """Store the database engine and seed sample data."""
+    logger.info("Application starting up...")
     app.state.db_engine = db_config.get_engine()
     await seed_sample_data()
+
+
+async def on_shutdown(app: Litestar) -> None:
+    """Clean up resources on shutdown."""
+    logger.info("Application shutting down...")
+
+
+async def before_request_handler(request: "Request") -> None:
+    """Log before each request."""
+    logger.debug("Before request: %s %s", request.method, request.url.path)
+
+
+async def after_request_handler(response: "Response") -> "Response":
+    """Add custom header after each request."""
+    response.headers["X-Debug-Toolbar"] = "enabled"
+    return response
 
 
 async def seed_sample_data() -> None:
@@ -381,5 +398,8 @@ app = Litestar(
         "post_repo": Provide(provide_post_repo),
     },
     on_startup=[on_startup],
+    on_shutdown=[on_shutdown],
+    before_request=before_request_handler,
+    after_request=after_request_handler,
     debug=True,
 )

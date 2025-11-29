@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from debug_toolbar.core import DebugToolbar, RequestContext, set_request_context
 from debug_toolbar.litestar.config import LitestarDebugToolbarConfig
+from debug_toolbar.litestar.panels.events import collect_events_metadata
 from litestar.middleware import AbstractMiddleware
 
 if TYPE_CHECKING:
@@ -69,6 +70,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
         context = await self.toolbar.process_request()
         self._populate_request_metadata(request, context)
+        self._populate_events_metadata(request, context)
 
         response_started = False
         response_body_chunks: list[bytes] = []
@@ -180,6 +182,23 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             context.metadata["client_port"] = request.client.port
 
         self._populate_routes_metadata(request, context)
+
+    def _populate_events_metadata(self, request: Request, context: RequestContext) -> None:
+        """Populate events/lifecycle metadata from the Litestar app.
+
+        Args:
+            request: The Litestar request.
+            context: The request context to populate.
+        """
+        try:
+            collect_events_metadata(request.app, context)
+        except Exception:
+            context.metadata["events"] = {
+                "lifecycle_hooks": {},
+                "request_hooks": {},
+                "exception_handlers": [],
+                "executed_hooks": [],
+            }
 
     def _populate_routes_metadata(self, request: Request, context: RequestContext) -> None:
         """Populate route information from the Litestar app.
