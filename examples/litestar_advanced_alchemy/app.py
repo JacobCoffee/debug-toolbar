@@ -228,30 +228,30 @@ async def list_users_with_posts_n_plus_one(
 <head>
 <title>Users (N+1 Demo)</title>
 <style>
-/* Light theme (default) */
-body {{ background: #f8fafc; color: #1e293b; font-family: system-ui, sans-serif; padding: 20px; }}
-h1 {{ color: #b45309; }}
-.warning {{ background: #fef3c7; border: 1px solid #f59e0b;
-    border-left: 4px solid #d97706; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #92400e; }}
-.warning strong {{ color: #78350f; }}
-table {{ border-collapse: collapse; background: #fff; }}
-th, td {{ border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }}
-th {{ background: #f1f5f9; color: #1e40af; }}
-a {{ color: #2563eb; }}
-a:hover {{ color: #1d4ed8; }}
+/* Dark theme (default) */
+body {{ background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; padding: 20px; }}
+h1 {{ color: #f5a623; }}
+.warning {{ background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.5);
+    border-left: 4px solid #eab308; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #fbbf24; }}
+.warning strong {{ color: #fcd34d; }}
+table {{ border-collapse: collapse; background: #16213e; }}
+th, td {{ border: 1px solid #334155; padding: 8px 12px; text-align: left; }}
+th {{ background: #1e3a5f; color: #93c5fd; }}
+a {{ color: #60a5fa; }}
+a:hover {{ color: #93c5fd; }}
 
-/* Dark theme */
-@media (prefers-color-scheme: dark) {{
-    body {{ background: #1a1a2e; color: #eee; }}
-    h1 {{ color: #f5a623; }}
-    .warning {{ background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.5);
-        border-left: 4px solid #eab308; color: #fbbf24; }}
-    .warning strong {{ color: #fcd34d; }}
-    table {{ background: #16213e; }}
-    th, td {{ border: 1px solid #334155; }}
-    th {{ background: #1e3a5f; color: #93c5fd; }}
-    a {{ color: #60a5fa; }}
-    a:hover {{ color: #93c5fd; }}
+/* Light theme */
+@media (prefers-color-scheme: light) {{
+    body {{ background: #f8fafc; color: #1e293b; }}
+    h1 {{ color: #b45309; }}
+    .warning {{ background: #fef3c7; border: 1px solid #f59e0b;
+        border-left: 4px solid #d97706; color: #92400e; }}
+    .warning strong {{ color: #78350f; }}
+    table {{ background: #fff; }}
+    th, td {{ border: 1px solid #e2e8f0; }}
+    th {{ background: #f1f5f9; color: #1e40af; }}
+    a {{ color: #2563eb; }}
+    a:hover {{ color: #1d4ed8; }}
 }}
 </style>
 </head>
