@@ -24,12 +24,12 @@ from advanced_alchemy.extensions.litestar import (
 )
 from advanced_alchemy.filters import LimitOffset
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
+from litestar import Litestar, MediaType, delete, get, post
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-from litestar import Litestar, MediaType, delete, get, post
 
 from .models import Post, User
 
