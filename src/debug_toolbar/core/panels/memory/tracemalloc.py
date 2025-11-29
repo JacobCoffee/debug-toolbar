@@ -34,6 +34,7 @@ class TraceMallocBackend(MemoryBackend):
         self._snapshot_after: tracemalloc.Snapshot | None = None
         self._profiling_overhead: float = 0.0
         self._was_running: bool = False
+        self._peak_memory: int = 0
 
     def start(self) -> None:
         """Begin memory tracking with tracemalloc."""
@@ -53,6 +54,8 @@ class TraceMallocBackend(MemoryBackend):
 
         self._snapshot_after = tracemalloc.take_snapshot()
 
+        _current, self._peak_memory = tracemalloc.get_traced_memory()
+
         if not self._was_running:
             tracemalloc.stop()
 
@@ -68,8 +71,6 @@ class TraceMallocBackend(MemoryBackend):
         if self._snapshot_before is None or self._snapshot_after is None:
             return self._empty_stats()
 
-        _current, peak = tracemalloc.get_traced_memory()
-
         stats_before = self._snapshot_before.statistics("lineno")
         stats_after = self._snapshot_after.statistics("lineno")
 
@@ -83,7 +84,7 @@ class TraceMallocBackend(MemoryBackend):
             "memory_before": memory_before,
             "memory_after": memory_after,
             "memory_delta": memory_delta,
-            "peak_memory": peak,
+            "peak_memory": self._peak_memory,
             "top_allocations": top_allocations,
             "backend": "tracemalloc",
             "profiling_overhead": self._profiling_overhead,
@@ -101,10 +102,18 @@ class TraceMallocBackend(MemoryBackend):
         """
         allocations = []
         for stat in stats[:limit]:
+            if stat.traceback and len(stat.traceback) > 0:
+                formatted = stat.traceback.format()
+                file_info = formatted[0] if formatted else "unknown"
+                line_no = stat.traceback[0].lineno
+            else:
+                file_info = "unknown"
+                line_no = 0
+
             allocations.append(
                 {
-                    "file": stat.traceback.format()[0] if stat.traceback else "unknown",
-                    "line": stat.traceback[0].lineno if stat.traceback else 0,
+                    "file": file_info,
+                    "line": line_no,
                     "size": stat.size,
                     "count": stat.count,
                 }
