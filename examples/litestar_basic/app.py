@@ -7,6 +7,7 @@ with a simple Litestar application, including the new Phase 10 panels:
 - Profiling Panel: Request profiling (optional)
 - Templates Panel: Template rendering tracking (with Jinja2)
 - Alerts Panel: Proactive issue detection (security, performance, database)
+- Memory Panel: Memory profiling and tracking
 
 UI Features:
 - Toolbar position: Click the arrow buttons to move the toolbar (left/right/top/bottom)
@@ -50,6 +51,7 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Templates Panel</strong> - Track Jinja2 template render times</li>
         <li><strong>Profiling Panel</strong> - Profile request execution with flame graph support</li>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
+        <li><strong>Memory Panel</strong> - Track memory allocations and usage (tracemalloc/memray)</li>
     </ul>
     <h2>Flame Graph Visualization</h2>
     <p>The Profiling Panel now supports interactive flame graph generation!</p>
@@ -94,6 +96,7 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Templates Panel</strong> - Track Jinja2/Mako template rendering times</li>
         <li><strong>Profiling Panel</strong> - cProfile/pyinstrument request profiling with flame graph visualization</li>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
+        <li><strong>Memory Panel</strong> - Memory profiling with tracemalloc/memray backends</li>
         <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
     </ul>
     <h2>Flame Graph Support</h2>
@@ -194,6 +197,7 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.settings.SettingsPanel",
         "debug_toolbar.core.panels.templates.TemplatesPanel",
         "debug_toolbar.core.panels.alerts.AlertsPanel",
+        "debug_toolbar.core.panels.memory.MemoryPanel",
     ],
 )
 
