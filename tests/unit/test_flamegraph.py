@@ -141,7 +141,7 @@ class TestFlameGraphGenerator:
 
         weights = result["profiles"][0]["weights"]
         for weight in weights:
-            assert isinstance(weight, (int, float))
+            assert isinstance(weight, int | float)
             assert weight >= 0
 
 

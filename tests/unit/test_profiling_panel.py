@@ -411,9 +411,7 @@ class TestProfilingPanelFlamegraph:
             assert "$schema" in stats["flamegraph_data"]
 
     @pytest.mark.asyncio
-    async def test_flamegraph_disabled_no_data(
-        self, mock_toolbar: MagicMock, request_context: RequestContext
-    ) -> None:
+    async def test_flamegraph_disabled_no_data(self, mock_toolbar: MagicMock, request_context: RequestContext) -> None:
         """Test flamegraph data is not included when disabled."""
         mock_toolbar.config.enable_flamegraph = False
         panel = ProfilingPanel(mock_toolbar)

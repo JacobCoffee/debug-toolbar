@@ -246,9 +246,7 @@ class TestFlamegraphEndpoint:
         assert response.status_code == 404
         assert b"Flame graph data not available" in response.content
 
-    def test_flamegraph_endpoint_returns_speedscope_json(
-        self, client: TestClient, plugin: DebugToolbarPlugin
-    ) -> None:
+    def test_flamegraph_endpoint_returns_speedscope_json(self, client: TestClient, plugin: DebugToolbarPlugin) -> None:
         """Test flamegraph endpoint returns speedscope JSON format."""
         client.get("/")
         storage = plugin.toolbar.storage
@@ -271,9 +269,7 @@ class TestFlamegraphEndpoint:
                 assert "profiles" in json_data
                 break
 
-    def test_flamegraph_endpoint_has_download_header(
-        self, client: TestClient, plugin: DebugToolbarPlugin
-    ) -> None:
+    def test_flamegraph_endpoint_has_download_header(self, client: TestClient, plugin: DebugToolbarPlugin) -> None:
         """Test flamegraph endpoint includes Content-Disposition header."""
         client.get("/")
         storage = plugin.toolbar.storage
