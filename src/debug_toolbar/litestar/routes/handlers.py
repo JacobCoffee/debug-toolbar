@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -320,11 +321,41 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
         js = get_toolbar_js()
         return Response(content=js, media_type="application/javascript")
 
+    async def get_flamegraph_data(request_id: UUID) -> Response[str]:
+        """Get flame graph data for a specific request in speedscope JSON format.
+
+        This endpoint returns speedscope-compatible JSON that can be:
+        1. Downloaded and opened in speedscope.app
+        2. Opened directly via speedscope.app URL with profileURL parameter
+        3. Embedded in a viewer that supports speedscope format
+        """
+        data = storage.get(request_id)
+        if data is None:
+            raise NotFoundException(f"Request {request_id} not found")
+
+        panel_data = data.get("panel_data", {})
+        profiling_data = panel_data.get("ProfilingPanel", {})
+        flamegraph_data = profiling_data.get("flamegraph_data")
+
+        if not flamegraph_data:
+            return Response(
+                content='{"error": "Flame graph data not available for this request"}',
+                media_type="application/json",
+                status_code=404,
+            )
+
+        return Response(
+            content=json.dumps(flamegraph_data, indent=2),
+            media_type="application/json",
+            headers={"Content-Disposition": f'attachment; filename="flamegraph-{str(request_id)[:8]}.speedscope.json"'},
+        )
+
     index_handler = get("/")(get_toolbar_index)
     detail_handler = get("/{request_id:uuid}")(get_request_detail)
     api_requests_handler = get("/api/requests")(get_requests_json)
     api_request_handler = get("/api/requests/{request_id:uuid}")(get_request_json)
     api_explain_handler = post("/api/explain")(post_explain)
+    api_flamegraph_handler = get("/api/flamegraph/{request_id:uuid}")(get_flamegraph_data)
     css_handler = get("/static/toolbar.css")(get_static_css)
     js_handler = get("/static/toolbar.js")(get_static_js)
 
@@ -336,6 +367,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
             api_requests_handler,
             api_request_handler,
             api_explain_handler,
+            api_flamegraph_handler,
             css_handler,
             js_handler,
         ],

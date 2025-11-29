@@ -385,3 +385,60 @@ class TestProfilingPanelEdgeCases:
         for func in stats["top_functions"]:
             if func["calls"] == 0:
                 assert func["per_call"] == 0.0
+
+
+class TestProfilingPanelFlamegraph:
+    """Tests for flamegraph generation in profiling panel."""
+
+    @pytest.mark.asyncio
+    async def test_flamegraph_enabled_includes_data(
+        self, mock_toolbar: MagicMock, request_context: RequestContext
+    ) -> None:
+        """Test flamegraph data is included when enabled."""
+        mock_toolbar.config.enable_flamegraph = True
+        panel = ProfilingPanel(mock_toolbar)
+
+        await panel.process_request(request_context)
+        sum(range(100))
+        await panel.process_response(request_context)
+
+        stats = await panel.generate_stats(request_context)
+
+        assert "flamegraph_available" in stats
+        if stats["flamegraph_available"]:
+            assert "flamegraph_data" in stats
+            assert isinstance(stats["flamegraph_data"], dict)
+            assert "$schema" in stats["flamegraph_data"]
+
+    @pytest.mark.asyncio
+    async def test_flamegraph_disabled_no_data(self, mock_toolbar: MagicMock, request_context: RequestContext) -> None:
+        """Test flamegraph data is not included when disabled."""
+        mock_toolbar.config.enable_flamegraph = False
+        panel = ProfilingPanel(mock_toolbar)
+
+        await panel.process_request(request_context)
+        sum(range(100))
+        await panel.process_response(request_context)
+
+        stats = await panel.generate_stats(request_context)
+
+        assert "flamegraph_available" not in stats
+        assert "flamegraph_data" not in stats
+
+    @pytest.mark.asyncio
+    async def test_flamegraph_available_reflects_data_presence(
+        self, profiling_panel: ProfilingPanel, request_context: RequestContext
+    ) -> None:
+        """Test flamegraph_available accurately reflects whether data was generated.
+
+        When no profiling occurs (profiler is None), flamegraph_available should
+        be False or absent. When profiling does occur, flamegraph_available should
+        be True only if flamegraph_data is present.
+        """
+        stats = await profiling_panel.generate_stats(request_context)
+
+        if "flamegraph_available" in stats:
+            has_data = "flamegraph_data" in stats and stats["flamegraph_data"] is not None
+            assert stats["flamegraph_available"] == has_data, (
+                f"flamegraph_available={stats['flamegraph_available']} but flamegraph_data presence is {has_data}"
+            )

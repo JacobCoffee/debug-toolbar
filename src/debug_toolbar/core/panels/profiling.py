@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 MAX_RECURSION_DEPTH = 100
 CPROFILE_FUNC_TUPLE_LENGTH = 3
+ENABLE_FLAMEGRAPH_DEFAULT = True
 
 
 class ProfilingPanel(Panel):
@@ -39,6 +40,7 @@ class ProfilingPanel(Panel):
         profiler_backend: "cprofile" | "pyinstrument" (default: "cprofile")
         profiler_top_functions: int (default: 50)
         profiler_sort_by: str (default: "cumulative")
+        enable_flamegraph: bool (default: True)
     """
 
     panel_id: ClassVar[str] = "ProfilingPanel"
@@ -47,7 +49,7 @@ class ProfilingPanel(Panel):
     has_content: ClassVar[bool] = True
     nav_title: ClassVar[str] = "Profile"
 
-    __slots__ = ("_backend", "_profiler", "_profiling_overhead", "_sort_by", "_top_functions")
+    __slots__ = ("_backend", "_enable_flamegraph", "_profiler", "_profiling_overhead", "_sort_by", "_top_functions")
 
     def __init__(self, toolbar: DebugToolbar) -> None:
         super().__init__(toolbar)
@@ -55,6 +57,7 @@ class ProfilingPanel(Panel):
         self._backend = self._get_backend()
         self._top_functions = self._get_config("profiler_top_functions", 50)
         self._sort_by = self._get_config("profiler_sort_by", "cumulative")
+        self._enable_flamegraph = self._get_config("enable_flamegraph", ENABLE_FLAMEGRAPH_DEFAULT)
         self._profiling_overhead: float = 0.0
 
     def _get_backend(self) -> str:
@@ -178,7 +181,7 @@ class ProfilingPanel(Panel):
 
         call_tree = self._generate_cprofile_tree(stats)
 
-        return {
+        result = {
             "backend": "cprofile",
             "total_time": total_time,
             "function_calls": total_calls,
@@ -187,6 +190,16 @@ class ProfilingPanel(Panel):
             "call_tree": call_tree,
             "profiling_overhead": self._profiling_overhead,
         }
+
+        if self._enable_flamegraph:
+            from debug_toolbar.core.panels.flamegraph import generate_flamegraph_data
+
+            flamegraph_data = generate_flamegraph_data(self._profiler)
+            result["flamegraph_available"] = flamegraph_data is not None
+            if flamegraph_data:
+                result["flamegraph_data"] = flamegraph_data
+
+        return result
 
     def _generate_cprofile_tree(self, stats: pstats.Stats) -> str:
         """Generate a formatted call tree from cProfile stats."""

@@ -94,6 +94,14 @@ async def index() -> str:
     </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
     <p><strong>Note:</strong> The Alerts Panel will automatically warn you about N+1 queries and other issues!</p>
+    <h2>Profiling & Flame Graphs</h2>
+    <p>The Profiling Panel generates interactive flame graph visualizations:</p>
+    <ul>
+        <li>Automatically generated for each profiled request (when enabled)</li>
+        <li>Visualize performance bottlenecks and call stacks</li>
+        <li>Access via: <code>/_debug_toolbar/api/flamegraph/{request_id}</code></li>
+        <li>Download as .speedscope.json and view at <a href="https://www.speedscope.app/" target="_blank">speedscope.app</a></li>
+    </ul>
     <h2>Toolbar Controls</h2>
     <ul>
         <li>Use arrow buttons (&lt; &gt; ^ v) to move the toolbar to different positions</li>

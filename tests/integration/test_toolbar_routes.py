@@ -217,3 +217,73 @@ class TestToolbarIntegration:
         paths = [req[1].get("metadata", {}).get("path") for req in requests]
         assert "/" in paths
         assert "/json" in paths
+
+
+class TestFlamegraphEndpoint:
+    """Tests for the flamegraph API endpoint."""
+
+    def test_flamegraph_endpoint_returns_404_for_unknown_request(self, client: TestClient) -> None:
+        """Test flamegraph endpoint returns 404 for unknown request."""
+        unknown_id = uuid4()
+        response = client.get(f"/_debug_toolbar/api/flamegraph/{unknown_id}")
+        assert response.status_code == 404
+
+    def test_flamegraph_endpoint_returns_404_when_no_flamegraph_data(
+        self, client: TestClient, plugin: DebugToolbarPlugin
+    ) -> None:
+        """Test flamegraph endpoint returns 404 when flamegraph data unavailable."""
+        client.get("/json")
+        storage = plugin.toolbar.storage
+        requests = storage.get_all()
+        request_id, data = requests[0]
+
+        panel_data = data.get("panel_data", {})
+        profiling_data = panel_data.get("ProfilingPanel", {})
+        if "flamegraph_data" in profiling_data:
+            del profiling_data["flamegraph_data"]
+
+        response = client.get(f"/_debug_toolbar/api/flamegraph/{request_id}")
+        assert response.status_code == 404
+        assert b"Flame graph data not available" in response.content
+
+    def test_flamegraph_endpoint_returns_speedscope_json(self, client: TestClient, plugin: DebugToolbarPlugin) -> None:
+        """Test flamegraph endpoint returns speedscope JSON format."""
+        client.get("/")
+        storage = plugin.toolbar.storage
+        requests = storage.get_all()
+
+        for request_id, data in requests:
+            panel_data = data.get("panel_data", {})
+            profiling_data = panel_data.get("ProfilingPanel", {})
+
+            if "flamegraph_data" in profiling_data:
+                response = client.get(f"/_debug_toolbar/api/flamegraph/{request_id}")
+                assert response.status_code == 200
+                assert response.headers["content-type"].startswith("application/json")
+
+                json_data = response.json()
+                assert "$schema" in json_data
+                assert json_data["$schema"] == "https://www.speedscope.app/file-format-schema.json"
+                assert "shared" in json_data
+                assert "frames" in json_data["shared"]
+                assert "profiles" in json_data
+                break
+
+    def test_flamegraph_endpoint_has_download_header(self, client: TestClient, plugin: DebugToolbarPlugin) -> None:
+        """Test flamegraph endpoint includes Content-Disposition header."""
+        client.get("/")
+        storage = plugin.toolbar.storage
+        requests = storage.get_all()
+
+        for request_id, data in requests:
+            panel_data = data.get("panel_data", {})
+            profiling_data = panel_data.get("ProfilingPanel", {})
+
+            if "flamegraph_data" in profiling_data:
+                response = client.get(f"/_debug_toolbar/api/flamegraph/{request_id}")
+                assert response.status_code == 200
+                assert "Content-Disposition" in response.headers
+                assert "attachment" in response.headers["Content-Disposition"]
+                assert "flamegraph" in response.headers["Content-Disposition"]
+                assert ".speedscope.json" in response.headers["Content-Disposition"]
+                break

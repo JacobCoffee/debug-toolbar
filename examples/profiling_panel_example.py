@@ -152,6 +152,53 @@ async def main() -> None:
     print(f"Panel enabled: {panel.enabled}")
     print()
 
+    print("Example 7: Flame Graph Data Generation")
+    print("-" * 70)
+    toolbar3 = DebugToolbar(config=DebugToolbarConfig(enabled=True))
+    toolbar3.config.profiler_backend = "cprofile"
+    toolbar3.config.enable_flamegraph = True
+
+    panel3 = ProfilingPanel(toolbar3)
+    context3 = await toolbar3.process_request()
+
+    await panel3.process_request(context3)
+
+    compute_intensive_task()
+
+    await panel3.process_response(context3)
+    stats3 = await panel3.generate_stats(context3)
+
+    if stats3.get("flamegraph_available") and stats3.get("flamegraph_data"):
+        flamegraph = stats3["flamegraph_data"]
+        print("Flame graph data generated successfully!")
+        print(f"  Schema: {flamegraph['$schema']}")
+        print(f"  Frames: {len(flamegraph['shared']['frames'])}")
+        print(f"  Profiles: {len(flamegraph['profiles'])}")
+        print(f"  Exporter: {flamegraph['exporter']}")
+        print()
+
+        profile_data = flamegraph["profiles"][0]
+        print("Profile info:")
+        print(f"  Type: {profile_data['type']}")
+        print(f"  Name: {profile_data['name']}")
+        print(f"  Duration: {profile_data['endValue']:.6f}s")
+        print(f"  Samples: {len(profile_data['samples'])}")
+        print()
+
+        print("Usage with speedscope.app:")
+        print("  1. Save flamegraph_data to a .speedscope.json file")
+        print("  2. Open https://www.speedscope.app/")
+        print("  3. Drag and drop the file to visualize")
+        print()
+
+        import json
+        with open("panel_profile.speedscope.json", "w") as f:
+            json.dump(flamegraph, f, indent=2)
+        print("  Saved to: panel_profile.speedscope.json")
+    else:
+        print("Flame graph not available (flamegraph disabled or profiler not cProfile)")
+    print()
+
     print("=" * 70)
     print("Examples completed successfully!")
     print("=" * 70)
