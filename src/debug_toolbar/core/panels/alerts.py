@@ -147,7 +147,7 @@ class AlertsPanel(Panel):
             normalized_headers = {k.lower() for k in headers}
 
             if not csrf_headers.intersection(normalized_headers):
-                content_type = headers.get("content-type", "")
+                content_type = next((v for k, v in headers.items() if k.lower() == "content-type"), "")
                 if "application/json" not in content_type.lower():
                     alerts.append(
                         Alert(
@@ -156,8 +156,10 @@ class AlertsPanel(Panel):
                             "This may indicate missing CSRF protection.",
                             severity=self.SEVERITY_WARNING,
                             category=self.CATEGORY_SECURITY,
-                            suggestion="Implement CSRF protection using Litestar's built-in CSRF middleware "
-                            "or ensure your application validates CSRF tokens for state-changing requests.",
+                            suggestion=(
+                                "Implement CSRF protection middleware or ensure your application "
+                                "validates CSRF tokens for state-changing requests."
+                            ),
                         )
                     )
 
@@ -250,7 +252,7 @@ class AlertsPanel(Panel):
         alerts = []
         metadata = context.metadata
         response_headers = metadata.get("response_headers", {})
-        content_length = response_headers.get("content-length", "0")
+        content_length = next((v for k, v in response_headers.items() if k.lower() == "content-length"), "0")
 
         try:
             size_bytes = int(content_length)
