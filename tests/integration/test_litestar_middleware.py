@@ -272,13 +272,13 @@ class TestToolbarWithLifecycleHooks:
         """Test toolbar works when app has before/after request hooks."""
         from litestar import Request, Response
 
-        request_hook_called = []
+        hook_state: dict[str, bool] = {"before": False, "after": False}
 
         async def before_request(request: Request) -> None:
-            request_hook_called.append("before")
+            hook_state["before"] = True
 
         async def after_request(response: Response) -> Response:
-            request_hook_called.append("after")
+            hook_state["after"] = True
             return response
 
         config = LitestarDebugToolbarConfig(enabled=True)
@@ -293,5 +293,5 @@ class TestToolbarWithLifecycleHooks:
             response = client.get("/")
             assert response.status_code == 200
             assert b"debug-toolbar" in response.content
-            assert "before" in request_hook_called
-            assert "after" in request_hook_called
+            assert hook_state["before"], "before_request hook was not called"
+            assert hook_state["after"], "after_request hook was not called"
