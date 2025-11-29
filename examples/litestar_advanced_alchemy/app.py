@@ -88,7 +88,7 @@ async def index() -> str:
         <li>DELETE /api/users/{id} - Delete user</li>
     </ul>
     <h2>N+1 Query Demo</h2>
-    <p style="background: #fee; padding: 10px; border: 1px solid #f00;">
+    <p style="background: #fee; padding: 10px; border: 1px solid #f00; color: #900;">
         <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
