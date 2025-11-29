@@ -121,6 +121,39 @@ Memory profiling backend selection:
 - `"memray"`: Bloomberg's advanced profiler (requires `pip install memray`, Linux/macOS only)
 - `"auto"`: Automatically selects best available backend
 
+### `profiler_backend`
+
+**Type**: `Literal["cprofile", "pyinstrument"]`
+**Default**: `"cprofile"`
+
+Profiling backend selection:
+- `"cprofile"`: Python's built-in cProfile profiler (always available)
+- `"pyinstrument"`: Statistical sampling profiler (requires `pip install pyinstrument`)
+
+### `profiler_top_functions`
+
+**Type**: `int`
+**Default**: `50`
+
+Maximum number of functions to display in the profiling panel.
+
+### `profiler_sort_by`
+
+**Type**: `str`
+**Default**: `"cumulative"`
+
+Sort order for profiling results. Common values:
+- `"cumulative"`: Sort by cumulative time (time spent in function and sub-calls)
+- `"tottime"`: Sort by total time (time spent in function only)
+- `"calls"`: Sort by number of calls
+
+### `enable_flamegraph`
+
+**Type**: `bool`
+**Default**: `True`
+
+Enable flame graph generation for the profiling panel. When enabled, a speedscope-compatible JSON file is generated that can be visualized at [speedscope.app](https://www.speedscope.app/).
+
 ### `panel_display_depth`
 
 **Type**: `int`
