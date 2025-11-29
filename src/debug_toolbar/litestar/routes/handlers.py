@@ -192,13 +192,16 @@ def _render_memory_panel(stats: dict[str, Any]) -> str:
         html += "<div class='allocations-list'>"
         for alloc in top_allocs[:10]:
             size = alloc.get("size", 0)
-            location = _escape_html(alloc.get("location", "unknown"))
+            file_info = alloc.get("file") or alloc.get("location", "unknown")
+            line = alloc.get("line", 0)
+            location = f"{file_info}:{line}" if line > 0 else file_info
+            location = _escape_html(str(location))
             count = alloc.get("count", 1)
             html += f"""
             <div class='allocation-item'>
                 <span class='alloc-size'>{_format_bytes(size)}</span>
                 <span class='alloc-location'>{location}</span>
-                <span class='alloc-count'>x{count}</span>
+                <span class='alloc-count'>({count} allocs)</span>
             </div>
             """
         html += "</div>"
@@ -250,10 +253,21 @@ def _render_profiling_panel(stats: dict[str, Any]) -> str:
         html += "<h4>Top Functions by Time</h4>"
         html += "<table class='panel-table'><tbody>"
         for func in top_funcs[:10]:
-            name = _escape_html(func.get("name", "unknown"))
+            # Handle both 'function' and 'name' keys
+            func_name = func.get("function") or func.get("name", "unknown")
+            filename = func.get("filename", "")
+            lineno = func.get("lineno", 0)
+            # Format as filename:lineno:function for better display
+            if filename and filename != "unknown":
+                short_file = filename.split("/")[-1] if "/" in filename else filename
+                display_name = f"{short_file}:{lineno} {func_name}" if lineno else f"{short_file} {func_name}"
+            else:
+                display_name = func_name
+            display_name = _escape_html(display_name)
             time_ms = func.get("cumulative_time", 0) * 1000
             calls = func.get("calls", 0)
-            html += f"<tr><td class='key'>{name}</td><td class='value'>{time_ms:.2f}ms ({calls} calls)</td></tr>"
+            value = f"{time_ms:.2f}ms ({calls} calls)"
+            html += f"<tr><td class='key'>{display_name}</td><td class='value'>{value}</td></tr>"
         html += "</tbody></table>"
 
     html += "</div>"
@@ -1987,16 +2001,160 @@ class DebugToolbar {
                 .then(data => {
                     const panelData = data.panel_data && data.panel_data[panelId];
                     if (panelData) {
-                        if (this.isSqlPanel(panelData)) {
-                            details.innerHTML = this.renderSqlPanel(panelData);
-                        } else {
-                            details.innerHTML = this.renderPanelData(panelData);
-                        }
+                        details.innerHTML = this.renderPanelById(panelId, panelData, data.request_id);
                         details.classList.add('expanded');
                     }
                 })
                 .catch(err => console.error('Failed to load panel data:', err));
         }
+    }
+
+    renderPanelById(panelId, data, requestId) {
+        switch (panelId) {
+            case 'AlertsPanel':
+                return this.renderAlertsPanel(data);
+            case 'MemoryPanel':
+                return this.renderMemoryPanel(data);
+            case 'ProfilingPanel':
+                return this.renderProfilingPanel(data, requestId);
+            case 'SQLAlchemyPanel':
+                return this.renderSqlPanel(data);
+            default:
+                return this.renderPanelData(data);
+        }
+    }
+
+    renderAlertsPanel(data) {
+        const alerts = data.alerts || [];
+        if (alerts.length === 0) {
+            return '<p class="empty alert-success">No issues detected</p>';
+        }
+        const severityColors = {critical: '#dc2626', warning: '#f59e0b', info: '#3b82f6'};
+        const severityIcons = {critical: '!', warning: '!', info: 'i'};
+        const categoryIcons = {security: 'lock', performance: 'zap', database: 'db', configuration: 'cog'};
+
+        let html = '<div class="alerts-summary"><strong>' + alerts.length + '</strong> issue(s) detected</div>';
+        html += '<div class="alerts-container">';
+
+        for (const alert of alerts) {
+            const severity = alert.severity || 'info';
+            const category = alert.category || '';
+            const title = this.escapeHtml(alert.title || 'Alert');
+            const message = this.escapeHtml(alert.message || '');
+            const suggestion = alert.suggestion || '';
+            const color = severityColors[severity] || '#6b7280';
+            const icon = severityIcons[severity] || '*';
+            const catIcon = categoryIcons[category] || '';
+
+            html += '<div class="alert-card alert-' + severity + '" style="border-left-color:' + color + '">';
+            html += '<div class="alert-header">';
+            html += '<span class="alert-icon">[' + icon + ']</span>';
+            html += '<span class="alert-title">' + title + '</span>';
+            html += '<span class="alert-category">[' + catIcon + '] ' + this.escapeHtml(category) + '</span>';
+            html += '</div>';
+            html += '<div class="alert-message">' + message + '</div>';
+            if (suggestion) {
+                html += '<div class="alert-suggestion">Tip: ' + this.escapeHtml(suggestion) + '</div>';
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    renderMemoryPanel(data) {
+        const peak = data.peak_memory || 0;
+        const current = data.current_memory || 0;
+        const allocCount = data.allocation_count || 0;
+        const backend = data.backend || 'unknown';
+
+        let html = '<div class="memory-panel">';
+        html += '<div class="memory-summary">';
+        html += '<div class="memory-stat"><span class="stat-value">' + this.formatBytes(peak) + '</span>';
+        html += '<span class="stat-label">Peak Memory</span></div>';
+        html += '<div class="memory-stat"><span class="stat-value">' + this.formatBytes(current) + '</span>';
+        html += '<span class="stat-label">Current</span></div>';
+        html += '<div class="memory-stat"><span class="stat-value">' + allocCount + '</span>';
+        html += '<span class="stat-label">Allocations</span></div>';
+        html += '<div class="memory-stat"><span class="stat-value">' + backend + '</span>';
+        html += '<span class="stat-label">Backend</span></div>';
+        html += '</div>';
+
+        const topAllocs = data.top_allocations || [];
+        if (topAllocs.length > 0) {
+            html += '<h4>Top Allocations</h4>';
+            html += '<table class="panel-table"><tbody>';
+            for (const alloc of topAllocs.slice(0, 10)) {
+                const file = alloc.file || alloc.location || 'unknown';
+                const line = alloc.line || 0;
+                const size = alloc.size || 0;
+                const count = alloc.count || 0;
+                let loc = file;
+                if (line > 0) loc += ':' + line;
+                html += '<tr><td class="key">' + this.escapeHtml(loc) + '</td>';
+                html += '<td class="value">' + this.formatBytes(size) + ' (' + count + ' allocs)</td></tr>';
+            }
+            html += '</tbody></table>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    renderProfilingPanel(data, requestId) {
+        let html = '<div class="profiling-panel">';
+
+        const totalTime = (data.total_time || 0) * 1000;
+        const funcCount = data.function_count || 0;
+        const callCount = data.total_calls || 0;
+        const profilerType = data.profiler_type || 'cProfile';
+
+        html += '<div class="profiling-summary">';
+        html += '<div class="profiling-stat"><span class="stat-value">' + totalTime.toFixed(2) + 'ms</span>';
+        html += '<span class="stat-label">Total Time</span></div>';
+        html += '<div class="profiling-stat"><span class="stat-value">' + funcCount + '</span>';
+        html += '<span class="stat-label">Functions</span></div>';
+        html += '<div class="profiling-stat"><span class="stat-value">' + callCount + '</span>';
+        html += '<span class="stat-label">Calls</span></div>';
+        html += '<div class="profiling-stat"><span class="stat-value">' + profilerType + '</span>';
+        html += '<span class="stat-label">Profiler</span></div>';
+        html += '</div>';
+
+        if (data.has_flamegraph && requestId) {
+            html += '<div class="flamegraph-action">';
+            html += '<button onclick="downloadFlamegraph(\\''+requestId+'\\')" class="flamegraph-btn">';
+            html += 'Download Flame Graph (Speedscope)</button></div>';
+        }
+
+        const topFuncs = data.top_functions || [];
+        if (topFuncs.length > 0) {
+            html += '<h4>Top Functions by Time</h4>';
+            html += '<table class="panel-table"><tbody>';
+            for (const func of topFuncs.slice(0, 15)) {
+                const funcName = func.function || func.name || 'unknown';
+                const filename = func.filename || '';
+                const lineno = func.lineno || 0;
+                let displayName = funcName;
+                if (filename && filename !== 'unknown') {
+                    const shortFile = filename.split('/').pop() || filename;
+                    displayName = lineno ? shortFile + ':' + lineno + ' ' + funcName : shortFile + ' ' + funcName;
+                }
+                const timeMs = (func.cumulative_time || 0) * 1000;
+                const calls = func.calls || 0;
+                html += '<tr><td class="key">' + this.escapeHtml(displayName) + '</td>';
+                html += '<td class="value">' + timeMs.toFixed(2) + 'ms (' + calls + ' calls)</td></tr>';
+            }
+            html += '</tbody></table>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     }
 
     renderPanelData(data) {
@@ -2077,10 +2235,6 @@ class DebugToolbar {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    isSqlPanel(data) {
-        return data && (data.queries !== undefined || data.total_queries !== undefined);
     }
 
     renderSqlPanel(data) {
