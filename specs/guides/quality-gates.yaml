@@ -1,0 +1,98 @@
+metadata:
+  version: "2.0"
+  adaptive: true
+  description: "Quality gates for debug-toolbar project"
+
+implementation_gates:
+  - name: local_tests_pass
+    command: "make test"
+    fallback: "uv run pytest"
+    required: true
+    adaptive: true
+    description: "All tests must pass before proceeding"
+
+  - name: linting_clean
+    command: "make lint"
+    fallback: "uv run ruff check src/ tests/"
+    required: true
+    description: "Zero linting errors allowed"
+
+  - name: type_checking_pass
+    command: "make type-check"
+    fallback: "uv run ty check src/"
+    required: true
+    adaptive: true
+    description: "Type checking must pass"
+
+  - name: formatting_clean
+    command: "make fmt-check"
+    fallback: "uv run ruff format --check src/ tests/"
+    required: true
+    description: "Code must be properly formatted"
+
+testing_gates:
+  - name: coverage_threshold
+    threshold: 90
+    scope: "modified_modules"
+    adaptive: true
+    description: "Modified modules must achieve 90%+ coverage"
+
+  - name: test_isolation
+    required: true
+    description: "Tests must work in parallel execution (pytest-xdist)"
+
+  - name: async_test_cleanup
+    required: true
+    description: "Async tests must clean up context vars with set_request_context(None)"
+
+  - name: fixture_usage
+    required: true
+    description: "Use fixtures from conftest.py (config, toolbar, context)"
+
+documentation_gates:
+  - name: anti_pattern_scan
+    adaptive: true
+    rules:
+      - pattern: "Optional\\["
+        severity: "error"
+        message: "Use T | None (PEP 604) instead of Optional[T]"
+
+      - pattern: "^(?!from __future__ import annotations)"
+        file_pattern: "*.py"
+        severity: "error"
+        message: "All Python files must have 'from __future__ import annotations'"
+
+      - pattern: "# type: ignore$"
+        severity: "warning"
+        message: "type: ignore should include specific error code"
+
+  - name: panel_compliance
+    applicable_when: "panel_implementation"
+    rules:
+      - pattern: "class.*Panel.*:"
+        must_include:
+          - "panel_id: ClassVar[str]"
+          - "title: ClassVar[str]"
+          - "async def generate_stats"
+        message: "Panels must define panel_id, title, and implement generate_stats"
+
+  - name: pattern_documentation
+    description: "New patterns must be captured in specs/guides/patterns/"
+    required: true
+
+commit_gates:
+  - name: no_debug_code
+    patterns:
+      - "breakpoint()"
+      - "import pdb"
+      - "print("  # Only in non-logging contexts
+    severity: "error"
+    description: "No debug code in commits"
+
+  - name: no_secrets
+    patterns:
+      - "password\\s*="
+      - "secret\\s*="
+      - "api_key\\s*="
+    severity: "error"
+    description: "No hardcoded secrets"
