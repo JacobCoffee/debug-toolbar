@@ -88,6 +88,11 @@ async def index() -> str:
         <li>POST /api/posts - Create post</li>
         <li>DELETE /api/users/{id} - Delete user</li>
     </ul>
+    <h2>N+1 Query Demo</h2>
+    <p style="background: #fee; padding: 10px; border: 1px solid #f00;">
+        <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
+        This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
+    </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
     <h2>Toolbar Controls</h2>
     <ul>
@@ -164,6 +169,72 @@ async def list_users(
     logger.info("Listing users with limit=%d, offset=%d", limit, offset)
     users = await user_repo.list(LimitOffset(limit=limit, offset=offset))
     return [{"id": str(u.id), "name": u.name, "email": u.email} for u in users]
+
+
+@get("/api/users-with-posts-bad", media_type=MediaType.HTML)
+async def list_users_with_posts_n_plus_one(
+    user_repo: UserRepository,
+    post_repo: PostRepository,
+) -> str:
+    """Deliberately cause N+1 query problem for demo purposes.
+
+    This endpoint fetches users first, then loops through each user to fetch their posts.
+    This is a classic N+1 pattern - 1 query for users + N queries for each user's posts.
+    """
+    logger.warning("N+1 DEMO: This endpoint deliberately causes N+1 queries!")
+
+    users = await user_repo.list(LimitOffset(limit=10, offset=0))
+
+    # ANTI-PATTERN DEMO: The loop below fetches ALL posts for EVERY user iteration,
+    # creating repeated identical queries from the same code location. This is
+    # intentionally inefficient to demonstrate N+1 detection. In production,
+    # use eager loading (joinedload/selectinload) or batch fetching instead.
+    results = []
+    for user in users:
+        posts = await post_repo.list(LimitOffset(limit=100, offset=0))
+        user_posts = [p for p in posts if p.author_id == user.id]
+        results.append({
+            "user": user,
+            "posts": user_posts,
+        })
+
+    rows = ""
+    for r in results:
+        user = r["user"]
+        post_count = len(r["posts"])
+        rows += f"<tr><td>{user.id}</td><td>{user.name}</td><td>{user.email}</td><td>{post_count}</td></tr>"
+
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<title>Users (N+1 Demo)</title>
+<style>
+body {{ background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; padding: 20px; }}
+h1 {{ color: #f5a623; }}
+.warning {{ background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.5);
+    border-left: 4px solid #eab308; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #fbbf24; }}
+.warning strong {{ color: #fcd34d; }}
+table {{ border-collapse: collapse; background: #16213e; }}
+th, td {{ border: 1px solid #334155; padding: 8px 12px; text-align: left; }}
+th {{ background: #1e3a5f; color: #93c5fd; }}
+a {{ color: #60a5fa; }}
+a:hover {{ color: #93c5fd; }}
+</style>
+</head>
+<body>
+    <h1>Users with Posts (N+1 Query Demo)</h1>
+    <div class="warning">
+        <strong>Warning:</strong> This page deliberately triggers N+1 queries for demonstration!
+        <br>Check the SQL panel in the debug toolbar to see the N+1 detection in action.
+    </div>
+    <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Post Count</th></tr></thead>
+        <tbody>{rows or '<tr><td colspan="4">No users yet. Create some users first!</td></tr>'}</tbody>
+    </table>
+    <p><a href="/users">View users (efficient query)</a></p>
+    <a href="/">Back to Home</a>
+</body>
+</html>"""
 
 
 @post("/api/users", media_type=MediaType.HTML)
@@ -247,8 +318,46 @@ toolbar_config = LitestarDebugToolbarConfig(
 
 
 async def on_startup(app: Litestar) -> None:
-    """Store the database engine in app state for EXPLAIN queries."""
+    """Store the database engine and seed sample data."""
     app.state.db_engine = db_config.get_engine()
+    await seed_sample_data()
+
+
+async def seed_sample_data() -> None:
+    """Seed sample users and posts for demo purposes."""
+    from sqlalchemy import select
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    async with db_config.get_engine().begin() as conn:
+        session = AsyncSession(bind=conn)
+
+        user_result = await session.execute(select(User).limit(1))
+        post_result = await session.execute(select(Post).limit(1))
+        if user_result.scalar_one_or_none() is not None and post_result.scalar_one_or_none() is not None:
+            return
+
+        users = [
+            User(name="Alice Johnson", email="alice@example.com"),
+            User(name="Bob Smith", email="bob@example.com"),
+            User(name="Charlie Brown", email="charlie@example.com"),
+            User(name="Diana Ross", email="diana@example.com"),
+            User(name="Eve Wilson", email="eve@example.com"),
+        ]
+        session.add_all(users)
+        await session.flush()
+
+        posts = [
+            Post(title="Getting Started with Litestar", content="Litestar is awesome!", author_id=users[0].id),
+            Post(title="Debug Toolbar Tips", content="Use the SQL panel to find N+1 queries.", author_id=users[0].id),
+            Post(title="Python Best Practices", content="Always use type hints.", author_id=users[1].id),
+            Post(title="Async Programming", content="async/await makes code clean.", author_id=users[1].id),
+            Post(title="SQLAlchemy 2.0", content="The new style is much better.", author_id=users[2].id),
+            Post(title="Testing Strategies", content="Test your N+1 queries!", author_id=users[3].id),
+            Post(title="Performance Tips", content="Eager loading prevents N+1.", author_id=users[4].id),
+        ]
+        session.add_all(posts)
+        await session.commit()
+        logger.info("Seeded %d users and %d posts", len(users), len(posts))
 
 
 app = Litestar(
@@ -257,6 +366,7 @@ app = Litestar(
         users_page,
         posts_page,
         list_users,
+        list_users_with_posts_n_plus_one,
         create_user,
         delete_user,
         list_posts,
