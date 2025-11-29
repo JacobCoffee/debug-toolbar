@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Async Debug Toolbar 0.1.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Getting Started" href="getting-started.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Debug Toolbar"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="#">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Debug Toolbar Comparison</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#screenshots">Screenshots</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="#"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Debug Toolbar</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="debug-toolbar">
+<h1>Debug Toolbar<a class="headerlink" href="#debug-toolbar" title="Link to this heading">¶</a></h1>
+<p>An async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+uv</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core package only</span>
+</span><span data-line="2">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># With Litestar integration</span>
+</span><span data-line="5">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># With Advanced-Alchemy SQLAlchemy panel</span>
+</span><span data-line="8">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>advanced-alchemy<span class="o">]</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># Everything</span>
+</span><span data-line="11">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>all<span class="o">]</span>
+</span></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+pip</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core package only</span>
+</span><span data-line="2">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># With Litestar integration</span>
+</span><span data-line="5">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># With Advanced-Alchemy SQLAlchemy panel</span>
+</span><span data-line="8">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>advanced-alchemy<span class="o">]</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># Everything</span>
+</span><span data-line="11">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>all<span class="o">]</span>
+</span></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-2">
+pdm</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core package only</span>
+</span><span data-line="2">pdm<span class="w"> </span>add<span class="w"> </span>debug-toolbar
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># With Litestar integration</span>
+</span><span data-line="5">pdm<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># With Advanced-Alchemy SQLAlchemy panel</span>
+</span><span data-line="8">pdm<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>advanced-alchemy<span class="o">]</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># Everything</span>
+</span><span data-line="11">pdm<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>all<span class="o">]</span>
+</span></pre></div>
+</div>
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+poetry</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># Core package only</span>
+</span><span data-line="2">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># With Litestar integration</span>
+</span><span data-line="5">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># With Advanced-Alchemy SQLAlchemy panel</span>
+</span><span data-line="8">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>advanced-alchemy<span class="o">]</span>
+</span><span data-line="9">
+</span><span data-line="10"><span class="c1"># Everything</span>
+</span><span data-line="11">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>all<span class="o">]</span>
+</span></pre></div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 sd-g-3 sd-g-xs-3 sd-g-sm-3 sd-g-md-3 sd-g-lg-3 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Getting Started</div>
+<p class="sd-card-text">New to debug-toolbar? Start here for installation and your first integration.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="getting-started.html"><span class="doc">Getting Started</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Configuration</div>
+<p class="sd-card-text">Learn how to configure panels, themes, positioning, and behavior.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="configuration.html"><span class="doc">Configuration</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Built-in Panels</div>
+<p class="sd-card-text">Explore the built-in panels: Timer, Request, Response, SQL, Logging, and more.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="panels.html"><span class="doc">Built-in Panels</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Creating Custom Panels</div>
+<p class="sd-card-text">Build your own debug panels with the extensible panel system.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="custom-panels.html"><span class="doc">Creating Custom Panels</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Debug Toolbar Comparison</div>
+<p class="sd-card-text">See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="comparison.html"><span class="doc">Debug Toolbar Comparison</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+API Reference</div>
+<p class="sd-card-text">Complete API documentation for all public classes and functions.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="api/index.html"><span class="doc">API Reference</span></a></div>
+</div>
+</div>
+</div>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Litestar</span><span class="p">,</span> <span class="n">get</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarPlugin</span><span class="p">,</span> <span class="n">LitestarDebugToolbarConfig</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="nd">@get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+</span><span data-line="5"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span data-line="6">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello, World!&quot;</span><span class="p">}</span>
+</span><span data-line="7">
+</span><span data-line="8"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="9"><span class="n">app</span> <span class="o">=</span> <span class="n">Litestar</span><span class="p">(</span>
+</span><span data-line="10">    <span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+</span><span data-line="11">    <span class="n">plugins</span><span class="o">=</span><span class="p">[</span><span class="n">DebugToolbarPlugin</span><span class="p">(</span><span class="n">config</span><span class="p">)],</span>
+</span><span data-line="12"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Async-Native</strong>: Built from the ground up for async/await patterns</p></li>
+<li><p><strong>Framework-Agnostic Core</strong>: Works with any ASGI framework</p></li>
+<li><p><strong>Litestar Integration</strong>: First-class plugin support</p></li>
+<li><p><strong>Pluggable Panels</strong>: Easy to add, remove, or customize</p></li>
+<li><p><strong>Dark/Light Themes</strong>: Toggle between themes</p></li>
+<li><p><strong>Flexible Positioning</strong>: Left, right, top, or bottom</p></li>
+<li><p><strong>SQL Analysis</strong>: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB</p></li>
+<li><p><strong>N+1 Detection</strong>: Automatic detection of N+1 query patterns with fix suggestions</p></li>
+</ul>
+</section>
+<section id="screenshots">
+<h2>Screenshots<a class="headerlink" href="#screenshots" title="Link to this heading">¶</a></h2>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-1 sd-row-cols-md-1 sd-row-cols-lg-1 sd-g-2 sd-g-xs-2 sd-g-sm-2 sd-g-md-2 sd-g-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-right-position.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Default View</div>
+<p class="sd-card-text">Right-side toolbar with all panels</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 sd-g-2 sd-g-xs-2 sd-g-sm-2 sd-g-md-2 sd-g-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-top-position.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Top Position</div>
+<p class="sd-card-text">Full-width horizontal layout</p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-users-queries.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+SQL Queries</div>
+<p class="sd-card-text">Query tracking with EXPLAIN</p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-n-plus-one-detection.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+N+1 Detection</div>
+<p class="sd-card-text">Automatic N+1 query detection with fix suggestions</p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-light-theme.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Light Theme</div>
+<p class="sd-card-text">Toggle dark/light themes</p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-request-history.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Request History</div>
+<p class="sd-card-text">Browse past requests</p>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<img alt="" class="sd-card-img-top" src="_images/toolbar-events-panel.png" />
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Events Panel</div>
+<p class="sd-card-text">Lifecycle hooks and exception handlers</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-next">
+    <a href="getting-started.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Getting Started</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>

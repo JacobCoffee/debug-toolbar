@@ -1,0 +1,125 @@
+# Configuration
+
+## Base Configuration
+
+The `DebugToolbarConfig` class provides the base configuration options:
+
+```python
+from debug_toolbar import DebugToolbarConfig
+
+config = DebugToolbarConfig(
+    enabled=True,                    # Enable/disable toolbar
+    panels=[...],                    # List of panel classes
+    intercept_redirects=False,       # Show intermediate page on redirects
+    max_request_history=50,          # Requests to keep in history
+    api_path="/_debug_toolbar",      # API endpoint prefix
+    static_path="/_debug_toolbar/static",  # Static assets path
+    allowed_hosts=[],                # Host whitelist (empty = all)
+    extra_panels=[],                 # Additional panels
+    exclude_panels=[],               # Panels to disable
+)
+```
+
+## Litestar Configuration
+
+`LitestarDebugToolbarConfig` extends the base config with Litestar-specific options:
+
+```python
+from debug_toolbar.litestar import LitestarDebugToolbarConfig
+
+config = LitestarDebugToolbarConfig(
+    # All base options, plus:
+    exclude_paths=["/_debug_toolbar", "/static"],  # Paths to skip
+    exclude_patterns=[r"^/api/v\d+/internal"],     # Regex patterns
+    show_on_errors=True,                           # Show on 4xx/5xx
+    show_toolbar_callback=None,                    # Custom visibility check
+)
+```
+
+## Configuration Options
+
+### `enabled`
+
+**Type**: `bool`
+**Default**: `True`
+
+Master switch for the toolbar. When `False`, no middleware is added.
+
+### `panels`
+
+**Type**: `list[str | type[Panel]]`
+**Default**: Built-in panels
+
+List of panel classes or import paths. Default panels:
+
+- `debug_toolbar.core.panels.timer.TimerPanel`
+- `debug_toolbar.core.panels.request.RequestPanel`
+- `debug_toolbar.core.panels.response.ResponsePanel`
+- `debug_toolbar.core.panels.logging.LoggingPanel`
+- `debug_toolbar.core.panels.versions.VersionsPanel`
+
+### `extra_panels`
+
+**Type**: `list[str | type[Panel]]`
+**Default**: `[]`
+
+Additional panels to add to the default set.
+
+```python
+config = LitestarDebugToolbarConfig(
+    extra_panels=[
+        "debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel",
+        "myapp.panels.CustomPanel",
+    ],
+)
+```
+
+### `exclude_panels`
+
+**Type**: `list[str]`
+**Default**: `[]`
+
+Panel names to exclude from the default set.
+
+```python
+config = LitestarDebugToolbarConfig(
+    exclude_panels=["VersionsPanel", "LoggingPanel"],
+)
+```
+
+### `exclude_paths`
+
+**Type**: `list[str]`
+**Default**: `["/_debug_toolbar", "/static", "/favicon.ico"]`
+
+URL paths to exclude from toolbar processing. Uses prefix matching.
+
+### `show_toolbar_callback`
+
+**Type**: `Callable[[Request], bool] | None`
+**Default**: `None`
+
+Custom function to determine toolbar visibility:
+
+```python
+def should_show(request: Request) -> bool:
+    # Only show for authenticated admins
+    return request.user and request.user.is_admin
+
+config = LitestarDebugToolbarConfig(
+    show_toolbar_callback=should_show,
+)
+```
+
+## Environment-Based Configuration
+
+Common pattern for different environments:
+
+```python
+import os
+
+config = LitestarDebugToolbarConfig(
+    enabled=os.getenv("DEBUG", "false").lower() == "true",
+    allowed_hosts=["localhost", "127.0.0.1"] if os.getenv("DEBUG") else [],
+)
+```
