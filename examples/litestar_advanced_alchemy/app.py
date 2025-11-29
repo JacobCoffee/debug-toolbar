@@ -72,7 +72,7 @@ async def index() -> str:
 <head><title>Litestar + Advanced-Alchemy Debug Toolbar</title></head>
 <body>
     <h1>Litestar + Advanced-Alchemy Debug Toolbar</h1>
-    <p>This example demonstrates SQL query tracking with the SQLAlchemy panel.</p>
+    <p>This example demonstrates SQL query tracking with the SQLAlchemy panel and memory profiling with the Memory panel.</p>
     <h2>Navigation</h2>
     <ul>
         <li><a href="/">Home</a></li>
@@ -92,7 +92,7 @@ async def index() -> str:
         <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
-    <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
+    <p>Check the debug toolbar's SQLAlchemy panel to see query statistics and Memory panel for allocation tracking!</p>
     <p><strong>Note:</strong> The Alerts Panel will automatically warn you about N+1 queries and other issues!</p>
     <h2>Profiling & Flame Graphs</h2>
     <p>The Profiling Panel generates interactive flame graph visualizations:</p>
@@ -101,6 +101,15 @@ async def index() -> str:
         <li>Visualize performance bottlenecks and call stacks</li>
         <li>Access via: <code>/_debug_toolbar/api/flamegraph/{request_id}</code></li>
         <li>Download as .speedscope.json and view at <a href="https://www.speedscope.app/" target="_blank">speedscope.app</a></li>
+    </ul>
+    <h2>Available Panels</h2>
+    <ul>
+        <li><strong>SQLAlchemy Panel</strong> - Query tracking with N+1 detection</li>
+        <li><strong>Headers Panel</strong> - HTTP header inspection</li>
+        <li><strong>Settings Panel</strong> - Configuration viewer</li>
+        <li><strong>Profiling Panel</strong> - Request profiling with flame graphs</li>
+        <li><strong>Alerts Panel</strong> - Proactive issue detection</li>
+        <li><strong>Memory Panel</strong> - Memory allocation tracking</li>
     </ul>
     <h2>Toolbar Controls</h2>
     <ul>
@@ -201,10 +210,12 @@ async def list_users_with_posts_n_plus_one(
     for user in users:
         posts = await post_repo.list(LimitOffset(limit=100, offset=0))
         user_posts = [p for p in posts if p.author_id == user.id]
-        results.append({
-            "user": user,
-            "posts": user_posts,
-        })
+        results.append(
+            {
+                "user": user,
+                "posts": user_posts,
+            }
+        )
 
     rows = ""
     for r in results:
@@ -323,6 +334,7 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.settings.SettingsPanel",
         "debug_toolbar.core.panels.profiling.ProfilingPanel",
         "debug_toolbar.core.panels.alerts.AlertsPanel",
+        "debug_toolbar.core.panels.memory.MemoryPanel",
     ],
 )
 
