@@ -49,8 +49,10 @@ class SQLNormalizer:
         parameter values (e.g., N+1 queries).
         """
         result = sql
-        result = re.sub(r"'[^']*'", "'?'", result)
-        result = re.sub(r'"[^"]*"', '"?"', result)
+        # Replace single-quoted strings, handling escaped quotes ('' or \')
+        result = re.sub(r"'([^'\\]|\\.|'')*'", "'?'", result)
+        # Replace double-quoted strings, handling escaped quotes ("" or \")
+        result = re.sub(r'"([^"\\]|\\.|"")*"', '"?"', result)
         result = re.sub(r"\b\d+\b", "?", result)
         result = re.sub(r":\w+", ":?", result)
         return re.sub(r"\s+", " ", result).strip()
