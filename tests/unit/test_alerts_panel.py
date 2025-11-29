@@ -250,6 +250,19 @@ class TestCookieSecurityAlerts:
 
         assert len(alerts) == 0
 
+    @pytest.mark.asyncio
+    async def test_cookie_attributes_without_spaces(
+        self, alerts_panel: AlertsPanel, request_context: RequestContext
+    ) -> None:
+        """Test cookie security check handles attributes without spaces after semicolons."""
+        request_context.metadata["response_headers"] = {
+            "set-cookie": "sessionid=abc;Secure;HttpOnly;SameSite=Lax",
+        }
+
+        alerts = alerts_panel._check_cookie_security(request_context)
+
+        assert len(alerts) == 0
+
 
 class TestDebugModeAlerts:
     """Tests for debug mode alert detection."""
