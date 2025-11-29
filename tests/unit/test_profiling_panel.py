@@ -426,12 +426,20 @@ class TestProfilingPanelFlamegraph:
         assert "flamegraph_data" not in stats
 
     @pytest.mark.asyncio
-    async def test_flamegraph_available_false_when_no_data(
+    async def test_flamegraph_available_reflects_data_presence(
         self, profiling_panel: ProfilingPanel, request_context: RequestContext
     ) -> None:
-        """Test flamegraph_available is False when data generation fails."""
+        """Test flamegraph_available accurately reflects whether data was generated.
+
+        When no profiling occurs (profiler is None), flamegraph_available should
+        be False or absent. When profiling does occur, flamegraph_available should
+        be True only if flamegraph_data is present.
+        """
         stats = await profiling_panel.generate_stats(request_context)
 
         if "flamegraph_available" in stats:
-            if not stats.get("flamegraph_data"):
-                assert stats["flamegraph_available"] is False
+            has_data = "flamegraph_data" in stats and stats["flamegraph_data"] is not None
+            assert stats["flamegraph_available"] == has_data, (
+                f"flamegraph_available={stats['flamegraph_available']} but "
+                f"flamegraph_data presence is {has_data}"
+            )
