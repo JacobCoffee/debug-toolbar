@@ -8,6 +8,7 @@ import time
 import traceback
 from collections.abc import Generator
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from sqlalchemy import event, text
@@ -49,12 +50,15 @@ class SQLNormalizer:
         parameter values (e.g., N+1 queries).
         """
         result = sql
-        # Replace single-quoted strings, handling escaped quotes ('' or \')
+        # Replace single-quoted strings (handles escaped quotes: '' or \')
         result = re.sub(r"'([^'\\]|\\.|'')*'", "'?'", result)
-        # Replace double-quoted strings, handling escaped quotes ("" or \")
+        # Replace double-quoted strings (handles escaped quotes: "" or \")
         result = re.sub(r'"([^"\\]|\\.|"")*"', '"?"', result)
-        result = re.sub(r"\b\d+\b", "?", result)
+        # Replace numeric literals (integers, floats, negatives)
+        result = re.sub(r"-?\d+(?:\.\d+)?", "?", result)
+        # Replace named parameters (e.g., :param) with :?
         result = re.sub(r":\w+", ":?", result)
+        # Collapse whitespace
         return re.sub(r"\s+", " ", result).strip()
 
     @classmethod
@@ -66,6 +70,9 @@ class SQLNormalizer:
     @classmethod
     def capture_stack(cls, skip_frames: int = 4) -> list[dict[str, Any]]:
         """Capture the current call stack, filtering out library frames.
+
+        Note: Stack capture has performance overhead. Disable via
+        QueryTracker(capture_stacks=False) in high-traffic environments.
 
         Args:
             skip_frames: Number of frames to skip from the top of the stack.
@@ -546,13 +553,11 @@ class SQLAlchemyPanel(Panel):
             return "Unknown origin"
 
         parts = origin.rsplit(":", 2)
-        if len(parts) < 2:  # noqa: PLR2004
+        if len(parts) < 3:  # noqa: PLR2004
             return origin
 
-        file_path = parts[0]
-        short_file = file_path.split("/")[-1] if "/" in file_path else file_path
-        line = parts[1] if len(parts) > 1 else "?"
-        func = parts[2] if len(parts) > 2 else "?"  # noqa: PLR2004
+        file_path, line, func = parts[0], parts[1], parts[2]
+        short_file = Path(file_path).name
         return f"{short_file}:{line} in {func}"
 
     def _get_fix_suggestion(self, normalized_sql: str, count: int) -> str:

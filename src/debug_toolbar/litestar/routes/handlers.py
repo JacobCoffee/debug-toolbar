@@ -1716,7 +1716,7 @@ class DebugToolbar {
                     html += '<summary>Call Stack</summary>';
                     html += '<div class="stack-frames">';
                     group.stack.forEach(frame => {
-                        const shortFile = (frame.file || '').split('/').pop();
+                        const shortFile = (frame.file || '').split(/[\\/]/).pop();
                         const loc = this.escapeHtml(shortFile) + ':' + frame.line;
                         const fn = this.escapeHtml(frame.function || '');
                         html += '<div class="stack-frame">';

@@ -185,6 +185,10 @@ async def list_users_with_posts_n_plus_one(
 
     users = await user_repo.list(LimitOffset(limit=10, offset=0))
 
+    # ANTI-PATTERN DEMO: The loop below fetches ALL posts for EVERY user iteration,
+    # creating repeated identical queries from the same code location. This is
+    # intentionally inefficient to demonstrate N+1 detection. In production,
+    # use eager loading (joinedload/selectinload) or batch fetching instead.
     results = []
     for user in users:
         posts = await post_repo.list(LimitOffset(limit=100, offset=0))
@@ -327,8 +331,9 @@ async def seed_sample_data() -> None:
     async with db_config.get_engine().begin() as conn:
         session = AsyncSession(bind=conn)
 
-        result = await session.execute(select(User).limit(1))
-        if result.scalar_one_or_none() is not None:
+        user_result = await session.execute(select(User).limit(1))
+        post_result = await session.execute(select(Post).limit(1))
+        if user_result.scalar_one_or_none() is not None and post_result.scalar_one_or_none() is not None:
             return
 
         users = [
