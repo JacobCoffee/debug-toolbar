@@ -54,7 +54,7 @@ class TraceMallocBackend(MemoryBackend):
 
         self._snapshot_after = tracemalloc.take_snapshot()
 
-        _current, self._peak_memory = tracemalloc.get_traced_memory()
+        self._peak_memory = tracemalloc.get_traced_memory()[1]
 
         if not self._was_running:
             tracemalloc.stop()

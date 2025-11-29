@@ -38,11 +38,12 @@ class MemrayBackend(MemoryBackend):
     Limitations:
         - Linux/macOS only (no Windows support)
         - Requires memray to be installed
+        - Requires psutil to be installed for RSS memory measurement
         - File-based tracking (creates temp files)
         - Higher overhead than tracemalloc
 
     Note:
-        Memray is an optional dependency. If not available, the panel
+        Memray and psutil are optional dependencies. If not available, the panel
         will gracefully fall back to tracemalloc.
     """
 
@@ -54,6 +55,7 @@ class MemrayBackend(MemoryBackend):
         self._memory_before: int = 0
         self._memory_after: int = 0
         self._peak_memory: int = 0
+        self._top_allocations: list[dict[str, Any]] = []
 
     def start(self) -> None:
         """Begin memory tracking with memray."""
@@ -103,6 +105,8 @@ class MemrayBackend(MemoryBackend):
                     reader = memray.FileReader(str(self._output_file))
                     self._peak_memory = reader.metadata.peak_memory
 
+                self._top_allocations = self._extract_allocations()
+
             except Exception as e:
                 logger.warning("Failed to stop memray tracker: %s", e)
             finally:
@@ -122,14 +126,12 @@ class MemrayBackend(MemoryBackend):
 
         memory_delta = self._memory_after - self._memory_before
 
-        top_allocations = self._extract_allocations()
-
         return {
             "memory_before": self._memory_before,
             "memory_after": self._memory_after,
             "memory_delta": memory_delta,
             "peak_memory": self._peak_memory,
-            "top_allocations": top_allocations,
+            "top_allocations": self._top_allocations,
             "backend": "memray",
             "profiling_overhead": self._profiling_overhead,
         }
