@@ -114,6 +114,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#logging-panel">Logging Panel</a></li>
 <li><a class="reference internal" href="#versions-panel">Versions Panel</a></li>
 <li><a class="reference internal" href="#routes-panel-litestar">Routes Panel (Litestar)</a></li>
+<li><a class="reference internal" href="#events-panel-litestar">Events Panel (Litestar)</a></li>
 <li><a class="reference internal" href="#sqlalchemy-panel-extra">SQLAlchemy Panel (Extra)</a></li>
 </ul>
 </div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
@@ -211,6 +212,24 @@ data-aria-dark="Switch to auto color mode">
 <li><p>HTTP methods</p></li>
 <li><p>Handler names</p></li>
 <li><p>Current matched route</p></li>
+</ul>
+</section>
+<section id="events-panel-litestar">
+<h2>Events Panel (Litestar)<a class="headerlink" href="#events-panel-litestar" title="Link to this heading">¶</a></h2>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">EventsPanel</span></code></p>
+<p>Litestar-specific panel showing lifecycle events and handlers:</p>
+<ul class="simple">
+<li><p><strong>Lifecycle hooks</strong>: <code class="docutils literal notranslate"><span class="pre">on_startup</span></code>, <code class="docutils literal notranslate"><span class="pre">on_shutdown</span></code> handlers</p></li>
+<li><p><strong>Request hooks</strong>: <code class="docutils literal notranslate"><span class="pre">before_request</span></code>, <code class="docutils literal notranslate"><span class="pre">after_request</span></code>, <code class="docutils literal notranslate"><span class="pre">after_response</span></code> handlers</p></li>
+<li><p><strong>Exception handlers</strong>: Registered exception handlers with their exception types</p></li>
+<li><p>Handler function details (name, module, file location, line number)</p></li>
+<li><p>Total hook count and execution statistics</p></li>
+</ul>
+<p>This panel helps you understand:</p>
+<ul class="simple">
+<li><p>What lifecycle hooks are registered in your application</p></li>
+<li><p>Which exception handlers are configured</p></li>
+<li><p>The source location of each handler for easy debugging</p></li>
 </ul>
 </section>
 <section id="sqlalchemy-panel-extra">
