@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import platform
@@ -81,6 +82,10 @@ class MemrayBackend(MemoryBackend):
 
         except ImportError as e:
             logger.warning("Failed to initialize memray backend: %s", e)
+            if self._tracker is not None:
+                with contextlib.suppress(Exception):
+                    self._tracker.__exit__(None, None, None)
+            self._cleanup_temp_file()
             self._tracker = None
             self._output_file = None
 
@@ -170,7 +175,7 @@ class MemrayBackend(MemoryBackend):
                         }
                     )
 
-            return allocations[:TOP_ALLOCATIONS_LIMIT]
+            return allocations
 
         except Exception as e:
             logger.warning("Failed to extract memray allocations: %s", e)
@@ -208,6 +213,7 @@ class MemrayBackend(MemoryBackend):
 
         try:
             import memray  # noqa: F401  # type: ignore[import-untyped]
+            import psutil  # noqa: F401  # type: ignore[import-untyped]
 
             return True
         except ImportError:
