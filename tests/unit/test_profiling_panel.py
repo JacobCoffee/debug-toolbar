@@ -440,6 +440,5 @@ class TestProfilingPanelFlamegraph:
         if "flamegraph_available" in stats:
             has_data = "flamegraph_data" in stats and stats["flamegraph_data"] is not None
             assert stats["flamegraph_available"] == has_data, (
-                f"flamegraph_available={stats['flamegraph_available']} but "
-                f"flamegraph_data presence is {has_data}"
+                f"flamegraph_available={stats['flamegraph_available']} but flamegraph_data presence is {has_data}"
             )
