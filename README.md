@@ -70,6 +70,10 @@
 - **Dark/Light Themes**: Toggle between dark and light themes
 - **Flexible Positioning**: Place toolbar on any edge (left, right, top, bottom)
 - **SQL Query Analysis**: EXPLAIN query plans for PostgreSQL, SQLite, MySQL, MariaDB
+- **N+1 Detection**: Automatic detection of N+1 query patterns with fix suggestions
+- **Flame Graphs**: Interactive profiling visualization in speedscope format
+- **Memory Profiling**: Multi-backend support (tracemalloc, memray)
+- **Proactive Alerts**: Automatic detection of security, performance, and database issues
 
 ## Installation
 
@@ -154,9 +158,16 @@ app = toolbar.wrap(your_asgi_app)
 | **Response** | Status code, response headers |
 | **Logging** | Log records captured during request |
 | **Versions** | Python and package versions |
+| **Headers** | Categorized headers with security analysis |
+| **Settings** | Application configuration viewer |
+| **Templates** | Jinja2/Mako render tracking |
+| **Profiling** | cProfile/pyinstrument with flame graphs |
+| **Alerts** | Proactive security/performance issue detection |
+| **Memory** | Memory profiling (tracemalloc/memray) |
+| **Cache** | Redis/memcached operation tracking |
 | **Routes** | Application routes (Litestar-specific) |
 | **Events** | Lifecycle hooks and exception handlers (Litestar-specific) |
-| **SQLAlchemy** | Query tracking (requires `advanced-alchemy` extra) |
+| **SQLAlchemy** | Query tracking with N+1 detection (requires `advanced-alchemy` extra) |
 
 ## Configuration
 
@@ -212,19 +223,23 @@ make ci
 ```
 debug_toolbar/
 ├── core/           # Framework-agnostic core
-│   ├── panels/     # Built-in panels (timer, request, response, logging, versions)
+│   ├── panels/     # Built-in panels
+│   │   ├── timer.py, request.py, response.py  # Default panels
+│   │   ├── headers.py, settings.py            # Optional panels
+│   │   ├── profiling.py, memory/, alerts.py   # Advanced panels
+│   │   └── templates.py, cache.py             # Integration panels
 │   ├── config.py   # DebugToolbarConfig
 │   ├── context.py  # RequestContext (contextvars-based)
 │   ├── panel.py    # Panel base class
 │   ├── storage.py  # LRU request history storage
 │   └── toolbar.py  # DebugToolbar manager
 ├── litestar/       # Litestar integration
-│   ├── panels/     # Litestar-specific panels (routes)
+│   ├── panels/     # Litestar-specific panels (routes, events)
 │   ├── config.py   # LitestarDebugToolbarConfig
 │   ├── middleware.py
 │   └── plugin.py   # DebugToolbarPlugin
 └── extras/         # Optional integrations
-    └── advanced_alchemy/  # SQLAlchemy panel
+    └── advanced_alchemy/  # SQLAlchemy panel with N+1 detection
 ```
 
 ## Versioning

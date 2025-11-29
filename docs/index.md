@@ -145,6 +145,10 @@ app = Litestar(
 - **Flexible Positioning**: Left, right, top, or bottom
 - **SQL Analysis**: EXPLAIN plans for PostgreSQL, SQLite, MySQL, MariaDB
 - **N+1 Detection**: Automatic detection of N+1 query patterns with fix suggestions
+- **Flame Graphs**: Interactive profiling visualization in speedscope format
+- **Memory Profiling**: Multi-backend support (tracemalloc, memray)
+- **Proactive Alerts**: Automatic security, performance, and database issue detection
+- **Lifecycle Events**: Track Litestar hooks and exception handlers
 
 ## Screenshots
 

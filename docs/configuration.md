@@ -111,6 +111,37 @@ config = LitestarDebugToolbarConfig(
 )
 ```
 
+### `memory_backend`
+
+**Type**: `Literal["tracemalloc", "memray", "auto"]`
+**Default**: `"auto"`
+
+Memory profiling backend selection:
+- `"tracemalloc"`: Python's built-in memory tracer (always available)
+- `"memray"`: Bloomberg's advanced profiler (requires `pip install memray`, Linux/macOS only)
+- `"auto"`: Automatically selects best available backend
+
+### `panel_display_depth`
+
+**Type**: `int`
+**Default**: `10`
+
+Maximum depth for nested data rendering in panels.
+
+### `panel_display_max_items`
+
+**Type**: `int`
+**Default**: `100`
+
+Maximum items to show in arrays/objects before truncation.
+
+### `panel_display_max_string`
+
+**Type**: `int`
+**Default**: `1000`
+
+Maximum string length before truncation.
+
 ## Environment-Based Configuration
 
 Common pattern for different environments:

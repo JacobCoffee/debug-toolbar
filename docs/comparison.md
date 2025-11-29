@@ -40,7 +40,7 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 | **Duplicate Detection** | **Yes** | No | No | No | No |
 | **Slow Query Highlighting** | **Yes** | No | No | No | Yes |
 | **EXPLAIN Plans** | **Yes** | **Yes** | No | No | Yes |
-| **N+1 Detection** | Planned | No | No | No | Yes |
+| **N+1 Detection** | **Yes** | No | No | No | Yes |
 
 ### Profiling & Performance
 
@@ -48,7 +48,7 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 |-------|:----:|:------:|:-----:|:-------:|:---------:|
 | **cProfile** | **Yes** | Yes | Yes | No | No |
 | **pyinstrument** | **Yes** | No | No | **Yes** | No |
-| **Flame Graphs** | No | Plugin | No | No | No |
+| **Flame Graphs** | **Yes** | Plugin | No | No | No |
 | **CPU Time (user/sys)** | **Yes** | Yes | Yes | No | No |
 | **Server-Timing Header** | **Yes** | No | No | No | No |
 | **Distributed Tracing** | No | No | No | No | **Yes** |
@@ -82,9 +82,9 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 | **Snapshot Switching** | Basic | **Yes** | No | No | **Yes** |
 | **GraphQL Support** | No | No | No | **Yes** | No |
 | **WebSocket Support** | No | No | No | No | No |
-| **Signals/Events Panel** | No | **Yes** | No | No | No |
+| **Signals/Events Panel** | **Yes** | **Yes** | No | No | No |
 | **Static Files Panel** | No | **Yes** | No | No | No |
-| **Alerts Panel** | No | **Yes** | No | No | **Yes** |
+| **Alerts Panel** | **Yes** | **Yes** | No | No | **Yes** |
 | **AI/MCP Integration** | No | No | No | No | **Yes** |
 | **Desktop App** | No | No | No | No | **Yes** |
 | **Multi-Service** | No | No | No | No | **Yes** |
@@ -100,9 +100,12 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 - **Full ASGI compliance** without blocking operations
 - **Server-Timing header support** (W3C standard)
 - **Security-focused**: Header analysis, CORS detection, sensitive data redaction
-- **Multiple profiler backends**: cProfile and pyinstrument
+- **Multiple profiler backends**: cProfile and pyinstrument with flame graphs
 - **Cache tracking** for Redis and Memcached with hit/miss stats
-- **Duplicate query detection** for SQLAlchemy
+- **Advanced SQL analysis**: Duplicate detection, N+1 detection, EXPLAIN plans
+- **Memory profiling**: tracemalloc and memray backends
+- **Proactive alerts**: Automatic detection of security, performance, and database issues
+- **Lifecycle tracking**: Events panel for Litestar hooks and exception handlers
 - **Framework-agnostic core** (can support other ASGI frameworks)
 
 **Best For:** Modern async Python applications using Litestar, SQLAlchemy, Redis
@@ -173,20 +176,25 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 5. **SQLAlchemy duplicate query detection**
 6. **Async-safe cache tracking** for Redis/Memcached
 7. **EXPLAIN query plans** for PostgreSQL, SQLite, MySQL, MariaDB
+8. **Flame graph visualization** in speedscope format
+9. **N+1 query detection** with call stack and fix suggestions
+10. **Multi-backend memory profiling** (tracemalloc + memray)
+11. **Proactive alerts panel** for security, performance, and database issues
 
 ### What We're Missing (Roadmap)
 
-#### High Priority (Phase 8)
-- ~~**EXPLAIN plan integration** for SQL queries~~ ✅ Done!
-- **N+1 query detection** with call stack
-- **Event/Signal panel** for Litestar lifecycle events
-- **Alerts panel** for common issues
+#### Completed Features
+- ~~EXPLAIN plan integration for SQL queries~~ Done
+- ~~N+1 query detection with call stack~~ Done
+- ~~Event/Signal panel for Litestar lifecycle events~~ Done
+- ~~Alerts panel for common issues~~ Done
+- ~~Memory profiling panel~~ Done
+- ~~Flame graph visualization~~ Done
 
 #### Medium Priority (Phase 9)
 - **GraphQL panel** for query inspection
 - **WebSocket panel** for WS debugging
 - **Background tasks panel** (SAQ/Celery)
-- **Memory profiling panel**
 
 #### Future Vision (Phase 10+)
 - **AI/MCP integration** for AI-assisted debugging
@@ -201,20 +209,19 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 ### From Django Debug Toolbar
 
 If migrating from Django to Litestar:
-- TimerPanel → TimerPanel (equivalent)
-- SQLPanel → SQLAlchemyPanel (use Advanced-Alchemy)
-- HeadersPanel → HeadersPanel (enhanced)
-- SettingsPanel → SettingsPanel (equivalent)
-- ProfilingPanel → ProfilingPanel (enhanced with pyinstrument)
-
-Missing: SignalsPanel (use Litestar lifecycle hooks instead)
+- TimerPanel -> TimerPanel (equivalent)
+- SQLPanel -> SQLAlchemyPanel (use Advanced-Alchemy)
+- HeadersPanel -> HeadersPanel (enhanced with security analysis)
+- SettingsPanel -> SettingsPanel (equivalent)
+- ProfilingPanel -> ProfilingPanel (enhanced with pyinstrument and flame graphs)
+- SignalsPanel -> EventsPanel (Litestar lifecycle hooks and exception handlers)
 
 ### From FastAPI Debug Toolbar
 
-- SQLAlchemyPanel → SQLAlchemyPanel (equivalent)
-- Default panels → Core panels (TimerPanel, RequestPanel, etc.)
+- SQLAlchemyPanel -> SQLAlchemyPanel (equivalent, with N+1 detection)
+- Default panels -> Core panels (TimerPanel, RequestPanel, etc.)
 
-Added: CachePanel, TemplatesPanel, HeadersPanel (categorized), ProfilingPanel
+Added: CachePanel, TemplatesPanel, HeadersPanel (categorized), ProfilingPanel (with flame graphs), AlertsPanel, MemoryPanel, EventsPanel
 
 ---
 
@@ -235,14 +242,16 @@ Added: CachePanel, TemplatesPanel, HeadersPanel (categorized), ProfilingPanel
 
 **debug-toolbar** excels in:
 - Modern async Python applications
-- Security-conscious debugging
-- Performance analysis with W3C Server-Timing
-- SQLAlchemy query optimization
+- Security-conscious debugging with proactive alerts
+- Performance analysis with W3C Server-Timing and flame graphs
+- SQLAlchemy query optimization with N+1 detection
+- Memory profiling with multiple backends
+- Comprehensive lifecycle event tracking
 
 **Choose Django Debug Toolbar** if you need:
-- Django-specific features (signals, static files)
+- Django-specific features (static files, Django templates)
 - Largest plugin ecosystem
-- EXPLAIN plan integration
+- Long-term stability (10+ years)
 
 **Choose Sentry Spotlight** if you need:
 - AI-assisted debugging

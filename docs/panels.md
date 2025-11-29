@@ -1,6 +1,30 @@
 # Built-in Panels
 
-## Core Panels
+The debug toolbar ships with a comprehensive set of panels for debugging and profiling your application.
+
+## Panel Quick Reference
+
+| Panel | Category | Auto-Enabled | Description |
+|-------|----------|--------------|-------------|
+| Timer | Default | Yes | Request timing and CPU time |
+| Request | Default | Yes | HTTP method, path, headers, cookies |
+| Response | Default | Yes | Status code, response headers |
+| Logging | Default | Yes | Log records captured during request |
+| Versions | Default | Yes | Python and package versions |
+| Headers | Optional | No | Categorized headers with security analysis |
+| Settings | Optional | No | Application configuration viewer |
+| Templates | Optional | No | Jinja2/Mako render tracking |
+| Profiling | Optional | No | cProfile/pyinstrument with flame graphs |
+| Alerts | Optional | No | Proactive issue detection |
+| Memory | Optional | No | Memory profiling (tracemalloc/memray) |
+| Cache | Optional | No | Redis/memcached tracking |
+| Routes | Litestar | Yes | Application routes |
+| Events | Litestar | Yes | Lifecycle hooks and exception handlers |
+| SQLAlchemy | Extra | No | Query tracking with N+1 detection |
+
+## Default Panels
+
+These panels are enabled by default and provide essential debugging information.
 
 ### Timer Panel
 
@@ -56,6 +80,10 @@ Shows environment information:
 - Python version
 - Platform details
 - Installed packages
+
+## Optional Core Panels
+
+These panels are available out of the box but must be explicitly enabled via `extra_panels` in your configuration.
 
 ### Headers Panel
 
@@ -159,13 +187,12 @@ Proactive issue detection panel that automatically identifies:
 - Debug mode enabled in production
 
 **Performance Issues**:
-- Large response sizes (warning at 1MB, critical at 10MB)
-- Slow SQL queries (configurable threshold)
+- Large response sizes (warning at 1MB, critical at 5MB)
+- Slow SQL queries (warning at 100ms, critical at 500ms)
 
 **Database Issues**:
-- N+1 query pattern detection
-- Excessive query counts from same code location
-- Optimization suggestions
+- N+1 query pattern detection (warning at 3+ similar queries, critical at 10+)
+- Optimization suggestions with eager loading recommendations
 
 Each alert includes:
 - Severity level (info, warning, critical)

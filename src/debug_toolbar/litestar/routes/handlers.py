@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 DEFAULT_DISPLAY_DEPTH = 10
 DEFAULT_MAX_ITEMS = 100
 DEFAULT_MAX_STRING = 1000
+BYTES_PER_KB = 1024
 
 
 def _escape_html(text: str) -> str:
@@ -73,16 +74,199 @@ def _format_value(  # noqa: PLR0911, PLR0912, C901
     return f"<span class='unknown'>{_escape_html(str(value)[:max_string])}</span>"
 
 
-def _render_panel_content(stats: dict[str, Any]) -> str:
-    """Render panel content as HTML."""
+def _render_panel_content(stats: dict[str, Any], panel_id: str = "") -> str:
+    """Render panel content as HTML with special handling for certain panels."""
     if not stats:
         return "<p class='empty'>No data</p>"
+
+    # Special rendering for Alerts panel
+    if panel_id == "AlertsPanel":
+        return _render_alerts_panel(stats)
+
+    # Special rendering for Memory panel
+    if panel_id == "MemoryPanel":
+        return _render_memory_panel(stats)
+
+    # Special rendering for Profiling panel (show flame graph button)
+    if panel_id == "ProfilingPanel":
+        return _render_profiling_panel(stats)
+
+    # Default table rendering
     rows = []
     for key, value in stats.items():
         escaped_key = _escape_html(str(key))
         formatted_value = _format_value(value)
         rows.append(f"<tr><td class='key'>{escaped_key}</td><td class='value'>{formatted_value}</td></tr>")
     return f"<table class='panel-table'><tbody>{''.join(rows)}</tbody></table>"
+
+
+def _render_alerts_panel(stats: dict[str, Any]) -> str:
+    """Render alerts panel with severity-colored cards."""
+    alerts = stats.get("alerts", [])
+    if not alerts:
+        return "<p class='empty alert-success'>✓ No issues detected</p>"
+
+    severity_colors = {
+        "critical": "#dc2626",
+        "warning": "#f59e0b",
+        "info": "#3b82f6",
+    }
+    severity_icons = {
+        "critical": "🚨",
+        "warning": "⚠️",
+        "info": "(i)",
+    }
+    category_icons = {
+        "security": "🔒",
+        "performance": "⚡",
+        "database": "🗄️",
+        "configuration": "⚙️",
+    }
+
+    html = f"<div class='alerts-summary'><strong>{len(alerts)}</strong> issue(s) detected</div>"
+    html += "<div class='alerts-container'>"
+
+    for alert in alerts:
+        severity = alert.get("severity", "info")
+        category = alert.get("category", "")
+        title = _escape_html(alert.get("title", "Alert"))
+        message = _escape_html(alert.get("message", ""))
+        suggestion = alert.get("suggestion", "")
+
+        color = severity_colors.get(severity, "#6b7280")
+        icon = severity_icons.get(severity, "•")
+        cat_icon = category_icons.get(category, "")
+
+        html += f"""
+        <div class='alert-card alert-{severity}' style='border-left-color: {color}'>
+            <div class='alert-header'>
+                <span class='alert-icon'>{icon}</span>
+                <span class='alert-title'>{title}</span>
+                <span class='alert-category'>{cat_icon} {_escape_html(category)}</span>
+            </div>
+            <div class='alert-message'>{message}</div>
+        """
+        if suggestion:
+            html += f"<div class='alert-suggestion'>💡 {_escape_html(suggestion)}</div>"
+        html += "</div>"
+
+    html += "</div>"
+    return html
+
+
+def _render_memory_panel(stats: dict[str, Any]) -> str:
+    """Render memory panel with allocation details."""
+    html = "<div class='memory-panel'>"
+
+    # Summary stats
+    peak = stats.get("peak_memory", 0)
+    current = stats.get("current_memory", 0)
+    alloc_count = stats.get("allocation_count", 0)
+    backend = stats.get("backend", "unknown")
+
+    html += f"""
+    <div class='memory-summary'>
+        <div class='memory-stat'>
+            <span class='stat-value'>{_format_bytes(peak)}</span>
+            <span class='stat-label'>Peak Memory</span>
+        </div>
+        <div class='memory-stat'>
+            <span class='stat-value'>{_format_bytes(current)}</span>
+            <span class='stat-label'>Current</span>
+        </div>
+        <div class='memory-stat'>
+            <span class='stat-value'>{alloc_count}</span>
+            <span class='stat-label'>Allocations</span>
+        </div>
+        <div class='memory-stat'>
+            <span class='stat-value'>{_escape_html(backend)}</span>
+            <span class='stat-label'>Backend</span>
+        </div>
+    </div>
+    """
+
+    # Top allocations
+    top_allocs = stats.get("top_allocations", [])
+    if top_allocs:
+        html += "<h4>Top Allocations</h4>"
+        html += "<div class='allocations-list'>"
+        for alloc in top_allocs[:10]:
+            size = alloc.get("size", 0)
+            location = _escape_html(alloc.get("location", "unknown"))
+            count = alloc.get("count", 1)
+            html += f"""
+            <div class='allocation-item'>
+                <span class='alloc-size'>{_format_bytes(size)}</span>
+                <span class='alloc-location'>{location}</span>
+                <span class='alloc-count'>x{count}</span>
+            </div>
+            """
+        html += "</div>"
+
+    html += "</div>"
+    return html
+
+
+def _render_profiling_panel(stats: dict[str, Any]) -> str:
+    """Render profiling panel with flame graph button."""
+    html = "<div class='profiling-panel'>"
+
+    # Stats
+    total_time = stats.get("total_time", 0)
+    function_count = stats.get("function_count", 0)
+    has_flamegraph = stats.get("flamegraph_data") is not None
+
+    html += f"""
+    <div class='profiling-summary'>
+        <div class='prof-stat'>
+            <span class='stat-value'>{total_time * 1000:.2f}ms</span>
+            <span class='stat-label'>Total Time</span>
+        </div>
+        <div class='prof-stat'>
+            <span class='stat-value'>{function_count}</span>
+            <span class='stat-label'>Functions</span>
+        </div>
+    </div>
+    """
+
+    if has_flamegraph:
+        html += """
+        <div class='flamegraph-actions'>
+            <button class='flamegraph-btn' onclick='downloadFlamegraph()'>
+                🔥 Download Flame Graph
+            </button>
+            <a class='flamegraph-link' href='https://www.speedscope.app/' target='_blank'>
+                Open speedscope.app →
+            </a>
+        </div>
+        <p class='flamegraph-hint'>Download the JSON and upload to speedscope.app to visualize</p>
+        """
+    else:
+        html += "<p class='empty'>Flame graph not available for this request</p>"
+
+    # Top functions
+    top_funcs = stats.get("top_functions", [])
+    if top_funcs:
+        html += "<h4>Top Functions by Time</h4>"
+        html += "<table class='panel-table'><tbody>"
+        for func in top_funcs[:10]:
+            name = _escape_html(func.get("name", "unknown"))
+            time_ms = func.get("cumulative_time", 0) * 1000
+            calls = func.get("calls", 0)
+            html += f"<tr><td class='key'>{name}</td><td class='value'>{time_ms:.2f}ms ({calls} calls)</td></tr>"
+        html += "</tbody></table>"
+
+    html += "</div>"
+    return html
+
+
+def _format_bytes(size: float) -> str:
+    """Format bytes to human readable string."""
+    for unit in ["B", "KB", "MB", "GB"]:
+        if abs(size) < BYTES_PER_KB:
+            return f"{size:.1f} {unit}"
+        size /= BYTES_PER_KB
+    return f"{size:.1f} TB"
 
 
 def _render_request_row(request_id: UUID, data: dict[str, Any]) -> str:
@@ -194,7 +378,7 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
 
         panels_html = []
         for panel_id, stats in panel_data.items():
-            panel_content = _render_panel_content(stats)
+            panel_content = _render_panel_content(stats, panel_id)
             # Sanitize panel_id for use in HTML id and JS (alphanumeric + underscore only)
             panel_id_class = "".join(c for c in str(panel_id) if c.isalnum() or c == "_")
             panel_title = _escape_html(str(panel_id).replace("Panel", ""))
@@ -1384,6 +1568,181 @@ body {
     gap: 8px;
     color: var(--dt-text-secondary);
 }
+
+/* Alerts Panel Styles */
+.alerts-summary {
+    padding: 12px 16px;
+    background: var(--dt-bg-tertiary);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    color: var(--dt-warning);
+}
+
+.alert-success {
+    color: var(--dt-success) !important;
+    background: rgba(78, 201, 176, 0.1);
+    padding: 16px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alert-card {
+    background: var(--dt-bg-secondary);
+    border-radius: 6px;
+    border-left: 4px solid;
+    padding: 12px 16px;
+}
+
+.alert-critical { border-left-color: #dc2626; background: rgba(220, 38, 38, 0.1); }
+.alert-warning { border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.alert-info { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+
+.alert-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.alert-icon { font-size: 16px; }
+.alert-title { font-weight: 600; color: var(--dt-text-primary); flex: 1; }
+.alert-category { font-size: 11px; color: var(--dt-text-muted); text-transform: uppercase; }
+.alert-message { color: var(--dt-text-secondary); font-size: 13px; line-height: 1.5; }
+.alert-suggestion {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--dt-success);
+}
+
+/* Memory Panel Styles */
+.memory-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
+
+.memory-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.memory-stat {
+    background: var(--dt-bg-secondary);
+    padding: 12px 16px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dt-accent);
+    font-family: var(--dt-font-mono);
+}
+
+.stat-label {
+    display: block;
+    font-size: 11px;
+    color: var(--dt-text-muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.allocations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.allocation-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--dt-bg-secondary);
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: var(--dt-font-mono);
+}
+
+.alloc-size {
+    min-width: 80px;
+    color: var(--dt-warning);
+    font-weight: 600;
+}
+
+.alloc-location {
+    flex: 1;
+    color: var(--dt-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.alloc-count {
+    color: var(--dt-text-muted);
+}
+
+/* Profiling Panel Styles */
+.profiling-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
+
+.profiling-summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.prof-stat {
+    background: var(--dt-bg-secondary);
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.flamegraph-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.flamegraph-btn {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.flamegraph-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+}
+
+.flamegraph-link {
+    color: var(--dt-accent);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.flamegraph-link:hover { text-decoration: underline; }
+
+.flamegraph-hint {
+    font-size: 12px;
+    color: var(--dt-text-muted);
+    margin: 8px 0 16px;
+}
 """
 
 
@@ -1395,6 +1754,25 @@ function togglePageTheme(btn) {
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     localStorage.setItem('debug-toolbar-theme', next);
+}
+
+function downloadFlamegraph() {
+    // Get request ID from URL or page
+    const pathParts = window.location.pathname.split('/');
+    const requestId = pathParts[pathParts.length - 1];
+    if (!requestId || requestId === '_debug_toolbar') {
+        alert('Could not determine request ID');
+        return;
+    }
+
+    // Trigger download
+    const downloadUrl = '/_debug_toolbar/api/flamegraph/' + requestId;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'flamegraph-' + requestId.substring(0, 8) + '.speedscope.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function togglePanel(panelId) {

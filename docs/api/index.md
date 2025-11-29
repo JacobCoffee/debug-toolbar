@@ -220,6 +220,48 @@ Complete API documentation for debug-toolbar.
    :cvar profiler_backend: "cprofile" or "pyinstrument"
 ```
 
+### Alerts Panel
+
+```{eval-rst}
+.. py:class:: debug_toolbar.core.panels.alerts.AlertsPanel
+
+   Proactive issue detection panel.
+
+   **Detection Categories:**
+
+   - Security: Missing headers, insecure cookies, CSRF issues
+   - Performance: Large responses, slow queries
+   - Database: N+1 patterns, query optimization
+   - Configuration: Debug mode in production
+
+   **Stats:**
+
+   - ``alerts``: List of detected alerts with severity and suggestions
+   - ``total_alerts``: Total alert count
+   - ``by_severity``: Counts by severity level
+   - ``by_category``: Counts by category
+```
+
+### Memory Panel
+
+```{eval-rst}
+.. py:class:: debug_toolbar.core.panels.memory.MemoryPanel
+
+   Memory profiling with multiple backend support.
+
+   **Backends:**
+
+   - ``tracemalloc``: Built-in Python tracer (default)
+   - ``memray``: Advanced profiler (Linux/macOS, requires install)
+
+   **Stats:**
+
+   - ``memory_before``: Memory at request start
+   - ``memory_after``: Memory at request end
+   - ``memory_delta``: Memory change during request
+   - ``top_allocations``: Largest allocations by file/line
+```
+
 ### SQLAlchemy Panel
 
 ```{eval-rst}
@@ -233,13 +275,45 @@ Complete API documentation for debug-toolbar.
    - ``total_queries``: Query count
    - ``total_time``: Total query time
    - ``duplicate_queries``: Detected duplicate queries
+   - ``n_plus_one_groups``: Detected N+1 query patterns
 
    **Features:**
 
    - Query timing
    - Parameter display
    - Duplicate detection
+   - N+1 query detection with fix suggestions
    - EXPLAIN query plans (PostgreSQL, SQLite, MySQL, MariaDB)
+```
+
+## Litestar-Specific Panels
+
+### Routes Panel
+
+```{eval-rst}
+.. py:class:: debug_toolbar.litestar.panels.routes.RoutesPanel
+
+   Displays all registered routes in the Litestar application.
+
+   **Stats:**
+
+   - ``routes``: List of all routes with methods and handlers
+   - ``current_route``: The matched route for this request
+```
+
+### Events Panel
+
+```{eval-rst}
+.. py:class:: debug_toolbar.litestar.panels.events.EventsPanel
+
+   Tracks Litestar lifecycle events and hooks.
+
+   **Stats:**
+
+   - ``lifecycle_hooks``: on_startup, on_shutdown handlers
+   - ``request_hooks``: before_request, after_request, after_response handlers
+   - ``exception_handlers``: Registered exception handlers
+   - ``executed_hooks``: Hooks that ran during this request
 ```
 
 ## Module Reference
@@ -253,7 +327,9 @@ Complete API documentation for debug-toolbar.
    debug_toolbar.core.context
    debug_toolbar.core.storage
    debug_toolbar.core.toolbar
+   debug_toolbar.core.panels
    debug_toolbar.litestar.plugin
    debug_toolbar.litestar.config
    debug_toolbar.litestar.middleware
+   debug_toolbar.litestar.panels
 ```
