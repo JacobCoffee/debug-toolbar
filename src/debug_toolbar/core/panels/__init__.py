@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from debug_toolbar.core.panels.alerts import AlertsPanel
 from debug_toolbar.core.panels.cache import CachePanel
 from debug_toolbar.core.panels.headers import HeadersPanel
 from debug_toolbar.core.panels.logging import LoggingPanel
@@ -14,6 +15,7 @@ from debug_toolbar.core.panels.timer import TimerPanel
 from debug_toolbar.core.panels.versions import VersionsPanel
 
 __all__ = [
+    "AlertsPanel",
     "CachePanel",
     "HeadersPanel",
     "LoggingPanel",

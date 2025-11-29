@@ -24,11 +24,10 @@ from advanced_alchemy.extensions.litestar import (
 )
 from advanced_alchemy.filters import LimitOffset
 from advanced_alchemy.repository import SQLAlchemyAsyncRepository
+from litestar import Litestar, MediaType, delete, get, post
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
-
-from litestar import Litestar, MediaType, delete, get, post
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
@@ -94,6 +93,7 @@ async def index() -> str:
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics!</p>
+    <p><strong>Note:</strong> The Alerts Panel will automatically warn you about N+1 queries and other issues!</p>
     <h2>Toolbar Controls</h2>
     <ul>
         <li>Use arrow buttons (&lt; &gt; ^ v) to move the toolbar to different positions</li>
@@ -226,6 +226,7 @@ a:hover {{ color: #93c5fd; }}
     <div class="warning">
         <strong>Warning:</strong> This page deliberately triggers N+1 queries for demonstration!
         <br>Check the SQL panel in the debug toolbar to see the N+1 detection in action.
+        <br>Also check the <strong>Alerts Panel</strong> for automatic warnings about the N+1 query pattern!
     </div>
     <table>
         <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Post Count</th></tr></thead>
@@ -313,6 +314,7 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.headers.HeadersPanel",
         "debug_toolbar.core.panels.settings.SettingsPanel",
         "debug_toolbar.core.panels.profiling.ProfilingPanel",
+        "debug_toolbar.core.panels.alerts.AlertsPanel",
     ],
 )
 
