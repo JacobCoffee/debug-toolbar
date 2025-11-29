@@ -235,7 +235,7 @@ h1 {{ color: #f5a623; }}
     border-left: 4px solid #eab308; padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #fbbf24; }}
 .warning strong {{ color: #fcd34d; }}
 table {{ border-collapse: collapse; background: #16213e; }}
-th, td {{ border: 1px solid #334155; padding: 8px 12px; text-align: left; }}
+th, td {{ border: 1px solid #334155; padding: 8px 12px; text-align: left; background: #16213e; color: #e2e8f0; }}
 th {{ background: #1e3a5f; color: #93c5fd; }}
 a {{ color: #60a5fa; }}
 a:hover {{ color: #93c5fd; }}
@@ -248,7 +248,7 @@ a:hover {{ color: #93c5fd; }}
         border-left: 4px solid #d97706; color: #92400e; }}
     .warning strong {{ color: #78350f; }}
     table {{ background: #fff; }}
-    th, td {{ border: 1px solid #e2e8f0; }}
+    th, td {{ border: 1px solid #e2e8f0; background: #fff; color: #1e293b; }}
     th {{ background: #f1f5f9; color: #1e40af; }}
     a {{ color: #2563eb; }}
     a:hover {{ color: #1d4ed8; }}
