@@ -19,8 +19,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - package-name: debug-toolbar
-            artifact-name: dist-debug-toolbar
+          # TODO: Re-enable after PEP 541 name request is processed
+          # - package-name: debug-toolbar
+          #   artifact-name: dist-debug-toolbar
           - package-name: litestar-debug-toolbar
             artifact-name: dist-litestar-debug-toolbar
     steps:
@@ -50,8 +51,14 @@ jobs:
             new_name=$(echo "$f" | sed 's/debug_toolbar/litestar_debug_toolbar/')
             # Unpack, modify metadata, repack
             unzip -q "$f" -d tmp_wheel
-            sed -i 's/^Name: debug-toolbar$/Name: litestar-debug-toolbar/' tmp_wheel/*.dist-info/METADATA
-            sed -i 's/^Name: debug-toolbar$/Name: litestar-debug-toolbar/' tmp_wheel/*.dist-info/RECORD 2>/dev/null || true
+            # Rename dist-info directory
+            old_dist_info=$(ls -d tmp_wheel/*.dist-info)
+            new_dist_info=$(echo "$old_dist_info" | sed 's/debug_toolbar/litestar_debug_toolbar/')
+            mv "$old_dist_info" "$new_dist_info"
+            # Update METADATA
+            sed -i 's/^Name: debug-toolbar$/Name: litestar-debug-toolbar/' "$new_dist_info/METADATA"
+            # Update RECORD with new paths
+            sed -i 's/debug_toolbar-/litestar_debug_toolbar-/g' "$new_dist_info/RECORD"
             cd tmp_wheel
             zip -q -r "../$new_name" .
             cd ..
@@ -92,9 +99,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - package-name: debug-toolbar
-            artifact-name: dist-debug-toolbar
-            signed-artifact-name: dist-debug-toolbar-signed
+          # TODO: Re-enable after PEP 541 name request is processed
+          # - package-name: debug-toolbar
+          #   artifact-name: dist-debug-toolbar
+          #   signed-artifact-name: dist-debug-toolbar-signed
           - package-name: litestar-debug-toolbar
             artifact-name: dist-litestar-debug-toolbar
             signed-artifact-name: dist-litestar-debug-toolbar-signed
@@ -125,11 +133,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [sign]
     steps:
-      - name: Download debug-toolbar signed artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
-        with:
-          name: dist-debug-toolbar-signed
-          path: dist/debug-toolbar/
+      # TODO: Re-enable after PEP 541 name request is processed
+      # - name: Download debug-toolbar signed artifacts
+      #   uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+      #   with:
+      #     name: dist-debug-toolbar-signed
+      #     path: dist/debug-toolbar/
 
       - name: Download litestar-debug-toolbar signed artifacts
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
@@ -147,26 +156,27 @@ jobs:
 
   # ==================================================================================== #
   # PUBLISH TO PYPI - debug-toolbar
+  # TODO: Re-enable after PEP 541 name request is processed
   # ==================================================================================== #
-  publish-debug-toolbar:
-    name: Publish debug-toolbar to PyPI
-    runs-on: ubuntu-latest
-    needs: [draft-release]
-    environment:
-      name: pypi
-      url: https://pypi.org/project/debug-toolbar/
-    steps:
-      - name: Download dist artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
-        with:
-          name: dist-debug-toolbar
-          path: dist/
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
-        with:
-          print-hash: true
-          attestations: true
+  # publish-debug-toolbar:
+  #   name: Publish debug-toolbar to PyPI
+  #   runs-on: ubuntu-latest
+  #   needs: [draft-release]
+  #   environment:
+  #     name: pypi
+  #     url: https://pypi.org/project/debug-toolbar/
+  #   steps:
+  #     - name: Download dist artifacts
+  #       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+  #       with:
+  #         name: dist-debug-toolbar
+  #         path: dist/
+  #
+  #     - name: Publish to PyPI
+  #       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # release/v1
+  #       with:
+  #         print-hash: true
+  #         attestations: true
 
   # ==================================================================================== #
   # PUBLISH TO PYPI - litestar-debug-toolbar
@@ -197,7 +207,8 @@ jobs:
   publish-release:
     name: Publish Release
     runs-on: ubuntu-latest
-    needs: [publish-debug-toolbar, publish-litestar-debug-toolbar]
+    # TODO: Add publish-debug-toolbar back after PEP 541 name request is processed
+    needs: [publish-litestar-debug-toolbar]
     steps:
       - name: Mark Release as Published
         uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2
@@ -210,7 +221,8 @@ jobs:
   cleanup-draft:
     name: Cleanup Draft Release
     runs-on: ubuntu-latest
-    needs: [publish-debug-toolbar, publish-litestar-debug-toolbar]
+    # TODO: Add publish-debug-toolbar back after PEP 541 name request is processed
+    needs: [publish-litestar-debug-toolbar]
     if: failure()
     steps:
       - name: Delete Draft Release
