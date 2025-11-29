@@ -32,6 +32,19 @@ class TestLitestarDebugToolbarConfig:
         routes_count = sum(1 for p in panel_strings if "RoutesPanel" in p)
         assert routes_count == 1
 
+    def test_adds_events_panel(self) -> None:
+        """Test that EventsPanel is added automatically."""
+        config = LitestarDebugToolbarConfig()
+        panel_strings = [p if isinstance(p, str) else p.__name__ for p in config.panels]
+        assert "debug_toolbar.litestar.panels.events.EventsPanel" in panel_strings
+
+    def test_does_not_duplicate_events_panel(self) -> None:
+        """Test that EventsPanel is not added if already present."""
+        config = LitestarDebugToolbarConfig(panels=["debug_toolbar.litestar.panels.events.EventsPanel"])
+        panel_strings = [p for p in config.panels if isinstance(p, str)]
+        events_count = sum(1 for p in panel_strings if "EventsPanel" in p)
+        assert events_count == 1
+
     def test_should_show_toolbar_when_disabled(self) -> None:
         """Test should_show_toolbar returns False when disabled."""
         config = LitestarDebugToolbarConfig(enabled=False)

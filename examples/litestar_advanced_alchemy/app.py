@@ -313,7 +313,6 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.headers.HeadersPanel",
         "debug_toolbar.core.panels.settings.SettingsPanel",
         "debug_toolbar.core.panels.profiling.ProfilingPanel",
-        "debug_toolbar.litestar.panels.events.EventsPanel",
     ],
 )
 

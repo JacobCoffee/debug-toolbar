@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -16,8 +16,11 @@ from debug_toolbar.litestar.panels.events import (
     record_hook_execution,
 )
 
-if TYPE_CHECKING:
-    pass
+
+@pytest.fixture
+def mock_toolbar() -> MagicMock:
+    """Create a mock toolbar."""
+    return MagicMock(spec=["config"])
 
 
 def sample_handler() -> None:
@@ -40,6 +43,7 @@ class TestGetHandlerInfo:
         assert info["module"] == "tests.unit.test_events_panel"
         assert "test_events_panel.py" in info["file"]
         assert info["line"] > 0
+        assert info["qualname"] == "sample_handler"
 
     def test_get_handler_info_with_async_function(self) -> None:
         """Test extracting info from an async function."""
@@ -54,6 +58,7 @@ class TestGetHandlerInfo:
         assert info["module"] == ""
         assert info["file"] == ""
         assert info["line"] == 0
+        assert info["qualname"] == ""
 
     def test_get_handler_info_with_lambda(self) -> None:
         """Test extracting info from a lambda function."""
@@ -271,12 +276,6 @@ class TestRecordHookExecution:
         assert len(events["executed_hooks"]) == 2
         assert events["executed_hooks"][0]["hook_type"] == "before_request"
         assert events["executed_hooks"][1]["hook_type"] == "after_request"
-
-
-@pytest.fixture
-def mock_toolbar() -> MagicMock:
-    """Create a mock toolbar."""
-    return MagicMock(spec=["config"])
 
 
 class TestEventsPanel:

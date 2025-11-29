@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import inspect
 import traceback
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from debug_toolbar.core.panel import Panel
 
@@ -15,11 +15,18 @@ if TYPE_CHECKING:
 
 
 def _get_handler_info(handler: Callable[..., Any] | None) -> dict[str, Any]:
-    """Extract information about a handler function."""
-    if handler is None:
-        return {"name": "None", "module": "", "file": "", "line": 0}
+    """Extract information about a handler function.
 
-    func = handler
+    Args:
+        handler: The handler function to inspect, or None.
+
+    Returns:
+        Dictionary containing name, module, file, line, and qualname information.
+    """
+    if handler is None:
+        return {"name": "None", "module": "", "file": "", "line": 0, "qualname": ""}
+
+    func: Any = handler
     if hasattr(handler, "__wrapped__"):
         func = handler.__wrapped__
     if hasattr(handler, "func"):
@@ -29,8 +36,8 @@ def _get_handler_info(handler: Callable[..., Any] | None) -> dict[str, Any]:
     module = getattr(func, "__module__", "")
 
     try:
-        file = inspect.getfile(func)
-        _, line = inspect.getsourcelines(func)
+        file = inspect.getfile(func)  # type: ignore[arg-type]
+        _, line = inspect.getsourcelines(func)  # type: ignore[arg-type]
     except (TypeError, OSError):
         file = ""
         line = 0
@@ -45,7 +52,15 @@ def _get_handler_info(handler: Callable[..., Any] | None) -> dict[str, Any]:
 
 
 def _get_stack_frames(skip: int = 2, limit: int = 10) -> list[dict[str, Any]]:
-    """Capture the current call stack."""
+    """Capture the current call stack.
+
+    Args:
+        skip: Number of most recent frames to skip (default: 2).
+        limit: Maximum number of frames to return (default: 10).
+
+    Returns:
+        List of dictionaries containing frame information.
+    """
     frames = []
     for frame_info in traceback.extract_stack()[:-skip][-limit:]:
         frames.append(
@@ -192,4 +207,4 @@ def record_hook_execution(
         "stack": _get_stack_frames() if not success else [],
     }
 
-    context.metadata["events"]["executed_hooks"].append(execution_record)
+    cast("list[dict[str, Any]]", context.metadata["events"]["executed_hooks"]).append(execution_record)
