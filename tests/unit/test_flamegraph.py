@@ -224,7 +224,7 @@ class TestFlameGraphIntegration:
 
         frame_names = [f["name"] for f in frames]
         expected_names = ("inner_function", "middle_function", "outer_function")
-        assert any(expected in name for expected in expected_names for name in frame_names)
+        assert all(any(expected in name for name in frame_names) for expected in expected_names)
 
         profile = result["profiles"][0]
         assert profile["endValue"] > 0

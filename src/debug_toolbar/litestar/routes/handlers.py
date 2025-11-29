@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -342,8 +343,6 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
                 media_type="application/json",
                 status_code=404,
             )
-
-        import json
 
         return Response(
             content=json.dumps(flamegraph_data, indent=2),

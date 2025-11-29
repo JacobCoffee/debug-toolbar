@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 MAX_RECURSION_DEPTH = 100
 CPROFILE_FUNC_TUPLE_LENGTH = 3
+ENABLE_FLAMEGRAPH_DEFAULT = True
 
 
 class ProfilingPanel(Panel):
@@ -56,8 +57,7 @@ class ProfilingPanel(Panel):
         self._backend = self._get_backend()
         self._top_functions = self._get_config("profiler_top_functions", 50)
         self._sort_by = self._get_config("profiler_sort_by", "cumulative")
-        enable_flamegraph_default = True
-        self._enable_flamegraph = self._get_config("enable_flamegraph", enable_flamegraph_default)
+        self._enable_flamegraph = self._get_config("enable_flamegraph", ENABLE_FLAMEGRAPH_DEFAULT)
         self._profiling_overhead: float = 0.0
 
     def _get_backend(self) -> str:
@@ -194,8 +194,8 @@ class ProfilingPanel(Panel):
         if self._enable_flamegraph:
             from debug_toolbar.core.panels.flamegraph import generate_flamegraph_data
 
-            result["flamegraph_available"] = True
             flamegraph_data = generate_flamegraph_data(self._profiler)
+            result["flamegraph_available"] = flamegraph_data is not None
             if flamegraph_data:
                 result["flamegraph_data"] = flamegraph_data
 
