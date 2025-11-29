@@ -148,6 +148,8 @@ config = LitestarDebugToolbarConfig(
 
 **ID**: `ProfilingPanel`
 
+![Profiling Panel](../assets/panel-profiling-expanded.png)
+
 Request profiling with flame graph visualization:
 
 - cProfile-based request profiling
@@ -177,6 +179,8 @@ config = LitestarDebugToolbarConfig(
 ### Alerts Panel
 
 **ID**: `AlertsPanel`
+
+![Alerts Panel](../assets/panel-alerts-expanded.png)
 
 Proactive issue detection panel that automatically identifies:
 
@@ -210,6 +214,8 @@ config = LitestarDebugToolbarConfig(
 ### Memory Panel
 
 **ID**: `MemoryPanel`
+
+![Memory Panel](../assets/panel-memory-expanded.png)
 
 Memory profiling and allocation tracking:
 
@@ -273,6 +279,8 @@ Litestar-specific panel showing:
 
 **ID**: `EventsPanel`
 
+![Events Panel](../assets/panel-events-expanded.png)
+
 Litestar-specific panel showing lifecycle events and handlers:
 
 - **Lifecycle hooks**: `on_startup`, `on_shutdown` handlers
@@ -293,6 +301,8 @@ This panel helps you understand:
 ### SQLAlchemy Panel
 
 **ID**: `SQLAlchemyPanel`
+
+![SQLAlchemy Panel](../assets/panel-sql-expanded.png)
 
 Requires `debug-toolbar[advanced-alchemy]`:
 

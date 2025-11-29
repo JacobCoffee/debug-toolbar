@@ -57,6 +57,21 @@
 ### Events Panel (Lifecycle Hooks)
 <img src="assets/toolbar-events-panel.png" alt="Debug Toolbar - Events Panel" width="100%">
 
+### N+1 Query Detection
+<img src="assets/toolbar-n-plus-one-detection.png" alt="Debug Toolbar - N+1 Detection" width="100%">
+
+### Alerts Panel (Proactive Issue Detection)
+<img src="assets/panel-alerts-expanded.png" alt="Debug Toolbar - Alerts Panel" width="100%">
+
+### Memory Panel
+<img src="assets/panel-memory-expanded.png" alt="Debug Toolbar - Memory Panel" width="100%">
+
+### SQL Panel with Query Analysis
+<img src="assets/panel-sql-expanded.png" alt="Debug Toolbar - SQL Panel" width="100%">
+
+### Profiling Panel
+<img src="assets/panel-profiling-expanded.png" alt="Debug Toolbar - Profiling Panel" width="100%">
+
 </details>
 
 ## Features
