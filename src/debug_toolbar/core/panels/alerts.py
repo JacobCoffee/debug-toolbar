@@ -54,6 +54,7 @@ class AlertsPanel(Panel):
     QUERY_TIME_CRITICAL_MS: ClassVar[float] = 500.0
 
     N_PLUS_ONE_THRESHOLD: ClassVar[int] = 3
+    N_PLUS_ONE_CRITICAL_THRESHOLD: ClassVar[int] = 10
 
     async def generate_stats(self, context: RequestContext) -> dict[str, Any]:
         """Generate alert statistics from context metadata."""
@@ -170,9 +171,9 @@ class AlertsPanel(Panel):
         set_cookie_headers = [v for k, v in response_headers.items() if k.lower() == "set-cookie"]
 
         for cookie in set_cookie_headers:
-            cookie_lower = cookie.lower()
+            cookie_parts = cookie.split(";")
 
-            if "; secure" not in cookie_lower and not cookie_lower.endswith("secure"):
+            if not any(part.strip().lower() == "secure" for part in cookie_parts):
                 alerts.append(
                     Alert(
                         title="Insecure Cookie Detected",
@@ -189,8 +190,8 @@ class AlertsPanel(Panel):
                     )
                 )
 
-            has_httponly = "; httponly" in cookie_lower or cookie_lower.endswith("httponly")
-            if not has_httponly and "session" in cookie_lower:
+            has_httponly = any(part.strip().lower() == "httponly" for part in cookie_parts)
+            if not has_httponly and "session" in cookie.lower():
                 alerts.append(
                     Alert(
                         title="Cookie Missing HttpOnly Flag",
@@ -204,7 +205,7 @@ class AlertsPanel(Panel):
                     )
                 )
 
-            if "; samesite" not in cookie_lower and not cookie_lower.endswith("samesite"):
+            if not any(part.strip().lower().startswith("samesite") for part in cookie_parts):
                 alerts.append(
                     Alert(
                         title="Cookie Missing SameSite Attribute",
@@ -346,7 +347,9 @@ class AlertsPanel(Panel):
             count = group.get("count", 0)
             if count >= self.N_PLUS_ONE_THRESHOLD:
                 origin = group.get("origin_display", "unknown location")
-                severity = self.SEVERITY_CRITICAL if count >= 10 else self.SEVERITY_WARNING  # noqa: PLR2004
+                severity = (
+                    self.SEVERITY_CRITICAL if count >= self.N_PLUS_ONE_CRITICAL_THRESHOLD else self.SEVERITY_WARNING
+                )
 
                 alerts.append(
                     Alert(
