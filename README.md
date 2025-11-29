@@ -54,6 +54,9 @@
 ### Request History
 <img src="assets/toolbar-request-history.png" alt="Debug Toolbar - Request History" width="100%">
 
+### Events Panel (Lifecycle Hooks)
+<img src="assets/toolbar-events-panel.png" alt="Debug Toolbar - Events Panel" width="100%">
+
 </details>
 
 ## Features
@@ -152,6 +155,7 @@ app = toolbar.wrap(your_asgi_app)
 | **Logging** | Log records captured during request |
 | **Versions** | Python and package versions |
 | **Routes** | Application routes (Litestar-specific) |
+| **Events** | Lifecycle hooks and exception handlers (Litestar-specific) |
 | **SQLAlchemy** | Query tracking (requires `advanced-alchemy` extra) |
 
 ## Configuration
