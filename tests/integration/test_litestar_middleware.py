@@ -138,3 +138,160 @@ class TestExcludePaths:
 
             response = client.get("/included")
             assert b"debug-toolbar" in response.content
+
+
+class TestExtraPanels:
+    """Test that extra panels can be added and work correctly."""
+
+    def test_alerts_panel_integration(self) -> None:
+        config = LitestarDebugToolbarConfig(
+            enabled=True,
+            extra_panels=["debug_toolbar.core.panels.alerts.AlertsPanel"],
+        )
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"AlertsPanel" in response.content
+
+    def test_memory_panel_integration(self) -> None:
+        config = LitestarDebugToolbarConfig(
+            enabled=True,
+            extra_panels=["debug_toolbar.core.panels.memory.MemoryPanel"],
+        )
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"MemoryPanel" in response.content
+
+    def test_headers_panel_integration(self) -> None:
+        config = LitestarDebugToolbarConfig(
+            enabled=True,
+            extra_panels=["debug_toolbar.core.panels.headers.HeadersPanel"],
+        )
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"HeadersPanel" in response.content
+
+    def test_events_panel_auto_added(self) -> None:
+        """Events panel should be auto-added by LitestarDebugToolbarConfig."""
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"EventsPanel" in response.content
+
+
+class TestMiddlewareExceptionHandling:
+    """Test that middleware handles exceptions gracefully."""
+
+    def test_handler_exception_doesnt_break_response(self) -> None:
+        """Test that exceptions in handlers are handled properly."""
+
+        @get("/error", media_type=MediaType.HTML)
+        async def error_handler() -> str:
+            raise ValueError("Test error")
+
+        config = LitestarDebugToolbarConfig(enabled=True, show_on_errors=True)
+        app = Litestar(
+            route_handlers=[error_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.get("/error")
+            assert response.status_code == 500
+
+    def test_multiple_routes_work(self) -> None:
+        """Test that hitting multiple routes works without errors."""
+
+        @get("/page1", media_type=MediaType.HTML)
+        async def page1() -> str:
+            return "<html><body><h1>Page 1</h1></body></html>"
+
+        @get("/page2", media_type=MediaType.HTML)
+        async def page2() -> str:
+            return "<html><body><h1>Page 2</h1></body></html>"
+
+        @get("/api/data")
+        async def api_data() -> dict:
+            return {"data": "test"}
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[page1, page2, api_data],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            r1 = client.get("/page1")
+            assert r1.status_code == 200
+            assert b"Page 1" in r1.content
+            assert b"debug-toolbar" in r1.content
+
+            r2 = client.get("/page2")
+            assert r2.status_code == 200
+            assert b"Page 2" in r2.content
+            assert b"debug-toolbar" in r2.content
+
+            r3 = client.get("/api/data")
+            assert r3.status_code == 200
+            assert r3.json() == {"data": "test"}
+
+            r4 = client.get("/_debug_toolbar/")
+            assert r4.status_code == 200
+
+
+class TestToolbarWithLifecycleHooks:
+    """Test toolbar works with Litestar lifecycle hooks."""
+
+    def test_works_with_before_after_request(self) -> None:
+        """Test toolbar works when app has before/after request hooks."""
+        from litestar import Request, Response
+
+        request_hook_called = []
+
+        async def before_request(request: Request) -> None:
+            request_hook_called.append("before")
+
+        async def after_request(response: Response) -> Response:
+            request_hook_called.append("after")
+            return response
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            before_request=before_request,
+            after_request=after_request,
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert "before" in request_hook_called
+            assert "after" in request_hook_called

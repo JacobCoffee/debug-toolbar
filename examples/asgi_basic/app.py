@@ -80,14 +80,13 @@ async def handle_debug_toolbar_request(
 
     if path == "/_debug_toolbar/requests":
         requests_list = []
-        for rid in toolbar.storage.get_request_ids():
-            ctx = toolbar.storage.get_context(rid)
-            if ctx:
-                requests_list.append({
-                    "request_id": rid,
-                    "method": ctx.metadata.get("method", ""),
-                    "path": ctx.metadata.get("path", ""),
-                })
+        for rid, data in toolbar.storage.get_all():
+            metadata = data.get("metadata", {})
+            requests_list.append({
+                "request_id": str(rid),
+                "method": metadata.get("method", ""),
+                "path": metadata.get("path", ""),
+            })
         body = json.dumps(requests_list).encode()
         await send({
             "type": "http.response.start",
@@ -98,18 +97,28 @@ async def handle_debug_toolbar_request(
         return
 
     if path.startswith("/_debug_toolbar/request/"):
-        request_id = path.split("/")[-1]
-        ctx = toolbar.storage.get_context(request_id)
-        if ctx:
-            stats = toolbar.storage.get_stats(request_id)
-            body = json.dumps({"request_id": request_id, "stats": stats}).encode()
-            await send({
-                "type": "http.response.start",
-                "status": 200,
-                "headers": [(b"content-type", b"application/json")],
-            })
-            await send({"type": "http.response.body", "body": body})
-            return
+        from uuid import UUID
+
+        request_id_str = path.split("/")[-1]
+        try:
+            request_id = UUID(request_id_str)
+            data = toolbar.storage.get(request_id)
+            if data:
+                body = json.dumps({
+                    "request_id": str(request_id),
+                    "metadata": data.get("metadata", {}),
+                    "timing_data": data.get("timing_data", {}),
+                    "panel_data": data.get("panel_data", {}),
+                }).encode()
+                await send({
+                    "type": "http.response.start",
+                    "status": 200,
+                    "headers": [(b"content-type", b"application/json")],
+                })
+                await send({"type": "http.response.body", "body": body})
+                return
+        except ValueError:
+            pass
 
     await send({"type": "http.response.start", "status": 404, "headers": []})
     await send({"type": "http.response.body", "body": b"Not Found"})

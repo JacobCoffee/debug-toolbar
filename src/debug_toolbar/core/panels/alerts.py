@@ -226,7 +226,8 @@ class AlertsPanel(Panel):
         settings_data = context.get_panel_data("SettingsPanel")
 
         is_debug = settings_data.get("debug", False) if settings_data else False
-        environment = settings_data.get("environment", "").lower() if settings_data else ""
+        env_value = settings_data.get("environment", "") if settings_data else ""
+        environment = env_value.lower() if isinstance(env_value, str) else ""
 
         if is_debug and environment in {"production", "prod"}:
             alerts.append(

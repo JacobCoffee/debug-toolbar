@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import logging
 import re
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, cast
 
 from debug_toolbar.core import DebugToolbar, RequestContext, set_request_context
@@ -22,6 +24,21 @@ if TYPE_CHECKING:
     )
 
     from litestar import Request
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ResponseState:
+    """Tracks response state during middleware processing."""
+
+    started: bool = False
+    body_chunks: list[bytes] = field(default_factory=list)
+    headers: dict[str, str] = field(default_factory=dict)
+    status_code: int = 200
+    is_html: bool = False
+    headers_sent: bool = False
+    original_headers: list[tuple[bytes, bytes]] = field(default_factory=list)
 
 
 class DebugToolbarMiddleware(AbstractMiddleware):
@@ -72,94 +89,145 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         self._populate_request_metadata(request, context)
         self._populate_events_metadata(request, context)
 
-        response_started = False
-        response_body_chunks: list[bytes] = []
-        response_headers: dict[str, str] = {}
-        status_code = 200
-        is_html_response = False
-        headers_sent = False
-        original_headers: list[tuple[bytes, bytes]] = []
-
-        async def send_wrapper(message: Message) -> None:
-            nonlocal response_started, status_code, response_headers, is_html_response, headers_sent, original_headers
-
-            if message["type"] == "http.response.start":
-                response_started = True
-                start_msg = cast("HTTPResponseStartEvent", message)
-                status_code = start_msg["status"]
-                original_headers = list(start_msg.get("headers", []))
-                headers = dict(original_headers)
-                response_headers = {
-                    k.decode() if isinstance(k, bytes) else k: v.decode() if isinstance(v, bytes) else v
-                    for k, v in headers.items()
-                }
-
-                context.metadata["status_code"] = status_code
-                context.metadata["response_headers"] = response_headers
-                context.metadata["response_content_type"] = response_headers.get("content-type", "")
-
-                is_html_response = "text/html" in response_headers.get("content-type", "")
-                if not is_html_response:
-                    await self.toolbar.process_response(context)
-                    server_timing = self.toolbar.get_server_timing_header(context)
-                    new_headers = list(original_headers)
-                    if server_timing:
-                        new_headers.append((b"server-timing", server_timing.encode()))
-                    modified_msg: HTTPResponseStartEvent = {
-                        "type": "http.response.start",
-                        "status": status_code,
-                        "headers": new_headers,
-                    }
-                    await send(modified_msg)
-                    headers_sent = True
-                return
-
-            if message["type"] == "http.response.body":
-                body_msg = cast("HTTPResponseBodyEvent", message)
-                body = body_msg.get("body", b"")
-
-                if not is_html_response:
-                    await send(message)
-                    return
-
-                response_body_chunks.append(body)
-
-                if not body_msg.get("more_body", False):
-                    await self.toolbar.process_response(context)
-
-                    full_body = b"".join(response_body_chunks)
-                    modified_body = self._inject_toolbar(full_body, context)
-
-                    server_timing = self.toolbar.get_server_timing_header(context)
-
-                    new_headers: list[tuple[bytes, bytes]] = [
-                        (k.encode(), v.encode()) for k, v in response_headers.items() if k.lower() != "content-length"
-                    ]
-                    new_headers.append((b"content-length", str(len(modified_body)).encode()))
-                    if server_timing:
-                        new_headers.append((b"server-timing", server_timing.encode()))
-
-                    start_event: HTTPResponseStartEvent = {
-                        "type": "http.response.start",
-                        "status": status_code,
-                        "headers": new_headers,
-                    }
-                    await send(start_event)
-                    body_event: HTTPResponseBodyEvent = {
-                        "type": "http.response.body",
-                        "body": modified_body,
-                        "more_body": False,
-                    }
-                    await send(body_event)
-                    headers_sent = True
-                return
-
-            await send(message)
+        state = ResponseState()
+        send_wrapper = self._create_send_wrapper(send, context, state)
 
         try:
             await self.app(scope, receive, send_wrapper)
+        except Exception:
+            await self._handle_exception(send, state)
+            raise
         finally:
             set_request_context(None)
+
+    def _create_send_wrapper(self, send: Send, context: RequestContext, state: ResponseState) -> Send:
+        """Create a send wrapper that intercepts and modifies responses."""
+
+        async def send_wrapper(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                await self._handle_response_start(send, message, context, state)
+            elif message["type"] == "http.response.body":
+                await self._handle_response_body(send, message, context, state)
+            else:
+                await send(message)
+
+        return send_wrapper
+
+    async def _handle_response_start(
+        self,
+        send: Send,
+        message: Message,
+        context: RequestContext,
+        state: ResponseState,
+    ) -> None:
+        """Handle http.response.start message."""
+        state.started = True
+        start_msg = cast("HTTPResponseStartEvent", message)
+        state.status_code = start_msg["status"]
+        state.original_headers = list(start_msg.get("headers", []))
+        headers = dict(state.original_headers)
+        state.headers = {
+            k.decode() if isinstance(k, bytes) else k: v.decode() if isinstance(v, bytes) else v
+            for k, v in headers.items()
+        }
+
+        context.metadata["status_code"] = state.status_code
+        context.metadata["response_headers"] = state.headers
+        context.metadata["response_content_type"] = state.headers.get("content-type", "")
+
+        state.is_html = "text/html" in state.headers.get("content-type", "")
+        if not state.is_html:
+            await self._send_non_html_start(send, context, state)
+
+    async def _send_non_html_start(self, send: Send, context: RequestContext, state: ResponseState) -> None:
+        """Send response start for non-HTML responses."""
+        await self.toolbar.process_response(context)
+        server_timing = self.toolbar.get_server_timing_header(context)
+        new_headers = list(state.original_headers)
+        if server_timing:
+            new_headers.append((b"server-timing", server_timing.encode()))
+        modified_msg: HTTPResponseStartEvent = {
+            "type": "http.response.start",
+            "status": state.status_code,
+            "headers": new_headers,
+        }
+        await send(modified_msg)
+        state.headers_sent = True
+
+    async def _handle_response_body(
+        self,
+        send: Send,
+        message: Message,
+        context: RequestContext,
+        state: ResponseState,
+    ) -> None:
+        """Handle http.response.body message."""
+        body_msg = cast("HTTPResponseBodyEvent", message)
+        body = body_msg.get("body", b"")
+
+        if not state.is_html:
+            await send(message)
+            return
+
+        state.body_chunks.append(body)
+
+        if not body_msg.get("more_body", False):
+            await self._send_html_response(send, context, state)
+
+    async def _send_html_response(self, send: Send, context: RequestContext, state: ResponseState) -> None:
+        """Process and send buffered HTML response with toolbar injection."""
+        full_body = b"".join(state.body_chunks)
+
+        try:
+            await self.toolbar.process_response(context)
+            modified_body = self._inject_toolbar(full_body, context)
+            server_timing = self.toolbar.get_server_timing_header(context)
+        except Exception:
+            logger.debug("Toolbar processing failed, sending original response", exc_info=True)
+            modified_body = full_body
+            server_timing = None
+
+        new_headers: list[tuple[bytes, bytes]] = [
+            (k.encode(), v.encode()) for k, v in state.headers.items() if k.lower() != "content-length"
+        ]
+        new_headers.append((b"content-length", str(len(modified_body)).encode()))
+        if server_timing:
+            new_headers.append((b"server-timing", server_timing.encode()))
+
+        start_event: HTTPResponseStartEvent = {
+            "type": "http.response.start",
+            "status": state.status_code,
+            "headers": new_headers,
+        }
+        await send(start_event)
+        body_event: HTTPResponseBodyEvent = {
+            "type": "http.response.body",
+            "body": modified_body,
+            "more_body": False,
+        }
+        await send(body_event)
+        state.headers_sent = True
+
+    async def _handle_exception(self, send: Send, state: ResponseState) -> None:
+        """Handle exception during response processing."""
+        if not (state.started and state.is_html and not state.headers_sent):
+            return
+
+        try:
+            start_event: HTTPResponseStartEvent = {
+                "type": "http.response.start",
+                "status": state.status_code,
+                "headers": state.original_headers,
+            }
+            await send(start_event)
+            body_event: HTTPResponseBodyEvent = {
+                "type": "http.response.body",
+                "body": b"".join(state.body_chunks),
+                "more_body": False,
+            }
+            await send(body_event)
+        except Exception:
+            logger.debug("Failed to send buffered response during exception handling", exc_info=True)
 
     def _populate_request_metadata(self, request: Request, context: RequestContext) -> None:
         """Populate request metadata in the context.
