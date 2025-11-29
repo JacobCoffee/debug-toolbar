@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from debug_toolbar.core.panel import Panel
@@ -26,6 +26,7 @@ class DebugToolbarConfig:
         allowed_hosts: List of allowed hosts. Empty list means all hosts.
         extra_panels: Additional panels to add beyond defaults.
         exclude_panels: Panel names to exclude from defaults.
+        memory_backend: Memory profiling backend. "auto" selects best available.
         panel_display_depth: Max depth for nested data rendering. Defaults to 10.
         panel_display_max_items: Max items to show in arrays/objects. Defaults to 100.
         panel_display_max_string: Max string length before truncation. Defaults to 1000.
@@ -50,6 +51,7 @@ class DebugToolbarConfig:
     allowed_hosts: Sequence[str] = field(default_factory=list)
     extra_panels: Sequence[str | type[Panel]] = field(default_factory=list)
     exclude_panels: Sequence[str] = field(default_factory=list)
+    memory_backend: Literal["tracemalloc", "memray", "auto"] = "auto"
     panel_display_depth: int = 10
     panel_display_max_items: int = 100
     panel_display_max_string: int = 1000
