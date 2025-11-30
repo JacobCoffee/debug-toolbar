@@ -129,16 +129,16 @@ upgrade: ## Upgrade all dependencies
 example: example-litestar ## Alias for example-litestar
 
 example-asgi: ## Run ASGI example app (http://localhost:8000)
-	@uv run uvicorn examples.asgi_basic.app:app --reload --port 8000
+	@uv run examples/asgi_basic/app.py
 
 example-litestar: ## Run Litestar example app (http://localhost:8001)
-	@uv run --extra litestar litestar --app examples.litestar_basic.app:app run --reload --port 8001
+	@uv run examples/litestar_basic/app.py
 
 example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
-	@uv run --extra all litestar --app examples.litestar_advanced_alchemy.app:app run --reload --port 8002
+	@uv run examples/litestar_advanced_alchemy/app.py
 
 example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
-	@uv run --extra all litestar --app examples.graphql_panel_example:app run --reload --port 8003
+	@uv run examples/graphql_panel_example.py
 
 ##@ Git Worktrees
 
