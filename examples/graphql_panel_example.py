@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+
 import strawberry
 from strawberry.litestar import make_graphql_controller
 
@@ -175,6 +176,18 @@ async def index() -> str:
 
     <h2>GraphQL Playground</h2>
     <p><a href="/graphql">Open GraphQL Playground</a></p>
+
+    <h2>How to View GraphQL Panel Data</h2>
+    <div style="background: rgba(59, 130, 246, 0.15); padding: 12px; border-radius: 6px;">
+        <p><strong>Important:</strong> GraphQL queries return JSON, so the toolbar
+        isn't visible in responses. To see the GraphQL panel data:</p>
+        <ol style="margin: 0; padding-left: 20px;">
+            <li>Run a query in the <a href="/graphql">GraphQL Playground</a></li>
+            <li>Go to <a href="/_debug_toolbar/"><strong>Request History</strong></a></li>
+            <li>Find the <code>POST /graphql</code> request</li>
+            <li>Click it to view the GraphQL panel with operations, resolvers, and N+1 detection</li>
+        </ol>
+    </div>
 
     <h2>Try These Queries</h2>
 
