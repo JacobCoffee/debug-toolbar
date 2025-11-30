@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from collections.abc import Callable, Generator
 from typing import TYPE_CHECKING, Any
@@ -16,6 +17,8 @@ if TYPE_CHECKING:
     from strawberry.utils.await_maybe import AwaitableOrValue
 
     from debug_toolbar.core.context import RequestContext
+
+logger = logging.getLogger(__name__)
 
 try:
     from strawberry.extensions import SchemaExtension as _SchemaExtension
@@ -67,6 +70,8 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         self._slow_operation_threshold_ms = slow_operation_threshold_ms
         self._slow_resolver_threshold_ms = slow_resolver_threshold_ms
         self._capture_stacks = capture_stacks
+        if STRAWBERRY_AVAILABLE:
+            super().__init__()
 
     def _get_debug_context(self) -> RequestContext | None:
         """Get the debug toolbar context from contextvar or Strawberry context.
@@ -74,11 +79,7 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         Returns:
             RequestContext if available, None otherwise.
         """
-        import logging
-
         from debug_toolbar.core.context import get_request_context
-
-        logger = logging.getLogger(__name__)
 
         # First try contextvar
         context = get_request_context()

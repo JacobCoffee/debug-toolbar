@@ -153,10 +153,15 @@ class GraphQLPanel(Panel):
             if len(path_parts) <= 1:
                 root_nodes.append(node)
             else:
-                parent_path = ".".join(path_parts[:-1])
-                if parent_path in tree_map:
-                    tree_map[parent_path]["children"].append(node)
-                else:
+                # Walk up the path to find the closest existing ancestor
+                parent_found = False
+                for i in range(len(path_parts) - 1, 0, -1):
+                    parent_path = ".".join(path_parts[:i])
+                    if parent_path in tree_map:
+                        tree_map[parent_path]["children"].append(node)
+                        parent_found = True
+                        break
+                if not parent_found:
                     root_nodes.append(node)
 
         return root_nodes
