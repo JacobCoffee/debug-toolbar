@@ -48,7 +48,7 @@ def redact_value(value: Any, key: str = "") -> Any:
     return value
 
 
-def redact_dict(data: dict[str, Any], deep: bool = True) -> dict[str, Any]:
+def redact_dict(data: dict[str, Any], *, deep: bool = True) -> dict[str, Any]:
     """Redact sensitive values from a dictionary.
 
     Args:
@@ -65,10 +65,7 @@ def redact_dict(data: dict[str, Any], deep: bool = True) -> dict[str, Any]:
         elif deep and isinstance(value, dict):
             result[key] = redact_dict(value, deep=True)
         elif deep and isinstance(value, list):
-            result[key] = [
-                redact_dict(item, deep=True) if isinstance(item, dict) else item
-                for item in value
-            ]
+            result[key] = [redact_dict(item, deep=True) if isinstance(item, dict) else item for item in value]
         else:
             result[key] = value
     return result
@@ -89,10 +86,8 @@ def redact_sql_parameters(params: dict[str, Any] | tuple | list | None) -> dict[
     if isinstance(params, dict):
         return redact_dict(params)
 
-    if isinstance(params, (list, tuple)):
-        return type(params)(
-            redact_dict(p) if isinstance(p, dict) else p for p in params
-        )
+    if isinstance(params, list | tuple):
+        return type(params)(redact_dict(p) if isinstance(p, dict) else p for p in params)
 
     return params
 
@@ -115,7 +110,4 @@ def redact_headers(headers: dict[str, str]) -> dict[str, str]:
         "x-csrf-token",
     }
 
-    return {
-        k: REDACTED if k.lower() in sensitive_headers or is_sensitive_key(k) else v
-        for k, v in headers.items()
-    }
+    return {k: REDACTED if k.lower() in sensitive_headers or is_sensitive_key(k) else v for k, v in headers.items()}

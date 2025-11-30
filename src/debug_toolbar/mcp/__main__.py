@@ -23,8 +23,8 @@ Examples:
   # Run with stdio transport (default, for Claude Code)
   python -m debug_toolbar.mcp
 
-  # Run with HTTP transport on custom port
-  python -m debug_toolbar.mcp --transport http --port 8765
+  # Run with SSE transport
+  python -m debug_toolbar.mcp --transport sse
 
   # Disable sensitive data redaction (development only)
   python -m debug_toolbar.mcp --no-redact
@@ -33,20 +33,9 @@ Examples:
 
     parser.add_argument(
         "--transport",
-        choices=["stdio", "http"],
+        choices=["stdio", "sse"],
         default="stdio",
         help="Transport mechanism (default: stdio)",
-    )
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Host for HTTP transport (default: 127.0.0.1)",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8765,
-        help="Port for HTTP transport (default: 8765)",
     )
     parser.add_argument(
         "--no-redact",
@@ -70,8 +59,7 @@ Examples:
 
     if not is_available():
         print(  # noqa: T201
-            "Error: MCP support requires the 'mcp' package.\n"
-            "Install with: pip install debug-toolbar[mcp]",
+            "Error: MCP support requires the 'mcp' package.\nInstall with: pip install debug-toolbar[mcp]",
             file=sys.stderr,
         )
         return 1
@@ -94,10 +82,7 @@ Examples:
 
     print(f"Starting debug-toolbar MCP server ({args.transport} transport)...", file=sys.stderr)  # noqa: T201
 
-    if args.transport == "stdio":
-        mcp.run()
-    else:
-        mcp.run(transport="sse", host=args.host, port=args.port)
+    mcp.run(transport=args.transport)
 
     return 0
 

@@ -16,7 +16,7 @@ except ImportError:
     FastMCP = Any  # type: ignore[assignment, misc]
 
 
-def register_resources(mcp: FastMCP) -> None:
+def register_resources(mcp: FastMCP) -> None:  # noqa: C901
     """Register all debug toolbar resources with the MCP server.
 
     Args:
@@ -133,10 +133,12 @@ def register_resources(mcp: FastMCP) -> None:
         panel_data = data.get("panel_data", {})
         if panel_name not in panel_data:
             available = list(panel_data.keys())
-            return json.dumps({
-                "error": f"Panel '{panel_name}' not found",
-                "available_panels": available,
-            })
+            return json.dumps(
+                {
+                    "error": f"Panel '{panel_name}' not found",
+                    "available_panels": available,
+                }
+            )
 
         result = panel_data[panel_name]
 
@@ -176,12 +178,16 @@ def register_resources(mcp: FastMCP) -> None:
                 for q in queries
             ]
 
-        return json.dumps({
-            "query_count": len(queries),
-            "total_duration_ms": sql_panel.get("total_duration_ms", 0),
-            "n_plus_one_patterns": sql_panel.get("n_plus_one_patterns", []),
-            "queries": queries,
-        }, indent=2, default=str)
+        return json.dumps(
+            {
+                "query_count": len(queries),
+                "total_duration_ms": sql_panel.get("total_duration_ms", 0),
+                "n_plus_one_patterns": sql_panel.get("n_plus_one_patterns", []),
+                "queries": queries,
+            },
+            indent=2,
+            default=str,
+        )
 
     @mcp.resource("debug://requests/{request_id}/graphql")
     def get_graphql_data(request_id: str, ctx: Context) -> str:
@@ -231,10 +237,14 @@ def register_resources(mcp: FastMCP) -> None:
         panel_data = data.get("panel_data", {})
         alerts_panel = panel_data.get("AlertsPanel", {})
 
-        return json.dumps({
-            "alerts": alerts_panel.get("alerts", []),
-            "alert_count": len(alerts_panel.get("alerts", [])),
-        }, indent=2, default=str)
+        return json.dumps(
+            {
+                "alerts": alerts_panel.get("alerts", []),
+                "alert_count": len(alerts_panel.get("alerts", [])),
+            },
+            indent=2,
+            default=str,
+        )
 
     @mcp.resource("debug://requests/{request_id}/memory")
     def get_memory_profile(request_id: str, ctx: Context) -> str:

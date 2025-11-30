@@ -14,8 +14,17 @@ except ImportError:
     Context = Any  # type: ignore[assignment, misc]
     FastMCP = Any  # type: ignore[assignment, misc]
 
+SLOW_QUERY_THRESHOLD_MS = 100
+SLOW_RESOLVER_THRESHOLD_MS = 50
+HIGH_MEMORY_THRESHOLD_MB = 10
+MAX_GRAPHQL_REQUESTS = 5
+REGRESSION_THRESHOLD_PCT = 20
+IMPROVEMENT_THRESHOLD_PCT = -20
+HIGH_QUERY_COUNT_THRESHOLD = 10
+SLOW_REQUEST_THRESHOLD_MS = 500
 
-def register_tools(mcp: FastMCP) -> None:
+
+def register_tools(mcp: FastMCP) -> None:  # noqa: C901
     """Register all debug toolbar tools with the MCP server.
 
     Args:
@@ -82,7 +91,7 @@ def register_tools(mcp: FastMCP) -> None:
         return requests
 
     @mcp.tool()
-    def analyze_performance_bottlenecks(
+    def analyze_performance_bottlenecks(  # noqa: C901, PLR0912
         ctx: Context,
         request_id: str | None = None,
         top_n: int = 5,
@@ -125,71 +134,73 @@ def register_tools(mcp: FastMCP) -> None:
             sql_panel = panel_data.get("SQLAlchemyPanel", {})
             queries = sql_panel.get("queries", [])
             for q in queries:
-                if q.get("duration_ms", 0) > 100:
-                    analysis["slow_queries"].append({
-                        "request_id": str(rid),
-                        "query": q.get("sql", "")[:200],
-                        "duration_ms": q.get("duration_ms"),
-                        "is_n_plus_one": q.get("is_n_plus_one", False),
-                    })
+                if q.get("duration_ms", 0) > SLOW_QUERY_THRESHOLD_MS:
+                    analysis["slow_queries"].append(
+                        {
+                            "request_id": str(rid),
+                            "query": q.get("sql", "")[:200],
+                            "duration_ms": q.get("duration_ms"),
+                            "is_n_plus_one": q.get("is_n_plus_one", False),
+                        }
+                    )
 
             graphql_panel = panel_data.get("GraphQLPanel", {})
             operations = graphql_panel.get("operations", [])
             for op in operations:
                 for resolver in op.get("resolvers", []):
-                    if resolver.get("duration_ms", 0) > 50:
-                        analysis["slow_resolvers"].append({
-                            "request_id": str(rid),
-                            "resolver": resolver.get("resolver_function", ""),
-                            "duration_ms": resolver.get("duration_ms"),
-                        })
+                    if resolver.get("duration_ms", 0) > SLOW_RESOLVER_THRESHOLD_MS:
+                        analysis["slow_resolvers"].append(
+                            {
+                                "request_id": str(rid),
+                                "resolver": resolver.get("resolver_function", ""),
+                                "duration_ms": resolver.get("duration_ms"),
+                            }
+                        )
 
             async_panel = panel_data.get("AsyncProfilerPanel", {})
             blocking = async_panel.get("blocking_calls", [])
             for call in blocking:
-                analysis["blocking_calls"].append({
-                    "request_id": str(rid),
-                    "location": call.get("location", ""),
-                    "duration_ms": call.get("duration_ms"),
-                })
+                analysis["blocking_calls"].append(
+                    {
+                        "request_id": str(rid),
+                        "location": call.get("location", ""),
+                        "duration_ms": call.get("duration_ms"),
+                    }
+                )
 
             memory_panel = panel_data.get("MemoryPanel", {})
             delta = memory_panel.get("delta_mb", 0)
-            if delta > 10:
-                analysis["memory_heavy_requests"].append({
-                    "request_id": str(rid),
-                    "memory_delta_mb": delta,
-                    "peak_mb": memory_panel.get("peak_mb"),
-                })
+            if delta > HIGH_MEMORY_THRESHOLD_MB:
+                analysis["memory_heavy_requests"].append(
+                    {
+                        "request_id": str(rid),
+                        "memory_delta_mb": delta,
+                        "peak_mb": memory_panel.get("peak_mb"),
+                    }
+                )
 
+        slow_queries: list[dict[str, Any]] = analysis["slow_queries"]  # type: ignore[assignment]
         analysis["slow_queries"] = sorted(
-            analysis["slow_queries"],
+            slow_queries,
             key=lambda x: x["duration_ms"],
             reverse=True,
         )[:top_n]
 
+        slow_resolvers: list[dict[str, Any]] = analysis["slow_resolvers"]  # type: ignore[assignment]
         analysis["slow_resolvers"] = sorted(
-            analysis["slow_resolvers"],
+            slow_resolvers,
             key=lambda x: x["duration_ms"],
             reverse=True,
         )[:top_n]
 
         if analysis["slow_queries"]:
-            analysis["recommendations"].append(
-                "Consider adding database indexes or optimizing slow queries"
-            )
+            analysis["recommendations"].append("Consider adding database indexes or optimizing slow queries")
         if any(q["is_n_plus_one"] for q in analysis["slow_queries"]):
-            analysis["recommendations"].append(
-                "N+1 queries detected - use eager loading or batch queries"
-            )
+            analysis["recommendations"].append("N+1 queries detected - use eager loading or batch queries")
         if analysis["blocking_calls"]:
-            analysis["recommendations"].append(
-                "Blocking calls detected in async context - use async alternatives"
-            )
+            analysis["recommendations"].append("Blocking calls detected in async context - use async alternatives")
         if analysis["memory_heavy_requests"]:
-            analysis["recommendations"].append(
-                "High memory usage detected - consider streaming or pagination"
-            )
+            analysis["recommendations"].append("High memory usage detected - consider streaming or pagination")
 
         return analysis
 
@@ -231,12 +242,14 @@ def register_tools(mcp: FastMCP) -> None:
                 sig = pattern.get("query_signature", "")
                 if sig not in patterns:
                     patterns[sig] = []
-                patterns[sig].append({
-                    "request_id": str(rid),
-                    "count": pattern.get("count", 0),
-                    "total_duration_ms": pattern.get("total_duration_ms", 0),
-                    "example_query": pattern.get("example_query", "")[:200],
-                })
+                patterns[sig].append(
+                    {
+                        "request_id": str(rid),
+                        "count": pattern.get("count", 0),
+                        "total_duration_ms": pattern.get("total_duration_ms", 0),
+                        "example_query": pattern.get("example_query", "")[:200],
+                    }
+                )
 
             graphql_panel = panel_data.get("GraphQLPanel", {})
             stats = graphql_panel.get("stats", {})
@@ -245,24 +258,28 @@ def register_tools(mcp: FastMCP) -> None:
                 sig = f"GraphQL:{pattern.get('resolver_signature', '')}"
                 if sig not in patterns:
                     patterns[sig] = []
-                patterns[sig].append({
-                    "request_id": str(rid),
-                    "count": pattern.get("count", 0),
-                    "total_duration_ms": pattern.get("total_duration_ms", 0),
-                    "suggestion": pattern.get("suggestion", ""),
-                })
+                patterns[sig].append(
+                    {
+                        "request_id": str(rid),
+                        "count": pattern.get("count", 0),
+                        "total_duration_ms": pattern.get("total_duration_ms", 0),
+                        "suggestion": pattern.get("suggestion", ""),
+                    }
+                )
 
         flagged_patterns = []
         for sig, occurrences in patterns.items():
             total_count = sum(o["count"] for o in occurrences)
             if total_count >= threshold:
-                flagged_patterns.append({
-                    "signature": sig,
-                    "total_occurrences": total_count,
-                    "affected_requests": len(occurrences),
-                    "total_duration_ms": sum(o["total_duration_ms"] for o in occurrences),
-                    "details": occurrences[:3],
-                })
+                flagged_patterns.append(
+                    {
+                        "signature": sig,
+                        "total_occurrences": total_count,
+                        "affected_requests": len(occurrences),
+                        "total_duration_ms": sum(o["total_duration_ms"] for o in occurrences),
+                        "details": occurrences[:3],
+                    }
+                )
 
         return {
             "n_plus_one_detected": len(flagged_patterns) > 0,
@@ -277,7 +294,9 @@ def register_tools(mcp: FastMCP) -> None:
                 "Use selectinload() or joinedload() for SQLAlchemy relationships",
                 "Implement DataLoader for GraphQL resolvers",
                 "Consider batch queries instead of individual lookups",
-            ] if flagged_patterns else [],
+            ]
+            if flagged_patterns
+            else [],
         }
 
     @mcp.tool()
@@ -355,12 +374,14 @@ def register_tools(mcp: FastMCP) -> None:
                 alert_type = alert.get("type", "unknown")
                 if alert_type not in all_alerts:
                     all_alerts[alert_type] = []
-                all_alerts[alert_type].append({
-                    "request_id": str(rid),
-                    "severity": alert.get("severity", "info"),
-                    "message": alert.get("message", ""),
-                    "details": alert.get("details"),
-                })
+                all_alerts[alert_type].append(
+                    {
+                        "request_id": str(rid),
+                        "severity": alert.get("severity", "info"),
+                        "message": alert.get("message", ""),
+                        "details": alert.get("details"),
+                    }
+                )
 
         summary = {
             "total_alerts": sum(len(v) for v in all_alerts.values()),
@@ -447,14 +468,15 @@ def register_tools(mcp: FastMCP) -> None:
                 "query_count_diff": queries_b - queries_a,
                 "memory_diff_mb": memory_b - memory_a,
             },
-            "regression_detected": duration_pct > 20 or queries_b > queries_a * 1.5,
-            "improvements_detected": duration_pct < -20 or queries_b < queries_a * 0.7,
+            "regression_detected": duration_pct > REGRESSION_THRESHOLD_PCT or queries_b > queries_a * 1.5,
+            "improvements_detected": duration_pct < IMPROVEMENT_THRESHOLD_PCT or queries_b < queries_a * 0.7,
         }
 
     @mcp.tool()
     def get_graphql_operations(
         ctx: Context,
         request_id: str | None = None,
+        *,
         include_resolvers: bool = True,
     ) -> dict[str, Any]:
         """Get GraphQL operation details and resolver timings.
@@ -481,7 +503,7 @@ def register_tools(mcp: FastMCP) -> None:
                 panel_data = data.get("panel_data", {})
                 if "GraphQLPanel" in panel_data:
                     requests_data.append((rid, data))
-                if len(requests_data) >= 5:
+                if len(requests_data) >= MAX_GRAPHQL_REQUESTS:
                     break
 
         all_operations = []
@@ -571,6 +593,7 @@ def register_tools(mcp: FastMCP) -> None:
     @mcp.tool()
     def generate_optimization_report(
         ctx: Context,
+        *,
         include_sql: bool = True,
         include_graphql: bool = True,
         include_async: bool = True,
@@ -642,43 +665,50 @@ def register_tools(mcp: FastMCP) -> None:
         }
 
         if n_plus_one_count > 0:
-            report["priority_actions"].append({
-                "priority": "HIGH",
-                "category": "SQL",
-                "action": f"Fix {n_plus_one_count} N+1 query patterns using eager loading",
-            })
+            report["priority_actions"].append(
+                {
+                    "priority": "HIGH",
+                    "category": "SQL",
+                    "action": f"Fix {n_plus_one_count} N+1 query patterns using eager loading",
+                }
+            )
 
         if graphql_n1_count > 0:
-            report["priority_actions"].append({
-                "priority": "HIGH",
-                "category": "GraphQL",
-                "action": f"Fix {graphql_n1_count} GraphQL N+1 patterns using DataLoader",
-            })
+            report["priority_actions"].append(
+                {
+                    "priority": "HIGH",
+                    "category": "GraphQL",
+                    "action": f"Fix {graphql_n1_count} GraphQL N+1 patterns using DataLoader",
+                }
+            )
 
         if blocking_calls_count > 0:
-            report["priority_actions"].append({
-                "priority": "HIGH",
-                "category": "Async",
-                "action": f"Replace {blocking_calls_count} blocking calls with async alternatives",
-            })
-
-        if avg_queries > 10:
-            report["priority_actions"].append({
-                "priority": "MEDIUM",
-                "category": "SQL",
-                "action": f"Reduce query count (avg {avg_queries:.1f}/request) through batching",
-            })
-
-        if avg_duration > 500:
-            report["general_recommendations"].append(
-                "Consider implementing caching for frequently accessed data"
+            report["priority_actions"].append(
+                {
+                    "priority": "HIGH",
+                    "category": "Async",
+                    "action": f"Replace {blocking_calls_count} blocking calls with async alternatives",
+                }
             )
+
+        if avg_queries > HIGH_QUERY_COUNT_THRESHOLD:
+            report["priority_actions"].append(
+                {
+                    "priority": "MEDIUM",
+                    "category": "SQL",
+                    "action": f"Reduce query count (avg {avg_queries:.1f}/request) through batching",
+                }
+            )
+
+        if avg_duration > SLOW_REQUEST_THRESHOLD_MS:
+            report["general_recommendations"].append("Consider implementing caching for frequently accessed data")
 
         return report
 
     @mcp.tool()
     def clear_request_history(
         ctx: Context,
+        *,
         confirm: bool = False,
     ) -> dict[str, Any]:
         """Clear all stored request history.

@@ -30,8 +30,8 @@ Usage:
     # In another terminal, run MCP server (shares storage)
     uv run examples/mcp_server_example.py --mcp
 
-    # Or run MCP with HTTP transport
-    uv run examples/mcp_server_example.py --mcp --transport http --port 8765
+    # Or run MCP with SSE transport
+    uv run examples/mcp_server_example.py --mcp --transport sse
 
 Then configure Claude Code or Cursor to connect to the MCP server.
 """
@@ -129,7 +129,7 @@ def create_app() -> Litestar:
     )
 
 
-def run_mcp_server(transport: str = "stdio", host: str = "127.0.0.1", port: int = 8765) -> None:
+def run_mcp_server(transport: str = "stdio") -> None:
     """Run the MCP server sharing storage with the web app."""
     from debug_toolbar.mcp import create_mcp_server, is_available
 
@@ -140,10 +140,9 @@ def run_mcp_server(transport: str = "stdio", host: str = "127.0.0.1", port: int 
 
     storage = get_shared_storage()
 
-    # Create MCP server with shared storage
     mcp = create_mcp_server(
         storage=storage,
-        toolbar=None,  # No toolbar instance needed for MCP-only mode
+        toolbar=None,
         redact_sensitive=True,
         server_name="debug-toolbar-example",
     )
@@ -159,12 +158,8 @@ def run_mcp_server(transport: str = "stdio", host: str = "127.0.0.1", port: int 
     print("  - generate_optimization_report: Full optimization report", file=sys.stderr)  # noqa: T201
     print("", file=sys.stderr)  # noqa: T201
 
-    if transport == "stdio":
-        print("Listening on stdio (for Claude Code)...", file=sys.stderr)  # noqa: T201
-        mcp.run()
-    else:
-        print(f"Listening on http://{host}:{port}", file=sys.stderr)  # noqa: T201
-        mcp.run(transport="sse", host=host, port=port)
+    print(f"Listening on {transport}...", file=sys.stderr)  # noqa: T201
+    mcp.run(transport=transport)
 
 
 def main() -> None:
@@ -203,20 +198,9 @@ Integration with Claude Code:
     )
     parser.add_argument(
         "--transport",
-        choices=["stdio", "http"],
+        choices=["stdio", "sse"],
         default="stdio",
         help="MCP transport (default: stdio)",
-    )
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Host for HTTP transport (default: 127.0.0.1)",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8765,
-        help="Port for HTTP transport (default: 8765)",
     )
     parser.add_argument(
         "--web-port",
@@ -228,7 +212,7 @@ Integration with Claude Code:
     args = parser.parse_args()
 
     if args.mcp:
-        run_mcp_server(args.transport, args.host, args.port)
+        run_mcp_server(args.transport)
     else:
         import uvicorn
 
