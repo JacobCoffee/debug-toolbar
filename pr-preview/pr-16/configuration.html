@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Configuration - Async Debug Toolbar 0.2.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Built-in Panels" href="panels.html" /><link rel="prev" title="Getting Started" href="getting-started.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Configuration"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Debug Toolbar Comparison</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#base-configuration">Base Configuration</a></li>
+<li><a class="reference internal" href="#litestar-configuration">Litestar Configuration</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a><ul>
+<li><a class="reference internal" href="#enabled"><code class="docutils literal notranslate"><span class="pre">enabled</span></code></a></li>
+<li><a class="reference internal" href="#panels"><code class="docutils literal notranslate"><span class="pre">panels</span></code></a></li>
+<li><a class="reference internal" href="#extra-panels"><code class="docutils literal notranslate"><span class="pre">extra_panels</span></code></a></li>
+<li><a class="reference internal" href="#exclude-panels"><code class="docutils literal notranslate"><span class="pre">exclude_panels</span></code></a></li>
+<li><a class="reference internal" href="#exclude-paths"><code class="docutils literal notranslate"><span class="pre">exclude_paths</span></code></a></li>
+<li><a class="reference internal" href="#show-toolbar-callback"><code class="docutils literal notranslate"><span class="pre">show_toolbar_callback</span></code></a></li>
+<li><a class="reference internal" href="#memory-backend"><code class="docutils literal notranslate"><span class="pre">memory_backend</span></code></a></li>
+<li><a class="reference internal" href="#profiler-backend"><code class="docutils literal notranslate"><span class="pre">profiler_backend</span></code></a></li>
+<li><a class="reference internal" href="#profiler-top-functions"><code class="docutils literal notranslate"><span class="pre">profiler_top_functions</span></code></a></li>
+<li><a class="reference internal" href="#profiler-sort-by"><code class="docutils literal notranslate"><span class="pre">profiler_sort_by</span></code></a></li>
+<li><a class="reference internal" href="#enable-flamegraph"><code class="docutils literal notranslate"><span class="pre">enable_flamegraph</span></code></a></li>
+<li><a class="reference internal" href="#panel-display-depth"><code class="docutils literal notranslate"><span class="pre">panel_display_depth</span></code></a></li>
+<li><a class="reference internal" href="#panel-display-max-items"><code class="docutils literal notranslate"><span class="pre">panel_display_max_items</span></code></a></li>
+<li><a class="reference internal" href="#panel-display-max-string"><code class="docutils literal notranslate"><span class="pre">panel_display_max_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#environment-based-configuration">Environment-Based Configuration</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Configuration</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
+<section id="base-configuration">
+<h2>Base Configuration<a class="headerlink" href="#base-configuration" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">DebugToolbarConfig</span></code> class provides the base configuration options:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarConfig</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">config</span> <span class="o">=</span> <span class="n">DebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="4">    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># Enable/disable toolbar</span>
+</span><span data-line="5">    <span class="n">panels</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span>                    <span class="c1"># List of panel classes</span>
+</span><span data-line="6">    <span class="n">intercept_redirects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># Show intermediate page on redirects</span>
+</span><span data-line="7">    <span class="n">max_request_history</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>          <span class="c1"># Requests to keep in history</span>
+</span><span data-line="8">    <span class="n">api_path</span><span class="o">=</span><span class="s2">&quot;/_debug_toolbar&quot;</span><span class="p">,</span>      <span class="c1"># API endpoint prefix</span>
+</span><span data-line="9">    <span class="n">static_path</span><span class="o">=</span><span class="s2">&quot;/_debug_toolbar/static&quot;</span><span class="p">,</span>  <span class="c1"># Static assets path</span>
+</span><span data-line="10">    <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[],</span>                <span class="c1"># Host whitelist (empty = all)</span>
+</span><span data-line="11">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[],</span>                 <span class="c1"># Additional panels</span>
+</span><span data-line="12">    <span class="n">exclude_panels</span><span class="o">=</span><span class="p">[],</span>               <span class="c1"># Panels to disable</span>
+</span><span data-line="13"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="litestar-configuration">
+<h2>Litestar Configuration<a class="headerlink" href="#litestar-configuration" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">LitestarDebugToolbarConfig</span></code> extends the base config with Litestar-specific options:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">LitestarDebugToolbarConfig</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="4">    <span class="c1"># All base options, plus:</span>
+</span><span data-line="5">    <span class="n">exclude_paths</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/_debug_toolbar&quot;</span><span class="p">,</span> <span class="s2">&quot;/static&quot;</span><span class="p">],</span>  <span class="c1"># Paths to skip</span>
+</span><span data-line="6">    <span class="n">exclude_patterns</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s2">&quot;^/api/v\d+/internal&quot;</span><span class="p">],</span>     <span class="c1"># Regex patterns</span>
+</span><span data-line="7">    <span class="n">show_on_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                           <span class="c1"># Show on 4xx/5xx</span>
+</span><span data-line="8">    <span class="n">show_toolbar_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                    <span class="c1"># Custom visibility check</span>
+</span><span data-line="9"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="configuration-options">
+<h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Link to this heading">¶</a></h2>
+<section id="enabled">
+<h3><code class="docutils literal notranslate"><span class="pre">enabled</span></code><a class="headerlink" href="#enabled" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Master switch for the toolbar. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, no middleware is added.</p>
+</section>
+<section id="panels">
+<h3><code class="docutils literal notranslate"><span class="pre">panels</span></code><a class="headerlink" href="#panels" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[str</span> <span class="pre">|</span> <span class="pre">type[Panel]]</span></code>
+<strong>Default</strong>: Built-in panels</p>
+<p>List of panel classes or import paths. Default panels:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">debug_toolbar.core.panels.timer.TimerPanel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug_toolbar.core.panels.request.RequestPanel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug_toolbar.core.panels.response.ResponsePanel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug_toolbar.core.panels.logging.LoggingPanel</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">debug_toolbar.core.panels.versions.VersionsPanel</span></code></p></li>
+</ul>
+</section>
+<section id="extra-panels">
+<h3><code class="docutils literal notranslate"><span class="pre">extra_panels</span></code><a class="headerlink" href="#extra-panels" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[str</span> <span class="pre">|</span> <span class="pre">type[Panel]]</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
+<p>Additional panels to add to the default set.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="3">        <span class="s2">&quot;debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel&quot;</span><span class="p">,</span>
+</span><span data-line="4">        <span class="s2">&quot;myapp.panels.CustomPanel&quot;</span><span class="p">,</span>
+</span><span data-line="5">    <span class="p">],</span>
+</span><span data-line="6"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="exclude-panels">
+<h3><code class="docutils literal notranslate"><span class="pre">exclude_panels</span></code><a class="headerlink" href="#exclude-panels" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[str]</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p>
+<p>Panel names to exclude from the default set.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">exclude_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VersionsPanel&quot;</span><span class="p">,</span> <span class="s2">&quot;LoggingPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="exclude-paths">
+<h3><code class="docutils literal notranslate"><span class="pre">exclude_paths</span></code><a class="headerlink" href="#exclude-paths" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">list[str]</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">[&quot;/_debug_toolbar&quot;,</span> <span class="pre">&quot;/static&quot;,</span> <span class="pre">&quot;/favicon.ico&quot;]</span></code></p>
+<p>URL paths to exclude from toolbar processing. Uses prefix matching.</p>
+</section>
+<section id="show-toolbar-callback">
+<h3><code class="docutils literal notranslate"><span class="pre">show_toolbar_callback</span></code><a class="headerlink" href="#show-toolbar-callback" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">Callable[[Request],</span> <span class="pre">bool]</span> <span class="pre">|</span> <span class="pre">None</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+<p>Custom function to determine toolbar visibility:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="k">def</span><span class="w"> </span><span class="nf">should_show</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="2">    <span class="c1"># Only show for authenticated admins</span>
+</span><span data-line="3">    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_admin</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="6">    <span class="n">show_toolbar_callback</span><span class="o">=</span><span class="n">should_show</span><span class="p">,</span>
+</span><span data-line="7"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="memory-backend">
+<h3><code class="docutils literal notranslate"><span class="pre">memory_backend</span></code><a class="headerlink" href="#memory-backend" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">Literal[&quot;tracemalloc&quot;,</span> <span class="pre">&quot;memray&quot;,</span> <span class="pre">&quot;auto&quot;]</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code></p>
+<p>Memory profiling backend selection:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tracemalloc&quot;</span></code>: Python’s built-in memory tracer (always available)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;memray&quot;</span></code>: Bloomberg’s advanced profiler (requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">memray</span></code>, Linux/macOS only)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code>: Automatically selects best available backend</p></li>
+</ul>
+</section>
+<section id="profiler-backend">
+<h3><code class="docutils literal notranslate"><span class="pre">profiler_backend</span></code><a class="headerlink" href="#profiler-backend" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">Literal[&quot;cprofile&quot;,</span> <span class="pre">&quot;pyinstrument&quot;]</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">&quot;cprofile&quot;</span></code></p>
+<p>Profiling backend selection:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;cprofile&quot;</span></code>: Python’s built-in cProfile profiler (always available)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;pyinstrument&quot;</span></code>: Statistical sampling profiler (requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pyinstrument</span></code>)</p></li>
+</ul>
+</section>
+<section id="profiler-top-functions">
+<h3><code class="docutils literal notranslate"><span class="pre">profiler_top_functions</span></code><a class="headerlink" href="#profiler-top-functions" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">50</span></code></p>
+<p>Maximum number of functions to display in the profiling panel.</p>
+</section>
+<section id="profiler-sort-by">
+<h3><code class="docutils literal notranslate"><span class="pre">profiler_sort_by</span></code><a class="headerlink" href="#profiler-sort-by" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">str</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">&quot;cumulative&quot;</span></code></p>
+<p>Sort order for profiling results. Common values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;cumulative&quot;</span></code>: Sort by cumulative time (time spent in function and sub-calls)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;tottime&quot;</span></code>: Sort by total time (time spent in function only)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;calls&quot;</span></code>: Sort by number of calls</p></li>
+</ul>
+</section>
+<section id="enable-flamegraph">
+<h3><code class="docutils literal notranslate"><span class="pre">enable_flamegraph</span></code><a class="headerlink" href="#enable-flamegraph" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">bool</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p>
+<p>Enable flame graph generation for the profiling panel. When enabled, a speedscope-compatible JSON file is generated that can be visualized at <a class="reference external" href="https://www.speedscope.app/">speedscope.app</a>.</p>
+</section>
+<section id="panel-display-depth">
+<h3><code class="docutils literal notranslate"><span class="pre">panel_display_depth</span></code><a class="headerlink" href="#panel-display-depth" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">10</span></code></p>
+<p>Maximum depth for nested data rendering in panels.</p>
+</section>
+<section id="panel-display-max-items">
+<h3><code class="docutils literal notranslate"><span class="pre">panel_display_max_items</span></code><a class="headerlink" href="#panel-display-max-items" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">100</span></code></p>
+<p>Maximum items to show in arrays/objects before truncation.</p>
+</section>
+<section id="panel-display-max-string">
+<h3><code class="docutils literal notranslate"><span class="pre">panel_display_max_string</span></code><a class="headerlink" href="#panel-display-max-string" title="Link to this heading">¶</a></h3>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code>
+<strong>Default</strong>: <code class="docutils literal notranslate"><span class="pre">1000</span></code></p>
+<p>Maximum string length before truncation.</p>
+</section>
+</section>
+<section id="environment-based-configuration">
+<h2>Environment-Based Configuration<a class="headerlink" href="#environment-based-configuration" title="Link to this heading">¶</a></h2>
+<p>Common pattern for different environments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="4">    <span class="n">enabled</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+</span><span data-line="5">    <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">[],</span>
+</span><span data-line="6"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="getting-started.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Getting Started</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="panels.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Built-in Panels</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
