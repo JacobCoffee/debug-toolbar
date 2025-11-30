@@ -216,15 +216,20 @@ class WebSocketPanel(Panel):
         with cls._subscribers_lock:
             if not cls._live_subscribers:
                 return
-            message = json.dumps({"type": event_type, "data": data})
-            dead_queues = []
-            for queue in cls._live_subscribers:
-                try:
-                    queue.put_nowait(message)
-                except asyncio.QueueFull:  # noqa: PERF203 - queue cleanup in loop is fine
-                    dead_queues.append(queue)
-            for queue in dead_queues:
-                cls._live_subscribers.discard(queue)
+            subscribers = set(cls._live_subscribers)
+
+        message = json.dumps({"type": event_type, "data": data})
+        dead_queues = []
+        for queue in subscribers:
+            try:
+                queue.put_nowait(message)
+            except asyncio.QueueFull:  # noqa: PERF203 - queue cleanup in loop is fine
+                dead_queues.append(queue)
+
+        if dead_queues:
+            with cls._subscribers_lock:
+                for queue in dead_queues:
+                    cls._live_subscribers.discard(queue)
 
     @classmethod
     def track_connection(cls, connection: WebSocketConnection, ttl: int = 3600, max_connections: int = 50) -> None:

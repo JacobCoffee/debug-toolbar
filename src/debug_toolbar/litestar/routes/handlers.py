@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -16,6 +17,7 @@ from litestar import Request, Router, get, post, websocket
 if TYPE_CHECKING:
     from debug_toolbar.core.storage import ToolbarStorage
 
+logger = logging.getLogger(__name__)
 
 DEFAULT_DISPLAY_DEPTH = 10
 DEFAULT_MAX_ITEMS = 100
@@ -847,10 +849,6 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
         connections and messages being tracked by the debug toolbar.
         """
         await socket.accept()
-        import logging
-
-        logger = logging.getLogger(__name__)
-
         queue = WebSocketPanel.subscribe()
         try:
             initial_stats = WebSocketPanel.get_current_stats()
@@ -3134,7 +3132,8 @@ class DebugToolbar {
     }
 
     connectWsLive() {
-        const wsUrl = 'ws://' + window.location.host + '/_debug_toolbar/ws/live';
+        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const wsUrl = protocol + window.location.host + '/_debug_toolbar/ws/live';
         this.wsLiveConnection = new WebSocket(wsUrl);
 
         this.wsLiveConnection.onopen = () => {
