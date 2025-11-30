@@ -235,6 +235,7 @@ custom-panels
 
 API Reference <api/index>
 comparison
+changelog
 ```
 
 ```{toctree}
