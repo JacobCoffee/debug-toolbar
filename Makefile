@@ -141,10 +141,10 @@ example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
 	@uv run examples/graphql_panel_example.py
 
 example-mcp: ## Run MCP server example (http://localhost:8004)
-	@uv run examples/mcp_server_example.py
+	@uv run python examples/mcp_server_example.py
 
 example-mcp-server: ## Run MCP server (stdio transport)
-	@uv run examples/mcp_server_example.py --mcp
+	@uv run python examples/mcp_server_example.py --mcp
 
 ##@ Git Worktrees
 

@@ -6,7 +6,7 @@
 
 ---
 
-## Current Status: Phase 13 IN PROGRESS - MCP Server
+## Current Status: Phase 13 COMPLETE - MCP Server ✅
 
 ### Test Coverage: 524+ tests passing
 ### Panels Implemented: 17 panels (15 core + 2 Litestar-specific)
@@ -17,7 +17,7 @@
 - PR #13 - N+1 example fix
 - PR #14 - Async Profiler Panel
 - PR #15 - GraphQL Panel with Strawberry integration
-- PR #16 - MCP Server for AI Assistant Integration (in review)
+- PR #16 - MCP Server for AI Assistant Integration ✅
 
 ---
 
@@ -33,7 +33,7 @@
 | Flame Graphs | **Complete** | Django (plugin only) |
 | Async Profiling | **Best-in-class** (task tracking, blocking detection) | **Unique - nobody else has this** |
 | GraphQL Debugging | **Best-in-class** (N+1, resolver timing, Strawberry) | FastAPI (basic only) |
-| AI Integration | **In Progress** (PR #16) | Spotlight (MCP) |
+| AI Integration | **Best-in-class** (MCP Server) | Spotlight (MCP) |
 | Distributed Tracing | Missing | Spotlight (Sentry) |
 
 ---
@@ -79,22 +79,22 @@ All foundational work complete:
 - [x] Flame Graph Integration (PR #11)
 - [x] Async Profiler Panel (PR #14)
 
-### Phase 13: AI & Modern Tooling 🔄 IN PROGRESS
-- [x] MCP Server Integration (PR #16 - in review)
+### Phase 13: AI & Modern Tooling ✅ COMPLETE
+- [x] MCP Server Integration (PR #16)
   - [x] 10 MCP tools for analysis
   - [x] 10 MCP resources for data access
   - [x] Security utilities for sensitive data redaction
   - [x] CLI entry point (`python -m debug_toolbar.mcp`)
   - [x] Example with shared storage pattern
+  - [x] Claude Code / Cursor integration ready
 
 ---
 
 ## Next Up
 
-### Immediate (PR #16 merge pending):
-1. Merge MCP Server PR
-2. Test Claude Code / Cursor integration
-3. Add MCP documentation
+### Immediate:
+1. Add MCP documentation to docs
+2. Release v0.3.0 with MCP support
 
 ### Phase 12: Multi-Framework Support
 - Starlette adapter
@@ -103,6 +103,10 @@ All foundational work complete:
 ### Phase 14: Distributed Debugging
 - OpenTelemetry integration
 - Cross-service tracing
+
+### Phase 10.3: WebSocket Panel (deferred)
+- WebSocket connection tracking
+- Message logging
 
 ---
 
