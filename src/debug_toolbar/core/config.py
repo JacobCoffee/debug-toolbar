@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from debug_toolbar.core.panel import Panel
+    from debug_toolbar.core.storage import ToolbarStorage
 
 
 @dataclass
@@ -70,6 +71,8 @@ class DebugToolbarConfig:
     async_event_loop_lag_threshold_ms: float = 10.0
     async_capture_task_stacks: bool = True
     async_max_stack_depth: int = 10
+
+    storage: ToolbarStorage | None = None
 
     def get_all_panels(self) -> list[str | type[Panel]]:
         """Get all panels including extras, excluding excluded panels."""

@@ -15,6 +15,7 @@ from __future__ import annotations
 from debug_toolbar.core import (
     DebugToolbar,
     DebugToolbarConfig,
+    FileToolbarStorage,
     Panel,
     RequestContext,
     ToolbarStorage,
@@ -25,6 +26,7 @@ from debug_toolbar.core import (
 __all__ = [
     "DebugToolbar",
     "DebugToolbarConfig",
+    "FileToolbarStorage",
     "Panel",
     "RequestContext",
     "ToolbarStorage",

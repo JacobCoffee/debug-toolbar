@@ -224,10 +224,13 @@ INDEX_HTML = """<!DOCTYPE html>
   "mcpServers": {{
     "debug-toolbar": {{
       "command": "uv",
-      "args": ["run", "python", "-m", "debug_toolbar.mcp"]
+      "args": ["run", "python", "-m", "debug_toolbar.mcp", "--storage-file", ".debug_toolbar_storage.json"],
+      "cwd": "/path/to/your/project"
     }}
   }}
 }}</pre>
+        <p><strong>Important:</strong> The <code>cwd</code> must point to where your web app runs
+        (where <code>.debug_toolbar_storage.json</code> is created).</p>
     </div>
 
     <div class="section">
@@ -275,12 +278,13 @@ INDEX_HTML = """<!DOCTYPE html>
     <div class="section">
         <h2>Setup Checklist</h2>
         <ol>
-            <li>Run this web app: <code>make example-mcp</code></li>
-            <li>Add MCP config to <code>~/.claude/settings.json</code> (see above)</li>
+            <li>Run this web app: <code>make example-mcp</code> (creates <code>.debug_toolbar_storage.json</code>)</li>
+            <li>Add MCP config to <code>~/.claude/settings.json</code> with correct <code>cwd</code></li>
             <li>Restart Claude Code to load the MCP server</li>
             <li>Click around this app to generate request data</li>
-            <li>Ask Claude Code to analyze the debug data!</li>
+            <li>Ask Claude Code: <code>"What requests have been made?"</code></li>
         </ol>
+        <p><strong>Verify:</strong> Check that <code>.debug_toolbar_storage.json</code> exists and grows as you click around.</p>
     </div>
 
     <p><em>The debug toolbar should appear on the right side of this page.</em></p>
@@ -412,16 +416,24 @@ ERROR_HTML = """<!DOCTYPE html>
 </html>"""
 
 
+STORAGE_FILE = ".debug_toolbar_storage.json"
+
+
 def create_app() -> Litestar:
     """Create Litestar application with debug toolbar."""
     import time
 
     from litestar import Litestar, MediaType, get, post
 
+    from debug_toolbar import FileToolbarStorage
     from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+
+    storage = FileToolbarStorage(STORAGE_FILE, max_size=100)
+    print(f"Using shared storage file: {STORAGE_FILE}", file=sys.stderr)  # noqa: T201
 
     config = LitestarDebugToolbarConfig(
         enabled=True,
+        storage=storage,
         panels=[
             "debug_toolbar.core.panels.timer.TimerPanel",
             "debug_toolbar.core.panels.request.RequestPanel",
@@ -519,7 +531,7 @@ def create_app() -> Litestar:
 
 def run_mcp_server(transport: str = "stdio") -> None:
     """Run standalone MCP server for AI assistant integration."""
-    from debug_toolbar import DebugToolbar, DebugToolbarConfig
+    from debug_toolbar import FileToolbarStorage
     from debug_toolbar.mcp import create_mcp_server, is_available
 
     if not is_available():
@@ -527,12 +539,12 @@ def run_mcp_server(transport: str = "stdio") -> None:
         print("Install with: pip install debug-toolbar[mcp]", file=sys.stderr)  # noqa: T201
         sys.exit(1)
 
-    config = DebugToolbarConfig(enabled=True, max_request_history=100)
-    toolbar = DebugToolbar(config)
+    storage = FileToolbarStorage(STORAGE_FILE, max_size=100)
+    print(f"Using shared storage file: {STORAGE_FILE}", file=sys.stderr)  # noqa: T201
 
     mcp = create_mcp_server(
-        storage=toolbar.storage,
-        toolbar=toolbar,
+        storage=storage,
+        toolbar=None,
         redact_sensitive=True,
         server_name="debug-toolbar-example",
     )
@@ -574,7 +586,8 @@ Integration with Claude Code:
     "mcpServers": {
       "debug-toolbar": {
         "command": "uv",
-        "args": ["run", "python", "-m", "debug_toolbar.mcp"]
+        "args": ["run", "python", "-m", "debug_toolbar.mcp", "--storage-file", ".debug_toolbar_storage.json"],
+        "cwd": "/path/to/project"
       }
     }
   }

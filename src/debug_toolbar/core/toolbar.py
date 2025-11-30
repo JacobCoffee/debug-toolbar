@@ -39,7 +39,11 @@ class DebugToolbar:
             config: Configuration options. Uses defaults if not provided.
         """
         self._config = config or DebugToolbarConfig()
-        self._storage = ToolbarStorage(max_size=self._config.max_request_history)
+        self._storage = (
+            self._config.storage
+            if self._config.storage is not None
+            else ToolbarStorage(max_size=self._config.max_request_history)
+        )
         self._panel_classes: list[type[Panel]] = []
         self._panels: list[Panel] = []
 

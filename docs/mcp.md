@@ -14,7 +14,33 @@ pip install debug-toolbar[mcp]
 
 ## Quick Start
 
-### 1. Configure Claude Code
+### 1. Configure Your App with Shared Storage
+
+The web app and MCP server need to share a storage file. Update your app:
+
+```python
+from litestar import Litestar, get
+from debug_toolbar import FileToolbarStorage
+from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+
+@get("/")
+async def index() -> dict:
+    return {"message": "Hello"}
+
+# Use file-based storage for sharing with MCP server
+storage = FileToolbarStorage(".debug_toolbar_storage.json", max_size=100)
+
+config = LitestarDebugToolbarConfig(
+    enabled=True,
+    storage=storage,  # Share storage with MCP server
+)
+app = Litestar(
+    route_handlers=[index],
+    plugins=[DebugToolbarPlugin(config)],
+)
+```
+
+### 2. Configure Claude Code
 
 Add to your `~/.claude/settings.json` (global) or `.claude/settings.json` (project):
 
@@ -23,36 +49,24 @@ Add to your `~/.claude/settings.json` (global) or `.claude/settings.json` (proje
   "mcpServers": {
     "debug-toolbar": {
       "command": "uv",
-      "args": ["run", "python", "-m", "debug_toolbar.mcp"]
+      "args": ["run", "python", "-m", "debug_toolbar.mcp", "--storage-file", ".debug_toolbar_storage.json"],
+      "cwd": "/path/to/your/project"
     }
   }
 }
 ```
 
-### 2. Restart Claude Code
+**Important:** The `cwd` must point to where your web app runs (where the storage file is created).
+
+### 3. Restart Claude Code
 
 After updating settings, restart Claude Code to load the MCP server.
 
-### 3. Run Your Application
+### 4. Generate Request Data
 
-Start your Litestar application with the debug toolbar enabled:
+Start your web app and make some requests. The storage file will be created and populated.
 
-```python
-from litestar import Litestar, get
-from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-
-@get("/")
-async def index() -> dict:
-    return {"message": "Hello"}
-
-config = LitestarDebugToolbarConfig(enabled=True)
-app = Litestar(
-    route_handlers=[index],
-    plugins=[DebugToolbarPlugin(config)],
-)
-```
-
-### 4. Ask Claude Code to Analyze
+### 5. Ask Claude Code to Analyze
 
 Once you have requests flowing through your app, ask Claude Code questions like:
 
