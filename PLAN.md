@@ -87,14 +87,16 @@ All foundational work complete:
   - [x] CLI entry point (`python -m debug_toolbar.mcp`)
   - [x] Example with shared storage pattern
   - [x] Claude Code / Cursor integration ready
+  - [x] FileToolbarStorage for cross-process data sharing
+  - [x] Comprehensive MCP documentation (docs/mcp.md)
+  - [x] Screenshot in README and docs
 
 ---
 
 ## Next Up
 
 ### Immediate:
-1. Add MCP documentation to docs
-2. Release v0.3.0 with MCP support
+1. Release v0.3.0 with MCP support
 
 ### Phase 12: Multi-Framework Support
 - Starlette adapter
