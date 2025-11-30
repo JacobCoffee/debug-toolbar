@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["debug-toolbar"]
+# ///
 """Demo script showing how the Cache Panel tracks cache operations.
 
 This example demonstrates how the Cache Panel automatically tracks Redis and

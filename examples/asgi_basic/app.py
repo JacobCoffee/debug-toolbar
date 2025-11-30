@@ -1,9 +1,17 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "debug-toolbar",
+#   "uvicorn>=0.30.0",
+# ]
+# ///
 """Basic ASGI application with debug-toolbar.
 
 This example demonstrates using the core debug-toolbar
 with a plain ASGI application, without any framework.
 
-Run with: uvicorn examples.asgi_basic.app:app --reload
+Run with: uv run examples/asgi_basic/app.py
+    or:   uvicorn examples.asgi_basic.app:app --reload
 """
 
 from __future__ import annotations
@@ -192,3 +200,9 @@ async def application(scope: dict, receive: Callable, send: Callable) -> None:  
 async def app(scope: dict, receive: Callable, send: Callable) -> None:
     """ASGI app with debug toolbar middleware."""
     await debug_toolbar_middleware(application, scope, receive, send)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("examples.asgi_basic.app:app", host="127.0.0.1", port=8000, reload=True)

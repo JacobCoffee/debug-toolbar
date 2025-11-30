@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["debug-toolbar"]
+# ///
 """Example demonstrating the Async Profiler Panel usage."""
 
 # ruff: noqa: T201, INP001, ASYNC251, C901, PLR0912

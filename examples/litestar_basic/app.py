@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "debug-toolbar[litestar]",
+#   "jinja2>=3.1.0",
+#   "uvicorn>=0.30.0",
+# ]
+# ///
 """Basic Litestar application with debug toolbar.
 
 This example demonstrates using debug-toolbar
@@ -15,7 +23,8 @@ UI Features:
 - Request history: Visit /_debug_toolbar/ to see all recorded requests
 - Panel details: Click panel buttons to expand and view detailed data
 
-Run with: litestar --app examples.litestar_basic.app:app run --reload
+Run with: uv run examples/litestar_basic/app.py
+    or:   litestar --app examples.litestar_basic.app:app run --reload
 """
 
 from __future__ import annotations
@@ -54,6 +63,7 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
         <li><strong>Memory Panel</strong> - Track memory allocations and usage (tracemalloc/memray)</li>
         <li><strong>Async Profiler Panel</strong> - Track async tasks, detect blocking calls, monitor event loop lag</li>
+        <li><strong>GraphQL Panel</strong> - Track Strawberry GraphQL operations, resolvers, N+1 detection</li>
     </ul>
     <h2>Flame Graph Visualization</h2>
     <p>The Profiling Panel now supports interactive flame graph generation!</p>
@@ -101,6 +111,7 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Memory Panel</strong> - Memory profiling with tracemalloc/memray backends</li>
         <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
         <li><strong>Async Profiler Panel</strong> - Track async tasks, blocking calls, and event loop lag</li>
+        <li><strong>GraphQL Panel</strong> - Strawberry GraphQL operation tracking with N+1 detection</li>
     </ul>
     <h2>Flame Graph Support</h2>
     <p>The Profiling Panel generates interactive flame graphs in speedscope format:</p>
@@ -210,3 +221,8 @@ app = Litestar(
     plugins=[DebugToolbarPlugin(toolbar_config)],
     debug=True,
 )
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("examples.litestar_basic.app:app", host="127.0.0.1", port=8001, reload=True)

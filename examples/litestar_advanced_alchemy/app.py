@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "debug-toolbar[litestar,advanced-alchemy]",
+#   "uvicorn>=0.30.0",
+# ]
+# ///
 """Litestar + Advanced-Alchemy application with debug toolbar.
 
 This example demonstrates using debug-toolbar with Advanced-Alchemy
@@ -8,7 +15,8 @@ UI Features:
 - Request history: Visit /_debug_toolbar/ to see all recorded requests
 - Panel details: Click panel buttons to expand and view detailed data
 
-Run with: litestar --app examples.litestar_advanced_alchemy.app:app run --reload
+Run with: uv run examples/litestar_advanced_alchemy/app.py
+    or:   litestar --app examples.litestar_advanced_alchemy.app:app run --reload
 """
 
 from __future__ import annotations
@@ -100,6 +108,12 @@ async def index() -> str:
         <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
+    <h2>GraphQL Demo</h2>
+    <p style="background: rgba(139, 92, 246, 0.15); padding: 10px; border: 1px solid #8b5cf6; border-radius: 6px;">
+        <strong>GraphQL Panel Demo</strong> - Run separately with:<br>
+        <code>litestar --app examples.graphql_panel_example:app run --reload</code><br>
+        Demonstrates N+1 detection, resolver timing, and duplicate query detection for Strawberry GraphQL.
+    </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics and Memory panel for allocation tracking!</p>
     <p><strong>Note:</strong> The Alerts Panel will automatically warn you about N+1 queries and other issues!</p>
     <h2>Profiling & Flame Graphs</h2>
@@ -119,6 +133,7 @@ async def index() -> str:
         <li><strong>Alerts Panel</strong> - Proactive issue detection</li>
         <li><strong>Memory Panel</strong> - Memory allocation tracking</li>
         <li><strong>Async Profiler Panel</strong> - Async task tracking, blocking call detection</li>
+        <li><strong>GraphQL Panel</strong> - Strawberry GraphQL operations with N+1 detection</li>
     </ul>
     <h2>Toolbar Controls</h2>
     <ul>
@@ -133,7 +148,7 @@ async def index() -> str:
 async def users_page(user_repo: UserRepository) -> str:
     """Users HTML page."""
     logger.info("Users page accessed")
-    users = await user_repo.list(LimitOffset(limit=100, offset=0))
+    users = await user_repo.list(LimitOffset(limit=100, offset=0), load=[User.posts])
 
     rows = "".join(
         f"<tr><td>{u.id}</td><td>{u.name}</td><td>{u.email}</td><td>{len(u.posts)} posts</td></tr>" for u in users
@@ -548,3 +563,10 @@ app = Litestar(
     after_request=after_request_handler,
     debug=True,
 )
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "examples.litestar_advanced_alchemy.app:app", host="127.0.0.1", port=8002, reload=True
+    )
