@@ -152,3 +152,13 @@ class FileToolbarStorage(ToolbarStorage):
     def reload(self) -> None:
         """Reload data from file (useful for MCP server to get fresh data)."""
         self._load()
+
+    def get(self, request_id: UUID) -> dict[str, Any] | None:
+        """Retrieve request data, reloading from file first."""
+        self._load()
+        return super().get(request_id)
+
+    def get_all(self) -> list[tuple[UUID, dict[str, Any]]]:
+        """Get all stored requests, reloading from file first."""
+        self._load()
+        return super().get_all()
