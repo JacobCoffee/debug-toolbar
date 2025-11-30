@@ -134,7 +134,7 @@ async def index() -> str:
 async def users_page(user_repo: UserRepository) -> str:
     """Users HTML page."""
     logger.info("Users page accessed")
-    users = await user_repo.list(LimitOffset(limit=100, offset=0))
+    users = await user_repo.list(LimitOffset(limit=100, offset=0), load=[User.posts])
 
     rows = "".join(
         f"<tr><td>{u.id}</td><td>{u.name}</td><td>{u.email}</td><td>{len(u.posts)} posts</td></tr>" for u in users
