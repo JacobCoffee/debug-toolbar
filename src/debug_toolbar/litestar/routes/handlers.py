@@ -6,7 +6,7 @@ import json
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from litestar.connection import WebSocket as LitestarWebSocket  # noqa: TC002 - Litestar needs at runtime
+from litestar.connection import WebSocket as LitestarWebSocket
 from litestar.exceptions import NotFoundException
 from litestar.response import Response
 
