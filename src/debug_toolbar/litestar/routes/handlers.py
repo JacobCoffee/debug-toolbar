@@ -713,7 +713,7 @@ def get_toolbar_css() -> str:
     --dt-bg-tertiary: #3d3d3d;
     --dt-text-primary: #ffffff;
     --dt-text-secondary: #b0b0b0;
-    --dt-text-muted: #707070;
+    --dt-text-muted: #9a9a9a;
     --dt-accent: #007acc;
     --dt-accent-hover: #0098ff;
     --dt-success: #4ec9b0;
@@ -730,7 +730,7 @@ def get_toolbar_css() -> str:
     --dt-bg-tertiary: #e8e8e8;
     --dt-text-primary: #1e1e1e;
     --dt-text-secondary: #555555;
-    --dt-text-muted: #888888;
+    --dt-text-muted: #6b6b6b;
     --dt-accent: #0066cc;
     --dt-accent-hover: #0052a3;
     --dt-success: #2e7d32;

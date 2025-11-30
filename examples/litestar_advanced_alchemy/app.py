@@ -80,6 +80,7 @@ async def index() -> str:
         <li><a href="/">Home</a></li>
         <li><a href="/users">Users List</a></li>
         <li><a href="/posts">Posts List</a></li>
+        <li><a href="/async-demo">Async Profiler Demo</a></li>
     </ul>
     <h2>API Endpoints</h2>
     <ul>
