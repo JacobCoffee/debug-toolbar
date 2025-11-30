@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - add MCP integration screenshot to README and docs - ([b197d29](https://github.com/JacobCoffee/debug-toolbar/commit/b197d299fa780efb8db1e2b6b4cdf448c3634e2b)) - Jacob Coffee
 - update PLAN.md with MCP completion status - ([652c755](https://github.com/JacobCoffee/debug-toolbar/commit/652c755e600e779f49348863ddd7eb55ac600ff4)) - Jacob Coffee
 - update MCP screenshot and API docs for FileToolbarStorage (#18) - ([38e9a4b](https://github.com/JacobCoffee/debug-toolbar/commit/38e9a4b756f87dc2fcea03d5b6c8b5dcabc3fb3b)) - Jacob Coffee
+- regenerate changelog for v0.3.0 - ([8e6f21c](https://github.com/JacobCoffee/debug-toolbar/commit/8e6f21cbc5fb6f3a4f4237a453e43057c3eaf881)) - github-actions[bot]
 
 ### Features
 
