@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
 if TYPE_CHECKING:
@@ -179,16 +179,14 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
                     }
                 )
 
-        slow_queries: list[dict[str, Any]] = analysis["slow_queries"]  # type: ignore[assignment]
         analysis["slow_queries"] = sorted(
-            slow_queries,
+            cast("list[dict[str, Any]]", analysis["slow_queries"]),
             key=lambda x: x["duration_ms"],
             reverse=True,
         )[:top_n]
 
-        slow_resolvers: list[dict[str, Any]] = analysis["slow_resolvers"]  # type: ignore[assignment]
         analysis["slow_resolvers"] = sorted(
-            slow_resolvers,
+            cast("list[dict[str, Any]]", analysis["slow_resolvers"]),
             key=lambda x: x["duration_ms"],
             reverse=True,
         )[:top_n]
@@ -439,13 +437,27 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
         duration_a = timing_a.get("total_time_ms", 0)
         duration_b = timing_b.get("total_time_ms", 0)
         duration_diff = duration_b - duration_a
-        duration_pct = (duration_diff / duration_a * 100) if duration_a > 0 else 0
+        if duration_a > 0:
+            duration_pct: float | None = duration_diff / duration_a * 100
+        elif duration_a == 0 and duration_b > 0:
+            duration_pct = None  # Undefined/infinite increase from zero baseline
+        else:
+            duration_pct = 0.0
 
         queries_a = len(sql_a.get("queries", []))
         queries_b = len(sql_b.get("queries", []))
 
         memory_a = panels_a.get("MemoryPanel", {}).get("delta_mb", 0)
         memory_b = panels_b.get("MemoryPanel", {}).get("delta_mb", 0)
+
+        regression_detected = (
+            (duration_pct is not None and duration_pct > REGRESSION_THRESHOLD_PCT)
+            or queries_b > queries_a * 1.5
+            or (duration_a == 0 and duration_b > 0)  # Any increase from zero is notable
+        )
+        improvements_detected = (
+            duration_pct is not None and duration_pct < IMPROVEMENT_THRESHOLD_PCT
+        ) or queries_b < queries_a * 0.7
 
         return {
             "baseline": {
@@ -464,12 +476,12 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
             },
             "differences": {
                 "duration_ms": duration_diff,
-                "duration_pct_change": round(duration_pct, 2),
+                "duration_pct_change": round(duration_pct, 2) if duration_pct is not None else None,
                 "query_count_diff": queries_b - queries_a,
                 "memory_diff_mb": memory_b - memory_a,
             },
-            "regression_detected": duration_pct > REGRESSION_THRESHOLD_PCT or queries_b > queries_a * 1.5,
-            "improvements_detected": duration_pct < IMPROVEMENT_THRESHOLD_PCT or queries_b < queries_a * 0.7,
+            "regression_detected": regression_detected,
+            "improvements_detected": improvements_detected,
         }
 
     @mcp.tool()
