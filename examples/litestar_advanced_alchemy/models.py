@@ -17,7 +17,7 @@ class User(UUIDAuditBase):
 
     name: Mapped[str] = mapped_column(String(100))
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    posts: Mapped[list[Post]] = relationship(back_populates="author", lazy="selectin")
+    posts: Mapped[list[Post]] = relationship(back_populates="author")
 
 
 class Post(UUIDAuditBase):
@@ -28,7 +28,7 @@ class Post(UUIDAuditBase):
     title: Mapped[str] = mapped_column(String(200))
     content: Mapped[str] = mapped_column(Text)
     author_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    author: Mapped[User] = relationship(back_populates="posts", lazy="joined")
+    author: Mapped[User] = relationship(back_populates="posts")
     published_at: Mapped[datetime | None] = mapped_column(default=None)
 
     def publish(self) -> None:
