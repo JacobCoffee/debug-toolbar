@@ -36,16 +36,253 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import logging
 import sys
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from litestar import Litestar
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+INDEX_HTML = """<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Server Example - Debug Toolbar</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+        .nav a:hover { text-decoration: underline; }
+        .section { margin: 25px 0; padding: 15px; border-left: 4px solid #0066cc; background: #f9f9f9; }
+        code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .tools-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
+        .tool { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 6px; }
+        .tool strong { color: #0066cc; }
+        .timestamp { color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Toolbar + MCP Server Example</h1>
+    <p class="timestamp">Server time: {timestamp}</p>
+
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/slow">Slow Page (500ms)</a>
+        <a href="/users">Users</a>
+        <a href="/compute">CPU Intensive</a>
+        <a href="/error-demo">Error Demo</a>
+        <a href="/api/data">API Data (JSON)</a>
+        <a href="/_debug_toolbar/">Request History</a>
+    </div>
+
+    <div class="section">
+        <h2>About This Example</h2>
+        <p>This example demonstrates the <strong>MCP (Model Context Protocol) Server</strong> integration
+        for the debug toolbar. It allows AI assistants like Claude Code to analyze your application's
+        debug data programmatically.</p>
+    </div>
+
+    <div class="section">
+        <h2>MCP Tools Available</h2>
+        <div class="tools-list">
+            <div class="tool"><strong>get_request_history</strong><br>List all tracked HTTP requests</div>
+            <div class="tool"><strong>get_request_details</strong><br>Get detailed info for a request</div>
+            <div class="tool"><strong>analyze_performance_bottlenecks</strong><br>Find slow operations</div>
+            <div class="tool"><strong>detect_n_plus_one_queries</strong><br>Find N+1 query patterns</div>
+            <div class="tool"><strong>analyze_security_alerts</strong><br>Security issue detection</div>
+            <div class="tool"><strong>compare_requests</strong><br>Compare two requests</div>
+            <div class="tool"><strong>generate_optimization_report</strong><br>Full optimization report</div>
+            <div class="tool"><strong>get_panel_data</strong><br>Get specific panel data</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Claude Code Integration</h2>
+        <p>Add to your <code>.claude/settings.json</code>:</p>
+        <pre>{
+  "mcpServers": {
+    "debug-toolbar": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "debug_toolbar.mcp"]
+    }
+  }
+}</pre>
+    </div>
+
+    <div class="section">
+        <h2>Try These Scenarios</h2>
+        <ol>
+            <li><strong>Click around</strong> - Visit different pages to generate request history</li>
+            <li><strong>Check the toolbar</strong> - See timing, headers, logs for each request</li>
+            <li><strong>View history</strong> - Go to <a href="/_debug_toolbar/">/_debug_toolbar/</a></li>
+            <li><strong>Test MCP</strong> - Run <code>make example-mcp-server</code> in another terminal</li>
+        </ol>
+    </div>
+
+    <p><em>The debug toolbar should appear on the right side of this page.</em></p>
+</body>
+</html>"""
+
+SLOW_HTML = """<!DOCTYPE html>
+<html>
+<head>
+    <title>Slow Page - Debug Toolbar</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; }
+        .metric { font-size: 48px; font-weight: bold; color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>Slow Page</h1>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/slow">Slow Page</a>
+        <a href="/users">Users</a>
+        <a href="/compute">CPU Intensive</a>
+        <a href="/_debug_toolbar/">Request History</a>
+    </div>
+
+    <div class="warning">
+        <p class="metric">{delay_ms}ms</p>
+        <p>This page intentionally delayed for <strong>{delay_ms} milliseconds</strong>
+        to demonstrate performance profiling.</p>
+        <p>Check the <strong>Timer Panel</strong> in the debug toolbar to see the timing breakdown.</p>
+    </div>
+
+    <h2>What to Look For</h2>
+    <ul>
+        <li><strong>Timer Panel</strong> - Shows total request time exceeds 500ms</li>
+        <li><strong>Alerts Panel</strong> - May show performance warnings</li>
+        <li><strong>MCP Analysis</strong> - <code>analyze_performance_bottlenecks</code> will flag this</li>
+    </ul>
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>"""
+
+USERS_HTML = """<!DOCTYPE html>
+<html>
+<head>
+    <title>Users - Debug Toolbar</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #f5f5f5; }
+        tr:hover { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Users</h1>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/slow">Slow Page</a>
+        <a href="/users">Users</a>
+        <a href="/compute">CPU Intensive</a>
+        <a href="/_debug_toolbar/">Request History</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+        </thead>
+        <tbody>
+            {rows}
+        </tbody>
+    </table>
+
+    <p>This page demonstrates a typical data display. In a real app with a database,
+    the <strong>SQLAlchemy Panel</strong> would show queries here.</p>
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>"""
+
+COMPUTE_HTML = """<!DOCTYPE html>
+<html>
+<head>
+    <title>CPU Intensive - Debug Toolbar</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+        .result { background: #d4edda; border: 1px solid #28a745; padding: 15px; border-radius: 8px; }
+        code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>CPU Intensive Computation</h1>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/slow">Slow Page</a>
+        <a href="/users">Users</a>
+        <a href="/compute">CPU Intensive</a>
+        <a href="/_debug_toolbar/">Request History</a>
+    </div>
+
+    <div class="result">
+        <p><strong>Fibonacci({n}) = {result}</strong></p>
+        <p>Computed in approximately <strong>{time_ms:.2f}ms</strong></p>
+    </div>
+
+    <h2>What to Look For</h2>
+    <ul>
+        <li><strong>Profiling Panel</strong> - Shows CPU time spent in computation</li>
+        <li><strong>Async Profiler Panel</strong> - Shows this was synchronous (blocking) work</li>
+        <li><strong>Flame Graph</strong> - Download from <code>/_debug_toolbar/api/flamegraph/{{request_id}}</code></li>
+    </ul>
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>"""
+
+ERROR_HTML = """<!DOCTYPE html>
+<html>
+<head>
+    <title>Error Demo - Debug Toolbar</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
+        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+        .error { background: #f8d7da; border: 1px solid #dc3545; padding: 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>Error Demo</h1>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/slow">Slow Page</a>
+        <a href="/users">Users</a>
+        <a href="/compute">CPU Intensive</a>
+        <a href="/_debug_toolbar/">Request History</a>
+    </div>
+
+    <div class="error">
+        <h2>Simulated Error Response</h2>
+        <p>This page returns successfully but represents an error scenario.</p>
+        <p>In a real application, check the <strong>Logging Panel</strong> for error logs.</p>
+    </div>
+
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>"""
+
 
 def create_app() -> Litestar:
     """Create Litestar application with debug toolbar."""
-    from litestar import Litestar, get, post
+    import time
+
+    from litestar import Litestar, MediaType, get, post
 
     from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
@@ -57,49 +294,90 @@ def create_app() -> Litestar:
             "debug_toolbar.core.panels.response.ResponsePanel",
             "debug_toolbar.core.panels.headers.HeadersPanel",
             "debug_toolbar.core.panels.logging.LoggingPanel",
+            "debug_toolbar.core.panels.profiling.ProfilingPanel",
+            "debug_toolbar.core.panels.alerts.AlertsPanel",
         ],
     )
 
     plugin = DebugToolbarPlugin(config=config)
 
-    @get("/")
-    async def index() -> dict:
-        """Home endpoint."""
-        return {
-            "message": "Debug Toolbar + MCP Example",
-            "endpoints": ["/", "/slow", "/error", "/api/data"],
-            "mcp_info": "Run with --mcp flag to start MCP server",
-        }
+    @get("/", media_type=MediaType.HTML)
+    async def index() -> str:
+        """Home page with MCP documentation."""
+        logger.info("Home page accessed")
+        timestamp = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        return INDEX_HTML.format(timestamp=timestamp)
 
-    @get("/slow")
-    async def slow_endpoint() -> dict:
+    @get("/slow", media_type=MediaType.HTML)
+    async def slow_endpoint() -> str:
         """Simulates a slow endpoint for profiling."""
+        logger.info("Slow endpoint accessed - waiting 500ms")
         await asyncio.sleep(0.5)
-        return {"message": "This was slow", "delay_ms": 500}
+        logger.warning("Slow endpoint completed after delay")
+        return SLOW_HTML.format(delay_ms=500)
 
-    @get("/error")
-    async def error_endpoint() -> dict:
-        """Returns an error response (simulated via dict for simplicity)."""
-        return {"error": "Something went wrong", "status": "error"}
+    @get("/users", media_type=MediaType.HTML)
+    async def users_page() -> str:
+        """Users listing page."""
+        logger.info("Users page accessed")
+        users = [
+            {"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "role": "Admin"},
+            {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "role": "User"},
+            {"id": 3, "name": "Charlie Brown", "email": "charlie@example.com", "role": "User"},
+            {"id": 4, "name": "Diana Prince", "email": "diana@example.com", "role": "Moderator"},
+        ]
+        rows = "\n".join(
+            f"<tr><td>{u['id']}</td><td>{u['name']}</td><td>{u['email']}</td><td>{u['role']}</td></tr>"
+            for u in users
+        )
+        return USERS_HTML.format(rows=rows)
+
+    @get("/compute", media_type=MediaType.HTML)
+    async def compute_endpoint() -> str:
+        """CPU-intensive computation for profiling."""
+        logger.info("Compute endpoint accessed - running fibonacci")
+
+        def fib(n: int) -> int:
+            if n <= 1:
+                return n
+            return fib(n - 1) + fib(n - 2)
+
+        n = 30
+        start = time.perf_counter()
+        result = fib(n)
+        elapsed = (time.perf_counter() - start) * 1000
+
+        logger.info(f"Fibonacci({n}) = {result} computed in {elapsed:.2f}ms")
+        return COMPUTE_HTML.format(n=n, result=result, time_ms=elapsed)
+
+    @get("/error-demo", media_type=MediaType.HTML)
+    async def error_demo() -> str:
+        """Error demonstration page."""
+        logger.error("Error demo page accessed - simulating error scenario")
+        logger.warning("This is a warning message")
+        return ERROR_HTML
 
     @get("/api/data")
     async def api_data() -> dict:
         """API endpoint returning sample data."""
+        logger.info("API data endpoint accessed")
         return {
             "users": [
                 {"id": 1, "name": "Alice"},
                 {"id": 2, "name": "Bob"},
             ],
             "total": 2,
+            "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         }
 
     @post("/api/create")
     async def api_create(data: dict) -> dict:
         """API endpoint for creating data."""
+        logger.info(f"API create endpoint accessed with data: {data}")
         return {"created": True, "data": data}
 
     return Litestar(
-        route_handlers=[index, slow_endpoint, error_endpoint, api_data, api_create],
+        route_handlers=[index, slow_endpoint, users_page, compute_endpoint, error_demo, api_data, api_create],
         plugins=[plugin],
         debug=True,
     )
