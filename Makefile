@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa act act-ci act-test
+.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql act act-ci act-test
 
 # ==================================================================================== #
 # VARIABLES
@@ -136,6 +136,9 @@ example-litestar: ## Run Litestar example app (http://localhost:8001)
 
 example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
 	@uv run --extra all litestar --app examples.litestar_advanced_alchemy.app:app run --reload --port 8002
+
+example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
+	@uv run --extra all litestar --app examples.graphql_panel_example:app run --reload --port 8003
 
 ##@ Git Worktrees
 
