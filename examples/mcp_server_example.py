@@ -22,14 +22,14 @@ Usage:
 
 Integration with Claude Code:
     Add to your .claude/settings.json:
-    {
-        "mcpServers": {
-            "debug-toolbar": {
+    {{
+        "mcpServers": {{
+            "debug-toolbar": {{
                 "command": "uv",
                 "args": ["run", "python", "-m", "debug_toolbar.mcp"]
-            }
-        }
-    }
+            }}
+        }}
+    }}
 """
 
 from __future__ import annotations
@@ -47,24 +47,140 @@ if TYPE_CHECKING:
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+COMMON_CSS = """
+:root {{
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #f9f9f9;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent: #0066cc;
+    --border: #dddddd;
+    --code-bg: #e8e8e8;
+    --pre-bg: #2d2d2d;
+    --pre-text: #f8f8f2;
+    --success-bg: #d4edda;
+    --success-border: #28a745;
+    --warning-bg: #fff3cd;
+    --warning-border: #ffc107;
+    --error-bg: #f8d7da;
+    --error-border: #dc3545;
+    --danger: #dc3545;
+}}
+@media (prefers-color-scheme: dark) {{
+    :root {{
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #16213e;
+        --bg-tertiary: #0f3460;
+        --text-primary: #e8e8e8;
+        --text-secondary: #a0a0a0;
+        --accent: #4da6ff;
+        --border: #404040;
+        --code-bg: #2d2d2d;
+        --pre-bg: #0d0d0d;
+        --pre-text: #f8f8f2;
+        --success-bg: #1e3a2f;
+        --success-border: #28a745;
+        --warning-bg: #3d3a1e;
+        --warning-border: #ffc107;
+        --error-bg: #3a1e1e;
+        --error-border: #dc3545;
+        --danger: #ff6b6b;
+    }}
+}}
+body {{
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}}
+h1, h2 {{ color: var(--text-primary); }}
+a {{ color: var(--accent); }}
+.nav {{
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}}
+.nav a {{
+    margin-right: 15px;
+    color: var(--accent);
+    text-decoration: none;
+}}
+.nav a:hover {{ text-decoration: underline; }}
+.section {{
+    margin: 25px 0;
+    padding: 15px;
+    border-left: 4px solid var(--accent);
+    background: var(--bg-tertiary);
+    border-radius: 0 8px 8px 0;
+}}
+code {{
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 14px;
+}}
+pre {{
+    background: var(--pre-bg);
+    color: var(--pre-text);
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+}}
+table {{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}}
+th, td {{
+    border: 1px solid var(--border);
+    padding: 12px;
+    text-align: left;
+}}
+th {{ background: var(--bg-secondary); }}
+tr:hover {{ background: var(--bg-tertiary); }}
+.tools-list {{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+}}
+.tool {{
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 6px;
+}}
+.tool strong {{ color: var(--accent); }}
+.timestamp {{ color: var(--text-secondary); font-size: 14px; }}
+.warning {{
+    background: var(--warning-bg);
+    border: 1px solid var(--warning-border);
+    padding: 15px;
+    border-radius: 8px;
+}}
+.metric {{ font-size: 48px; font-weight: bold; color: var(--danger); }}
+.result {{
+    background: var(--success-bg);
+    border: 1px solid var(--success-border);
+    padding: 15px;
+    border-radius: 8px;
+}}
+.error {{
+    background: var(--error-bg);
+    border: 1px solid var(--error-border);
+    padding: 15px;
+    border-radius: 8px;
+}}
+"""
+
 INDEX_HTML = """<!DOCTYPE html>
 <html>
 <head>
     <title>MCP Server Example - Debug Toolbar</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        h1 { color: #333; }
-        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
-        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
-        .nav a:hover { text-decoration: underline; }
-        .section { margin: 25px 0; padding: 15px; border-left: 4px solid #0066cc; background: #f9f9f9; }
-        code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
-        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 8px; overflow-x: auto; }
-        .tools-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; }
-        .tool { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 6px; }
-        .tool strong { color: #0066cc; }
-        .timestamp { color: #666; font-size: 14px; }
-    </style>
+    <style>{css}</style>
 </head>
 <body>
     <h1>Debug Toolbar + MCP Server Example</h1>
@@ -104,14 +220,14 @@ INDEX_HTML = """<!DOCTYPE html>
     <div class="section">
         <h2>Claude Code Integration</h2>
         <p>Add to your <code>.claude/settings.json</code>:</p>
-        <pre>{
-  "mcpServers": {
-    "debug-toolbar": {
+        <pre>{{
+  "mcpServers": {{
+    "debug-toolbar": {{
       "command": "uv",
       "args": ["run", "python", "-m", "debug_toolbar.mcp"]
-    }
-  }
-}</pre>
+    }}
+  }}
+}}</pre>
     </div>
 
     <div class="section">
@@ -132,13 +248,7 @@ SLOW_HTML = """<!DOCTYPE html>
 <html>
 <head>
     <title>Slow Page - Debug Toolbar</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
-        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
-        .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 8px; }
-        .metric { font-size: 48px; font-weight: bold; color: #dc3545; }
-    </style>
+    <style>{css}</style>
 </head>
 <body>
     <h1>Slow Page</h1>
@@ -172,15 +282,7 @@ USERS_HTML = """<!DOCTYPE html>
 <html>
 <head>
     <title>Users - Debug Toolbar</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
-        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #f5f5f5; }
-        tr:hover { background: #f9f9f9; }
-    </style>
+    <style>{css}</style>
 </head>
 <body>
     <h1>Users</h1>
@@ -212,13 +314,7 @@ COMPUTE_HTML = """<!DOCTYPE html>
 <html>
 <head>
     <title>CPU Intensive - Debug Toolbar</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
-        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
-        .result { background: #d4edda; border: 1px solid #28a745; padding: 15px; border-radius: 8px; }
-        code { background: #e8e8e8; padding: 2px 6px; border-radius: 3px; }
-    </style>
+    <style>{css}</style>
 </head>
 <body>
     <h1>CPU Intensive Computation</h1>
@@ -250,12 +346,7 @@ ERROR_HTML = """<!DOCTYPE html>
 <html>
 <head>
     <title>Error Demo - Debug Toolbar</title>
-    <style>
-        body { font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; }
-        .nav { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }
-        .nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
-        .error { background: #f8d7da; border: 1px solid #dc3545; padding: 15px; border-radius: 8px; }
-    </style>
+    <style>{css}</style>
 </head>
 <body>
     <h1>Error Demo</h1>
@@ -306,7 +397,7 @@ def create_app() -> Litestar:
         """Home page with MCP documentation."""
         logger.info("Home page accessed")
         timestamp = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
-        return INDEX_HTML.format(timestamp=timestamp)
+        return INDEX_HTML.format(css=COMMON_CSS, timestamp=timestamp)
 
     @get("/slow", media_type=MediaType.HTML)
     async def slow_endpoint() -> str:
@@ -314,7 +405,7 @@ def create_app() -> Litestar:
         logger.info("Slow endpoint accessed - waiting 500ms")
         await asyncio.sleep(0.5)
         logger.warning("Slow endpoint completed after delay")
-        return SLOW_HTML.format(delay_ms=500)
+        return SLOW_HTML.format(css=COMMON_CSS, delay_ms=500)
 
     @get("/users", media_type=MediaType.HTML)
     async def users_page() -> str:
@@ -330,7 +421,7 @@ def create_app() -> Litestar:
             f"<tr><td>{u['id']}</td><td>{u['name']}</td><td>{u['email']}</td><td>{u['role']}</td></tr>"
             for u in users
         )
-        return USERS_HTML.format(rows=rows)
+        return USERS_HTML.format(css=COMMON_CSS, rows=rows)
 
     @get("/compute", media_type=MediaType.HTML)
     async def compute_endpoint() -> str:
@@ -348,14 +439,14 @@ def create_app() -> Litestar:
         elapsed = (time.perf_counter() - start) * 1000
 
         logger.info(f"Fibonacci({n}) = {result} computed in {elapsed:.2f}ms")
-        return COMPUTE_HTML.format(n=n, result=result, time_ms=elapsed)
+        return COMPUTE_HTML.format(css=COMMON_CSS, n=n, result=result, time_ms=elapsed)
 
     @get("/error-demo", media_type=MediaType.HTML)
     async def error_demo() -> str:
         """Error demonstration page."""
         logger.error("Error demo page accessed - simulating error scenario")
         logger.warning("This is a warning message")
-        return ERROR_HTML
+        return ERROR_HTML.format(css=COMMON_CSS)
 
     @get("/api/data")
     async def api_data() -> dict:
