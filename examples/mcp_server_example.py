@@ -231,12 +231,55 @@ INDEX_HTML = """<!DOCTYPE html>
     </div>
 
     <div class="section">
-        <h2>Try These Scenarios</h2>
+        <h2>How to Use with Claude Code</h2>
+        <p>Once you have the MCP server configured, ask Claude Code questions like:</p>
+        <div class="tools-list">
+            <div class="tool">
+                <strong>"What requests have been made?"</strong><br>
+                <em>Uses get_request_history to show recent requests</em>
+            </div>
+            <div class="tool">
+                <strong>"Are there any slow endpoints?"</strong><br>
+                <em>Uses analyze_performance_bottlenecks</em>
+            </div>
+            <div class="tool">
+                <strong>"Check for security issues"</strong><br>
+                <em>Uses analyze_security_alerts</em>
+            </div>
+            <div class="tool">
+                <strong>"Generate a performance report"</strong><br>
+                <em>Uses generate_optimization_report</em>
+            </div>
+            <div class="tool">
+                <strong>"Are there any N+1 queries?"</strong><br>
+                <em>Uses detect_n_plus_one_queries</em>
+            </div>
+            <div class="tool">
+                <strong>"Compare /slow and /users requests"</strong><br>
+                <em>Uses compare_requests</em>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Example Prompts to Try</h2>
         <ol>
-            <li><strong>Click around</strong> - Visit different pages to generate request history</li>
-            <li><strong>Check the toolbar</strong> - See timing, headers, logs for each request</li>
-            <li><strong>View history</strong> - Go to <a href="/_debug_toolbar/">/_debug_toolbar/</a></li>
-            <li><strong>Test MCP</strong> - Run <code>make example-mcp-server</code> in another terminal</li>
+            <li><strong>First, click around this app</strong> - Visit /slow, /users, /compute to generate data</li>
+            <li>Then ask Claude Code: <code>"Analyze the debug toolbar data for performance issues"</code></li>
+            <li>Or: <code>"What's the slowest endpoint in my app?"</code></li>
+            <li>Or: <code>"Show me the request history and identify any problems"</code></li>
+            <li>Or: <code>"Generate a full optimization report for my application"</code></li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>Setup Checklist</h2>
+        <ol>
+            <li>Run this web app: <code>make example-mcp</code></li>
+            <li>Add MCP config to <code>~/.claude/settings.json</code> (see above)</li>
+            <li>Restart Claude Code to load the MCP server</li>
+            <li>Click around this app to generate request data</li>
+            <li>Ask Claude Code to analyze the debug data!</li>
         </ol>
     </div>
 

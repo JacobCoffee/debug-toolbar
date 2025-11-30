@@ -103,18 +103,18 @@ Explore the built-in panels: Timer, Request, Response, SQL, Logging, and more.
 Build your own debug panels with the extensible panel system.
 :::
 
+:::{grid-item-card} MCP Server (AI Integration)
+:link: mcp
+:link-type: doc
+
+Let Claude Code analyze your debug data with the MCP server integration.
+:::
+
 :::{grid-item-card} Debug Toolbar Comparison
 :link: comparison
 :link-type: doc
 
 See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
-:::
-
-:::{grid-item-card} API Reference
-:link: api/index
-:link-type: doc
-
-Complete API documentation for all public classes and functions.
 :::
 ::::
 
@@ -149,6 +149,7 @@ app = Litestar(
 - **Memory Profiling**: Multi-backend support (tracemalloc, memray)
 - **Proactive Alerts**: Automatic security, performance, and database issue detection
 - **Lifecycle Events**: Track Litestar hooks and exception handlers
+- **MCP Server**: AI assistant integration for Claude Code analysis
 
 ## Screenshots
 
@@ -226,6 +227,7 @@ getting-started
 configuration
 panels
 custom-panels
+mcp
 ```
 
 ```{toctree}
