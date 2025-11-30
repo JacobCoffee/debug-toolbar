@@ -148,4 +148,4 @@ class DuplicateDetector:
         var_json = json.dumps(variables, sort_keys=True, default=str)
 
         combined = f"{normalized_query}:{var_json}"
-        return hashlib.md5(combined.encode(), usedforsecurity=False).hexdigest()[:12]
+        return hashlib.md5(combined.encode(), usedforsecurity=False).hexdigest()

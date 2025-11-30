@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 import time
 from collections.abc import Callable, Generator
@@ -132,32 +133,33 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
 
         context.store_panel_data("GraphQLPanel", "current_operation", operation)
 
-        yield
+        try:
+            yield
+        finally:
+            operation.end_time = time.perf_counter()
+            operation.duration_ms = (operation.end_time - operation.start_time) * 1000
 
-        operation.end_time = time.perf_counter()
-        operation.duration_ms = (operation.end_time - operation.start_time) * 1000
+            if hasattr(exec_ctx, "result") and exec_ctx.result is not None:
+                result = exec_ctx.result
+                if hasattr(result, "errors") and result.errors:
+                    operation.errors = [
+                        {
+                            "message": str(getattr(err, "message", str(err))),
+                            "path": list(err.path) if hasattr(err, "path") and err.path else None,
+                            "locations": (
+                                [{"line": loc.line, "column": loc.column} for loc in (err.locations or [])]
+                                if hasattr(err, "locations")
+                                else None
+                            ),
+                        }
+                        for err in result.errors
+                    ]
 
-        if hasattr(exec_ctx, "result") and exec_ctx.result is not None:
-            result = exec_ctx.result
-            if hasattr(result, "errors") and result.errors:
-                operation.errors = [
-                    {
-                        "message": str(getattr(err, "message", str(err))),
-                        "path": list(err.path) if hasattr(err, "path") and err.path else None,
-                        "locations": (
-                            [{"line": loc.line, "column": loc.column} for loc in (err.locations or [])]
-                            if hasattr(err, "locations")
-                            else None
-                        ),
-                    }
-                    for err in result.errors
-                ]
-
-        panel_data = context.get_panel_data("GraphQLPanel")
-        operations = panel_data.get("operations", [])
-        operations.append(operation)
-        context.store_panel_data("GraphQLPanel", "operations", operations)
-        context.store_panel_data("GraphQLPanel", "current_operation", None)
+            panel_data = context.get_panel_data("GraphQLPanel")
+            operations = panel_data.get("operations", [])
+            operations.append(operation)
+            context.store_panel_data("GraphQLPanel", "operations", operations)
+            context.store_panel_data("GraphQLPanel", "current_operation", None)
 
     def resolve(
         self,
@@ -170,6 +172,7 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         """Track individual resolver execution.
 
         Called for every field resolver. Measures timing and captures metadata.
+        Handles both sync and async resolvers correctly.
 
         Args:
             _next: Next resolver in chain.
@@ -208,9 +211,8 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         if self._capture_stacks:
             resolver.stack_trace = StackCapture.capture()
 
-        try:
-            result = _next(root, info, *args, **kwargs)
-        except Exception:
+        def _record_resolver() -> None:
+            """Record resolver timing and add to current operation."""
             resolver.end_time = time.perf_counter()
             resolver.duration_ms = (resolver.end_time - start_time) * 1000
             resolver.is_slow = resolver.duration_ms >= self._slow_resolver_threshold_ms
@@ -219,16 +221,23 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
             if current_op:
                 current_op.resolvers.append(resolver)
 
+        try:
+            result = _next(root, info, *args, **kwargs)
+        except Exception:
+            _record_resolver()
             raise
 
-        resolver.end_time = time.perf_counter()
-        resolver.duration_ms = (resolver.end_time - start_time) * 1000
-        resolver.is_slow = resolver.duration_ms >= self._slow_resolver_threshold_ms
+        if inspect.isawaitable(result):
 
-        current_op = context.get_panel_data("GraphQLPanel").get("current_operation")
-        if current_op:
-            current_op.resolvers.append(resolver)
+            async def _wrap_async() -> Any:
+                try:
+                    return await result
+                finally:
+                    _record_resolver()
 
+            return _wrap_async()
+
+        _record_resolver()
         return result
 
     def _build_field_path(self, info: GraphQLResolveInfo) -> str:

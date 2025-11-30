@@ -483,7 +483,8 @@ def _render_graphql_panel(stats: dict[str, Any]) -> str:  # noqa: C901, PLR0912
     # Duplicate Operations
     dups = stats.get("duplicate_operations", [])
     if dups:
-        html += f"<h4>Duplicate Operations ({len(dups)} queries)</h4>"
+        unique_count = len(set(dups))
+        html += f"<h4>Duplicate Operations ({unique_count} unique, {len(dups)} total)</h4>"
         html += "<p class='dup-hint'>These queries were executed multiple times with the same parameters.</p>"
 
     # Operations list
