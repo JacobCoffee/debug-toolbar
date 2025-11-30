@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql act act-ci act-test
+.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql example-mcp example-mcp-server act act-ci act-test
 
 # ==================================================================================== #
 # VARIABLES
@@ -139,6 +139,12 @@ example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
 
 example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
 	@uv run examples/graphql_panel_example.py
+
+example-mcp: ## Run MCP server example (http://localhost:8004)
+	@uv run examples/mcp_server_example.py
+
+example-mcp-server: ## Run MCP server (stdio transport)
+	@uv run examples/mcp_server_example.py --mcp
 
 ##@ Git Worktrees
 
