@@ -100,6 +100,12 @@ async def index() -> str:
         <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
+    <h2>GraphQL Demo</h2>
+    <p style="background: rgba(139, 92, 246, 0.15); padding: 10px; border: 1px solid #8b5cf6; border-radius: 6px;">
+        <strong>GraphQL Panel Demo</strong> - Run separately with:<br>
+        <code>litestar --app examples.graphql_panel_example:app run --reload</code><br>
+        Demonstrates N+1 detection, resolver timing, and duplicate query detection for Strawberry GraphQL.
+    </p>
     <p>Check the debug toolbar's SQLAlchemy panel to see query statistics and Memory panel for allocation tracking!</p>
     <p><strong>Note:</strong> The Alerts Panel will automatically warn you about N+1 queries and other issues!</p>
     <h2>Profiling & Flame Graphs</h2>
