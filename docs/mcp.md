@@ -2,6 +2,8 @@
 
 The debug toolbar includes an MCP (Model Context Protocol) server that allows AI assistants like Claude Code to analyze your application's debug data programmatically.
 
+![MCP Integration with Claude Code](../assets/mcp-integration-example.png)
+
 ## Installation
 
 Install with MCP support:

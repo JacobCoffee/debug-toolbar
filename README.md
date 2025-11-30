@@ -63,6 +63,9 @@
 ### Alerts Panel (Proactive Issue Detection)
 <img src="assets/panel-alerts-expanded.png" alt="Debug Toolbar - Alerts Panel" width="100%">
 
+### MCP Integration (Claude Code)
+<img src="assets/mcp-integration-example.png" alt="Debug Toolbar - MCP Integration with Claude Code" width="100%">
+
 ### Memory Panel
 <img src="assets/panel-memory-expanded.png" alt="Debug Toolbar - Memory Panel" width="100%">
 
@@ -89,6 +92,7 @@
 - **Flame Graphs**: Interactive profiling visualization in speedscope format
 - **Memory Profiling**: Multi-backend support (tracemalloc, memray)
 - **Proactive Alerts**: Automatic detection of security, performance, and database issues
+- **MCP Integration**: AI assistant integration for automated debugging with Claude Code
 
 ## Installation
 
