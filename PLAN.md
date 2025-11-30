@@ -6,18 +6,19 @@
 
 ---
 
-## Current Status: Phase 13 COMPLETE - MCP Server ✅
+## Current Status: v0.3.0 RELEASED ✅
 
-### Test Coverage: 524+ tests passing
+### Test Coverage: 529 tests passing
 ### Panels Implemented: 17 panels (15 core + 2 Litestar-specific)
-### Latest Merges:
-- PR #10 - Alerts Panel (proactive issue detection)
-- PR #11 - Flame Graph Visualization
-- PR #12 - Multi-Backend Memory Profiling Panel
-- PR #13 - N+1 example fix
-- PR #14 - Async Profiler Panel
-- PR #15 - GraphQL Panel with Strawberry integration
-- PR #16 - MCP Server for AI Assistant Integration ✅
+### Latest Release: v0.3.0 (2025-11-30)
+- MCP Server for AI Assistant Integration
+- FileToolbarStorage for cross-process data sharing
+- Published to PyPI as `litestar-debug-toolbar`
+
+### Recent PRs:
+- PR #16 - MCP Server for AI Assistant Integration
+- PR #17 - Release v0.3.0 version bump
+- PR #18 - Documentation updates (MCP screenshot, API docs)
 
 ---
 
@@ -58,10 +59,10 @@ All foundational work complete:
 - [ ] Performance benchmarks
 - [ ] API documentation expansion
 
-### Phase 7: Polish & Release 🔄 IN PROGRESS
+### Phase 7: Polish & Release ✅ COMPLETE
 - [x] PyPI packaging
-- [x] Release automation
-- [ ] Documentation completion
+- [x] Release automation (Sigstore signing, trusted publishers)
+- [x] v0.3.0 released to PyPI
 
 ### Phase 8: Database Intelligence ✅ COMPLETE
 - [x] EXPLAIN Plan Integration (PR #5)
@@ -95,20 +96,25 @@ All foundational work complete:
 
 ## Next Up
 
-### Immediate:
-1. Release v0.3.0 with MCP support
-
-### Phase 12: Multi-Framework Support
-- Starlette adapter
-- FastAPI adapter
+### Phase 12: Multi-Framework Support (NEXT)
+- [ ] Starlette adapter (core ASGI middleware)
+- [ ] FastAPI adapter (builds on Starlette)
+- [ ] Framework detection and auto-configuration
 
 ### Phase 14: Distributed Debugging
-- OpenTelemetry integration
-- Cross-service tracing
+- [ ] OpenTelemetry integration
+- [ ] Cross-service request tracing
+- [ ] Span correlation
+
+### Phase 6.2: Documentation & Benchmarks
+- [ ] Performance benchmarks
+- [ ] API documentation expansion
+- [ ] Usage guides for each panel
 
 ### Phase 10.3: WebSocket Panel (deferred)
-- WebSocket connection tracking
-- Message logging
+- [ ] WebSocket connection tracking
+- [ ] Message logging
+- [ ] Connection lifecycle
 
 ---
 
