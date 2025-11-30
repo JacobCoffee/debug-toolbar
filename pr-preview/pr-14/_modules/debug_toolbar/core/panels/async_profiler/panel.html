@@ -250,7 +250,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="100">                <span class="k">if</span> <span class="n">YappiBackend</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
 </span><span data-line="101">                    <span class="k">return</span> <span class="s2">&quot;yappi&quot;</span>
 </span><span data-line="102">            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-</span><span data-line="103">                <span class="k">pass</span>
+</span><span data-line="103">                <span class="k">pass</span>  <span class="c1"># Yappi is not installed; fall back to taskfactory backend.</span>
 </span><span data-line="104">            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Yappi requested but not available, falling back to taskfactory&quot;</span><span class="p">)</span>
 </span><span data-line="105">            <span class="k">return</span> <span class="s2">&quot;taskfactory&quot;</span>
 </span><span data-line="106">
@@ -265,7 +265,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="115">            <span class="k">if</span> <span class="n">YappiBackend</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
 </span><span data-line="116">                <span class="k">return</span> <span class="s2">&quot;yappi&quot;</span>
 </span><span data-line="117">        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-</span><span data-line="118">            <span class="k">pass</span>
+</span><span data-line="118">            <span class="k">pass</span>  <span class="c1"># Yappi backend is not available; fall back to taskfactory backend.</span>
 </span><span data-line="119">
 </span><span data-line="120">        <span class="k">return</span> <span class="s2">&quot;taskfactory&quot;</span>
 </span><span data-line="121">
@@ -292,7 +292,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="142">                    <span class="n">max_stack_depth</span><span class="o">=</span><span class="n">max_stack_depth</span><span class="p">,</span>
 </span><span data-line="143">                <span class="p">)</span>
 </span><span data-line="144">            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-</span><span data-line="145">                <span class="k">pass</span>
+</span><span data-line="145">                <span class="k">pass</span>  <span class="c1"># Yappi not available; will use TaskFactoryBackend instead.</span>
 </span><span data-line="146">
 </span><span data-line="147">        <span class="k">return</span> <span class="n">TaskFactoryBackend</span><span class="p">(</span>
 </span><span data-line="148">            <span class="n">capture_stacks</span><span class="o">=</span><span class="n">capture_stacks</span><span class="p">,</span>
