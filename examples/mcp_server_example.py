@@ -7,33 +7,29 @@
 # ///
 """Debug Toolbar with MCP Server for AI Assistant Integration.
 
-This example demonstrates how to run the debug toolbar alongside an MCP server,
-allowing AI assistants like Claude Code and Cursor to query debug data.
-
-Architecture:
-    ┌─────────────────┐     ┌─────────────────┐
-    │   Litestar App  │     │   MCP Server    │
-    │   (port 8004)   │     │   (stdio/http)  │
-    └────────┬────────┘     └────────┬────────┘
-             │                       │
-             └───────────┬───────────┘
-                         │
-                ┌────────▼────────┐
-                │  Shared Storage │
-                │  (ToolbarStorage)│
-                └─────────────────┘
+This example demonstrates:
+1. Running the debug toolbar with a Litestar web app
+2. Running a standalone MCP server for AI assistant integration
 
 Usage:
     # Run the web app (generates debug data)
-    uv run examples/mcp_server_example.py
+    make example-mcp
+    # or: uv run python examples/mcp_server_example.py
 
-    # In another terminal, run MCP server (shares storage)
-    uv run examples/mcp_server_example.py --mcp
+    # Run standalone MCP server (for Claude Code integration)
+    make example-mcp-server
+    # or: uv run python examples/mcp_server_example.py --mcp
 
-    # Or run MCP with SSE transport
-    uv run examples/mcp_server_example.py --mcp --transport sse
-
-Then configure Claude Code or Cursor to connect to the MCP server.
+Integration with Claude Code:
+    Add to your .claude/settings.json:
+    {
+        "mcpServers": {
+            "debug-toolbar": {
+                "command": "uv",
+                "args": ["run", "python", "-m", "debug_toolbar.mcp"]
+            }
+        }
+    }
 """
 
 from __future__ import annotations
@@ -46,42 +42,25 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from litestar import Litestar
 
-# Shared storage instance (would be in a shared module in real apps)
-_shared_storage = None
-
-
-def get_shared_storage():
-    """Get or create the shared storage instance."""
-    global _shared_storage
-    if _shared_storage is None:
-        from debug_toolbar.core.storage import ToolbarStorage
-        _shared_storage = ToolbarStorage(max_size=100)
-    return _shared_storage
-
 
 def create_app() -> Litestar:
     """Create Litestar application with debug toolbar."""
     from litestar import Litestar, get, post
-    from litestar.response import Response
 
-    from debug_toolbar.litestar import DebugToolbarConfig, DebugToolbarPlugin
+    from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 
-    storage = get_shared_storage()
-
-    config = DebugToolbarConfig(
+    config = LitestarDebugToolbarConfig(
         enabled=True,
         panels=[
             "debug_toolbar.core.panels.timer.TimerPanel",
             "debug_toolbar.core.panels.request.RequestPanel",
             "debug_toolbar.core.panels.response.ResponsePanel",
             "debug_toolbar.core.panels.headers.HeadersPanel",
-            "debug_toolbar.core.panels.logging_panel.LoggingPanel",
+            "debug_toolbar.core.panels.logging.LoggingPanel",
         ],
     )
 
     plugin = DebugToolbarPlugin(config=config)
-    # Share storage with MCP server
-    plugin.toolbar.storage = storage
 
     @get("/")
     async def index() -> dict:
@@ -99,12 +78,9 @@ def create_app() -> Litestar:
         return {"message": "This was slow", "delay_ms": 500}
 
     @get("/error")
-    async def error_endpoint() -> Response:
-        """Returns an error response."""
-        return Response(
-            content={"error": "Something went wrong"},
-            status_code=500,
-        )
+    async def error_endpoint() -> dict:
+        """Returns an error response (simulated via dict for simplicity)."""
+        return {"error": "Something went wrong", "status": "error"}
 
     @get("/api/data")
     async def api_data() -> dict:
@@ -130,7 +106,8 @@ def create_app() -> Litestar:
 
 
 def run_mcp_server(transport: str = "stdio") -> None:
-    """Run the MCP server sharing storage with the web app."""
+    """Run standalone MCP server for AI assistant integration."""
+    from debug_toolbar import DebugToolbar, DebugToolbarConfig
     from debug_toolbar.mcp import create_mcp_server, is_available
 
     if not is_available():
@@ -138,11 +115,12 @@ def run_mcp_server(transport: str = "stdio") -> None:
         print("Install with: pip install debug-toolbar[mcp]", file=sys.stderr)  # noqa: T201
         sys.exit(1)
 
-    storage = get_shared_storage()
+    config = DebugToolbarConfig(enabled=True, max_request_history=100)
+    toolbar = DebugToolbar(config)
 
     mcp = create_mcp_server(
-        storage=storage,
-        toolbar=None,
+        storage=toolbar.storage,
+        toolbar=toolbar,
         redact_sensitive=True,
         server_name="debug-toolbar-example",
     )
@@ -170,13 +148,13 @@ def main() -> None:
         epilog="""
 Examples:
   # Run web app (port 8004)
-  uv run examples/mcp_server_example.py
+  make example-mcp
 
   # Run MCP server (stdio for Claude Code)
-  uv run examples/mcp_server_example.py --mcp
+  make example-mcp-server
 
-  # Run MCP server with HTTP transport
-  uv run examples/mcp_server_example.py --mcp --transport http
+  # Or using the module directly:
+  python -m debug_toolbar.mcp
 
 Integration with Claude Code:
   Add to your .claude/settings.json:
@@ -184,7 +162,7 @@ Integration with Claude Code:
     "mcpServers": {
       "debug-toolbar": {
         "command": "uv",
-        "args": ["run", "examples/mcp_server_example.py", "--mcp"]
+        "args": ["run", "python", "-m", "debug_toolbar.mcp"]
       }
     }
   }
@@ -218,8 +196,7 @@ Integration with Claude Code:
 
         print(f"Starting web app on http://127.0.0.1:{args.web_port}", file=sys.stderr)  # noqa: T201
         print("", file=sys.stderr)  # noqa: T201
-        print("Make some requests, then run MCP server to analyze:", file=sys.stderr)  # noqa: T201
-        print(f"  uv run examples/mcp_server_example.py --mcp", file=sys.stderr)  # noqa: T201
+        print("Debug toolbar available at /_debug_toolbar", file=sys.stderr)  # noqa: T201
         print("", file=sys.stderr)  # noqa: T201
 
         app = create_app()
