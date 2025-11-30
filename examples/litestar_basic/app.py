@@ -1,13 +1,14 @@
 """Basic Litestar application with debug toolbar.
 
 This example demonstrates using debug-toolbar
-with a simple Litestar application, including the new Phase 10 panels:
+with a simple Litestar application, including the new panels:
 - Headers Panel: HTTP header inspection
 - Settings Panel: Application configuration viewer
 - Profiling Panel: Request profiling (optional)
 - Templates Panel: Template rendering tracking (with Jinja2)
 - Alerts Panel: Proactive issue detection (security, performance, database)
 - Memory Panel: Memory profiling and tracking
+- Async Profiler Panel: Async task tracking, blocking call detection, event loop monitoring
 
 UI Features:
 - Toolbar position: Click the arrow buttons to move the toolbar (left/right/top/bottom)
@@ -44,7 +45,7 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><a href="/alerts-demo">Alerts Demo</a></li>
         <li><a href="/api/status">API Status (JSON)</a></li>
     </ul>
-    <h2>New Phase 10 Panels</h2>
+    <h2>Available Panels</h2>
     <ul>
         <li><strong>Headers Panel</strong> - Inspect request/response headers, security analysis</li>
         <li><strong>Settings Panel</strong> - View toolbar and app configuration</li>
@@ -52,6 +53,7 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Profiling Panel</strong> - Profile request execution with flame graph support</li>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
         <li><strong>Memory Panel</strong> - Track memory allocations and usage (tracemalloc/memray)</li>
+        <li><strong>Async Profiler Panel</strong> - Track async tasks, detect blocking calls, monitor event loop lag</li>
     </ul>
     <h2>Flame Graph Visualization</h2>
     <p>The Profiling Panel now supports interactive flame graph generation!</p>
@@ -89,7 +91,7 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li>Versions Panel - Environment info</li>
         <li>Routes Panel - Litestar routes</li>
     </ul>
-    <h2>Phase 10 Panels (New!)</h2>
+    <h2>Extended Panels</h2>
     <ul>
         <li><strong>Headers Panel</strong> - Detailed HTTP header inspection with security analysis</li>
         <li><strong>Settings Panel</strong> - Application configuration viewer with sensitive data redaction</li>
@@ -98,6 +100,7 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
         <li><strong>Memory Panel</strong> - Memory profiling with tracemalloc/memray backends</li>
         <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
+        <li><strong>Async Profiler Panel</strong> - Track async tasks, blocking calls, and event loop lag</li>
     </ul>
     <h2>Flame Graph Support</h2>
     <p>The Profiling Panel generates interactive flame graphs in speedscope format:</p>
@@ -198,6 +201,7 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.templates.TemplatesPanel",
         "debug_toolbar.core.panels.alerts.AlertsPanel",
         "debug_toolbar.core.panels.memory.MemoryPanel",
+        "debug_toolbar.core.panels.async_profiler.AsyncProfilerPanel",
     ],
 )
 
