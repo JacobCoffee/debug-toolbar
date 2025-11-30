@@ -27,8 +27,9 @@ logger = logging.getLogger(__name__)
 
 async def get_context(request: Request) -> dict:
     """Get GraphQL context with debug toolbar request context from scope."""
-    state = request.scope.get("state", {})
-    return {"debug_toolbar_context": state.get("debug_toolbar_context")}
+    ctx = request.scope.get("_debug_toolbar_context")
+    logger.info("GraphQL context_getter: scope keys=%s, ctx=%s", list(request.scope.keys()), ctx)
+    return {"debug_toolbar_context": ctx}
 
 
 USERS_DB = [
