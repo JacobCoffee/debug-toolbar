@@ -30,6 +30,13 @@ class DebugToolbarConfig:
         panel_display_depth: Max depth for nested data rendering. Defaults to 10.
         panel_display_max_items: Max items to show in arrays/objects. Defaults to 100.
         panel_display_max_string: Max string length before truncation. Defaults to 1000.
+        async_profiler_backend: Async profiler backend. "auto" selects best available.
+        async_blocking_threshold_ms: Threshold for blocking call detection. Defaults to 100.
+        async_enable_blocking_detection: Whether to detect blocking calls. Defaults to True.
+        async_enable_event_loop_monitoring: Whether to monitor event loop lag. Defaults to True.
+        async_event_loop_lag_threshold_ms: Threshold for lag alerts. Defaults to 10.
+        async_capture_task_stacks: Whether to capture task creation stacks. Defaults to True.
+        async_max_stack_depth: Maximum stack depth to capture. Defaults to 10.
     """
 
     enabled: bool = True
@@ -55,6 +62,14 @@ class DebugToolbarConfig:
     panel_display_depth: int = 10
     panel_display_max_items: int = 100
     panel_display_max_string: int = 1000
+
+    async_profiler_backend: Literal["taskfactory", "yappi", "auto"] = "auto"
+    async_blocking_threshold_ms: float = 100.0
+    async_enable_blocking_detection: bool = True
+    async_enable_event_loop_monitoring: bool = True
+    async_event_loop_lag_threshold_ms: float = 10.0
+    async_capture_task_stacks: bool = True
+    async_max_stack_depth: int = 10
 
     def get_all_panels(self) -> list[str | type[Panel]]:
         """Get all panels including extras, excluding excluded panels."""

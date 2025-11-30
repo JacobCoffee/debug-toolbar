@@ -13,7 +13,9 @@ Run with: litestar --app examples.litestar_advanced_alchemy.app:app run --reload
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import time
 from typing import TYPE_CHECKING, Annotated
 from uuid import UUID
 
@@ -87,8 +89,13 @@ async def index() -> str:
         <li>POST /api/posts - Create post</li>
         <li>DELETE /api/users/{id} - Delete user</li>
     </ul>
+    <h2>Async Profiler Demo</h2>
+    <p style="background: rgba(78, 205, 196, 0.15); padding: 10px; border: 1px solid #4ecdc4; border-radius: 6px;">
+        <a href="/async-demo"><strong>View Async Demo</strong></a> -
+        This page creates concurrent async tasks to demonstrate the Async Profiler Panel!
+    </p>
     <h2>N+1 Query Demo</h2>
-    <p style="background: #fee; padding: 10px; border: 1px solid #f00; color: #900;">
+    <p style="background: rgba(239, 68, 68, 0.15); padding: 10px; border: 1px solid #ef4444; border-radius: 6px;">
         <a href="/api/users-with-posts-bad"><strong>View N+1 Demo</strong></a> -
         This page deliberately triggers N+1 queries. Create a few users first, then visit to see the detection!
     </p>
@@ -110,6 +117,7 @@ async def index() -> str:
         <li><strong>Profiling Panel</strong> - Request profiling with flame graphs</li>
         <li><strong>Alerts Panel</strong> - Proactive issue detection</li>
         <li><strong>Memory Panel</strong> - Memory allocation tracking</li>
+        <li><strong>Async Profiler Panel</strong> - Async task tracking, blocking call detection</li>
     </ul>
     <h2>Toolbar Controls</h2>
     <ul>
@@ -332,6 +340,103 @@ async def create_post(
     return {"id": str(post.id), "title": post.title}
 
 
+# ruff: noqa: ASYNC251
+@get("/async-demo", media_type=MediaType.HTML)
+async def async_demo() -> str:
+    """Demonstrate the Async Profiler Panel with concurrent tasks.
+
+    This endpoint creates multiple async tasks to showcase:
+    - Task tracking and timing
+    - Concurrent execution visualization
+    - Blocking call detection (intentional time.sleep)
+    """
+    logger.info("Async demo page accessed")
+
+    async def fast_task(task_id: int) -> int:
+        """A fast async task."""
+        await asyncio.sleep(0.05)
+        return task_id * 2
+
+    async def slow_task(task_id: int) -> int:
+        """A slower async task."""
+        await asyncio.sleep(0.15)
+        return task_id * 10
+
+    async def blocking_task() -> str:
+        """A task with blocking I/O (bad practice demo)."""
+        time.sleep(0.1)  # Intentional blocking call for demo
+        return "blocked"
+
+    # Create concurrent tasks
+    tasks = [
+        asyncio.create_task(fast_task(1), name="fast_task_1"),
+        asyncio.create_task(fast_task(2), name="fast_task_2"),
+        asyncio.create_task(slow_task(3), name="slow_task_1"),
+        asyncio.create_task(fast_task(4), name="fast_task_3"),
+        asyncio.create_task(blocking_task(), name="blocking_task"),
+    ]
+
+    results = await asyncio.gather(*tasks)
+
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+<title>Async Profiler Demo</title>
+<style>
+/* Dark theme (default) */
+body {{ background: #1a1a2e; color: #eee; font-family: system-ui, sans-serif; padding: 20px; }}
+h1 {{ color: #4ecdc4; }}
+h2 {{ color: #93c5fd; }}
+.info {{ background: rgba(78, 205, 196, 0.15); border: 1px solid rgba(78, 205, 196, 0.5);
+    padding: 12px 16px; margin-bottom: 20px; border-radius: 6px; color: #4ecdc4; }}
+code {{ background: #16213e; padding: 2px 6px; border-radius: 4px; color: #fbbf24; }}
+a {{ color: #60a5fa; }}
+a:hover {{ color: #93c5fd; }}
+ul {{ line-height: 1.8; }}
+
+/* Light theme */
+@media (prefers-color-scheme: light) {{
+    body {{ background: #f8fafc; color: #1e293b; }}
+    h1 {{ color: #0d9488; }}
+    h2 {{ color: #1e40af; }}
+    .info {{ background: rgba(13, 148, 136, 0.1); border-color: #0d9488; color: #0f766e; }}
+    code {{ background: #e2e8f0; color: #92400e; }}
+    a {{ color: #2563eb; }}
+    a:hover {{ color: #1d4ed8; }}
+}}
+</style>
+</head>
+<body>
+    <h1>Async Profiler Demo</h1>
+    <div class="info">
+        <strong>Check the Async panel in the debug toolbar!</strong><br>
+        This page created {len(tasks)} concurrent tasks.
+    </div>
+    <h2>What happened:</h2>
+    <ul>
+        <li>Created 3x <code>fast_task</code> (50ms each)</li>
+        <li>Created 1x <code>slow_task</code> (150ms)</li>
+        <li>Created 1x <code>blocking_task</code> with <code>time.sleep()</code> (bad practice!)</li>
+    </ul>
+    <h2>Results:</h2>
+    <ul>
+        <li>fast_task_1: {results[0]}</li>
+        <li>fast_task_2: {results[1]}</li>
+        <li>slow_task_1: {results[2]}</li>
+        <li>fast_task_3: {results[3]}</li>
+        <li>blocking_task: {results[4]}</li>
+    </ul>
+    <h2>In the Async Panel you should see:</h2>
+    <ul>
+        <li><strong>5 tasks</strong> tracked with their durations</li>
+        <li><strong>Timeline</strong> showing concurrent execution</li>
+        <li><strong>Max concurrent</strong> tasks running at once</li>
+    </ul>
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>"""
+
+
 db_config = SQLAlchemyAsyncConfig(
     connection_string="sqlite+aiosqlite:///./example.db",
     before_send_handler=async_autocommit_before_send_handler,
@@ -350,6 +455,7 @@ toolbar_config = LitestarDebugToolbarConfig(
         "debug_toolbar.core.panels.profiling.ProfilingPanel",
         "debug_toolbar.core.panels.alerts.AlertsPanel",
         "debug_toolbar.core.panels.memory.MemoryPanel",
+        "debug_toolbar.core.panels.async_profiler.AsyncProfilerPanel",
     ],
 )
 
@@ -425,6 +531,7 @@ app = Litestar(
         delete_user,
         list_posts,
         create_post,
+        async_demo,
     ],
     plugins=[
         SQLAlchemyPlugin(config=db_config),

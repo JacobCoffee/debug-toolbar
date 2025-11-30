@@ -91,6 +91,10 @@ def _render_panel_content(stats: dict[str, Any], panel_id: str = "") -> str:
     if panel_id == "ProfilingPanel":
         return _render_profiling_panel(stats)
 
+    # Special rendering for Async Profiler panel
+    if panel_id == "AsyncProfilerPanel":
+        return _render_async_profiler_panel(stats)
+
     # Default table rendering
     rows = []
     for key, value in stats.items():
@@ -269,6 +273,128 @@ def _render_profiling_panel(stats: dict[str, Any]) -> str:
             value = f"{time_ms:.2f}ms ({calls} calls)"
             html += f"<tr><td class='key'>{display_name}</td><td class='value'>{value}</td></tr>"
         html += "</tbody></table>"
+
+    html += "</div>"
+    return html
+
+
+def _render_async_profiler_panel(stats: dict[str, Any]) -> str:
+    """Render async profiler panel with timeline and task details."""
+    html = "<div class='async-profiler-panel'>"
+
+    summary = stats.get("summary", {})
+    total_tasks = summary.get("total_tasks", 0)
+    completed = summary.get("completed_tasks", 0)
+    cancelled = summary.get("cancelled_tasks", 0)
+    errors = summary.get("error_tasks", 0)
+    blocking_count = summary.get("blocking_calls_count", 0)
+    max_lag = summary.get("max_lag_ms", 0.0)
+    has_warnings = summary.get("has_warnings", False)
+    backend = _escape_html(stats.get("backend", "unknown"))
+
+    html += f"""
+    <div class='async-summary'>
+        <div class='async-stat'>
+            <span class='stat-value'>{total_tasks}</span>
+            <span class='stat-label'>Total Tasks</span>
+        </div>
+        <div class='async-stat'>
+            <span class='stat-value'>{completed}</span>
+            <span class='stat-label'>Completed</span>
+        </div>
+        <div class='async-stat {"async-warning" if cancelled > 0 else ""}'>
+            <span class='stat-value'>{cancelled}</span>
+            <span class='stat-label'>Cancelled</span>
+        </div>
+        <div class='async-stat {"async-error" if errors > 0 else ""}'>
+            <span class='stat-value'>{errors}</span>
+            <span class='stat-label'>Errors</span>
+        </div>
+        <div class='async-stat {"async-error" if blocking_count > 0 else ""}'>
+            <span class='stat-value'>{blocking_count}</span>
+            <span class='stat-label'>Blocking Calls</span>
+        </div>
+        <div class='async-stat'>
+            <span class='stat-value'>{max_lag:.1f}ms</span>
+            <span class='stat-label'>Max Lag</span>
+        </div>
+        <div class='async-stat'>
+            <span class='stat-value'>{backend}</span>
+            <span class='stat-label'>Backend</span>
+        </div>
+    </div>
+    """
+
+    if has_warnings:
+        html += """
+        <div class='async-warning-banner'>
+            <span class='warning-icon'>⚠️</span>
+            <span>Blocking calls detected! These may impact application performance.</span>
+        </div>
+        """
+
+    blocking_calls = stats.get("blocking_calls", [])
+    if blocking_calls:
+        html += "<h4>Blocking Calls</h4>"
+        html += "<div class='blocking-calls-list'>"
+        for call in blocking_calls[:10]:
+            func_name = _escape_html(call.get("function_name", "unknown"))
+            duration = call.get("duration_ms", 0.0)
+            file_loc = _escape_html(call.get("file", "unknown"))
+            line = call.get("line", 0)
+            location = f"{file_loc}:{line}" if line > 0 else file_loc
+            html += f"""
+            <div class='blocking-call-item'>
+                <div class='blocking-call-header'>
+                    <span class='blocking-func'>{func_name}</span>
+                    <span class='blocking-duration'>{duration:.2f}ms</span>
+                </div>
+                <div class='blocking-location'>{location}</div>
+            </div>
+            """
+        html += "</div>"
+
+    tasks = stats.get("tasks", [])
+    created_tasks = [t for t in tasks if t.get("event_type") == "created"]
+    if created_tasks:
+        html += "<h4>Tasks</h4>"
+        html += "<table class='panel-table'><tbody>"
+        for task in created_tasks[:15]:
+            task_name = _escape_html(task.get("task_name", "unknown"))
+            coro_name = _escape_html(task.get("coro_name", ""))
+            duration = task.get("duration_ms", 0)
+            task_id = task.get("task_id", "")
+            end_states = ("completed", "cancelled", "error")
+            completion = next(
+                (t for t in tasks if t.get("task_id") == task_id and t.get("event_type") in end_states),
+                None,
+            )
+            if completion:
+                status = completion.get("event_type", "completed")
+                status_class = "async-status-" + status
+            else:
+                status = "running"
+                status_class = "async-status-running"
+            html += f"""
+            <tr>
+                <td class='key'>{task_name}<br><small class='coro-name'>{coro_name}</small></td>
+                <td class='value'>
+                    <span class='task-status {status_class}'>{status}</span>
+                    {f"<span class='task-duration'>{duration:.2f}ms</span>" if duration else ""}
+                </td>
+            </tr>
+            """
+        html += "</tbody></table>"
+
+    timeline = stats.get("timeline", {})
+    if timeline.get("events"):
+        html += f"""
+        <h4>Timeline</h4>
+        <div class='timeline-info'>
+            <span>Duration: {timeline.get("total_duration_ms", 0):.2f}ms</span>
+            <span>Max Concurrent: {timeline.get("max_concurrent", 0)}</span>
+        </div>
+        """
 
     html += "</div>"
     return html
@@ -1757,6 +1883,116 @@ body {
     color: var(--dt-text-muted);
     margin: 8px 0 16px;
 }
+
+/* Async Profiler Panel Styles */
+.async-profiler-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
+
+.async-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.async-stat {
+    background: var(--dt-bg-secondary);
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.async-stat.async-warning .stat-value { color: var(--dt-warning); }
+.async-stat.async-error .stat-value { color: var(--dt-error); }
+
+.async-warning-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    color: var(--dt-warning);
+    font-size: 13px;
+}
+
+.blocking-calls-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.blocking-call-item {
+    background: var(--dt-bg-secondary);
+    border-left: 3px solid var(--dt-error);
+    padding: 10px 12px;
+    border-radius: 0 4px 4px 0;
+}
+
+.blocking-call-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.blocking-func {
+    font-family: var(--dt-font-mono);
+    font-weight: 600;
+    color: var(--dt-text-primary);
+}
+
+.blocking-duration {
+    font-family: var(--dt-font-mono);
+    color: var(--dt-error);
+    font-weight: 600;
+}
+
+.blocking-location {
+    font-family: var(--dt-font-mono);
+    font-size: 11px;
+    color: var(--dt-text-muted);
+}
+
+.coro-name {
+    font-family: var(--dt-font-mono);
+    color: var(--dt-text-muted);
+    font-size: 11px;
+}
+
+.task-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 8px;
+}
+
+.async-status-completed { background: rgba(78, 201, 176, 0.2); color: var(--dt-success); }
+.async-status-cancelled { background: rgba(220, 220, 170, 0.2); color: var(--dt-warning); }
+.async-status-error { background: rgba(241, 76, 76, 0.2); color: var(--dt-error); }
+.async-status-running { background: rgba(0, 122, 204, 0.2); color: var(--dt-accent); }
+
+.task-duration {
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-text-secondary);
+}
+
+.timeline-info {
+    display: flex;
+    gap: 20px;
+    padding: 10px 14px;
+    background: var(--dt-bg-secondary);
+    border-radius: 6px;
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-text-secondary);
+}
 """
 
 
@@ -2017,6 +2253,8 @@ class DebugToolbar {
                 return this.renderMemoryPanel(data);
             case 'ProfilingPanel':
                 return this.renderProfilingPanel(data, requestId);
+            case 'AsyncProfilerPanel':
+                return this.renderAsyncProfilerPanel(data);
             case 'SQLAlchemyPanel':
                 return this.renderSqlPanel(data);
             default:
@@ -2145,6 +2383,111 @@ class DebugToolbar {
             }
             html += '</tbody></table>';
         }
+        html += '</div>';
+        return html;
+    }
+
+    renderAsyncProfilerPanel(data) {
+        let html = '<div class="async-profiler-panel">';
+
+        const summary = data.summary || {};
+        const totalTasks = summary.total_tasks || 0;
+        const completed = summary.completed_tasks || 0;
+        const cancelled = summary.cancelled_tasks || 0;
+        const errors = summary.error_tasks || 0;
+        const blockingCount = summary.blocking_calls_count || 0;
+        const maxLag = summary.max_lag_ms || 0;
+        const hasWarnings = summary.has_warnings || false;
+        const backend = data.backend || 'unknown';
+
+        html += '<div class="async-summary">';
+        html += '<div class="async-stat"><span class="stat-value">' + totalTasks + '</span>';
+        html += '<span class="stat-label">Total Tasks</span></div>';
+        html += '<div class="async-stat"><span class="stat-value">' + completed + '</span>';
+        html += '<span class="stat-label">Completed</span></div>';
+        html += '<div class="async-stat' + (cancelled > 0 ? ' async-warning' : '') + '">';
+        html += '<span class="stat-value">' + cancelled + '</span>';
+        html += '<span class="stat-label">Cancelled</span></div>';
+        html += '<div class="async-stat' + (errors > 0 ? ' async-error' : '') + '">';
+        html += '<span class="stat-value">' + errors + '</span>';
+        html += '<span class="stat-label">Errors</span></div>';
+        html += '<div class="async-stat' + (blockingCount > 0 ? ' async-error' : '') + '">';
+        html += '<span class="stat-value">' + blockingCount + '</span>';
+        html += '<span class="stat-label">Blocking</span></div>';
+        html += '<div class="async-stat"><span class="stat-value">' + maxLag.toFixed(1) + 'ms</span>';
+        html += '<span class="stat-label">Max Lag</span></div>';
+        html += '<div class="async-stat"><span class="stat-value">' + this.escapeHtml(backend) + '</span>';
+        html += '<span class="stat-label">Backend</span></div>';
+        html += '</div>';
+
+        if (hasWarnings) {
+            html += '<div class="async-warning-banner">';
+            html += '<span class="warning-icon">⚠️</span>';
+            html += '<span>Blocking calls detected! These may impact performance.</span>';
+            html += '</div>';
+        }
+
+        const blockingCalls = data.blocking_calls || [];
+        if (blockingCalls.length > 0) {
+            html += '<h4>Blocking Calls</h4>';
+            html += '<div class="blocking-calls-list">';
+            for (const call of blockingCalls.slice(0, 10)) {
+                const funcName = this.escapeHtml(call.function_name || 'unknown');
+                const duration = call.duration_ms || 0;
+                const file = this.escapeHtml(call.file || 'unknown');
+                const line = call.line || 0;
+                const location = line > 0 ? file + ':' + line : file;
+                html += '<div class="blocking-call-item">';
+                html += '<div class="blocking-call-header">';
+                html += '<span class="blocking-func">' + funcName + '</span>';
+                html += '<span class="blocking-duration">' + duration.toFixed(2) + 'ms</span>';
+                html += '</div>';
+                html += '<div class="blocking-location">' + location + '</div>';
+                html += '</div>';
+            }
+            html += '</div>';
+        }
+
+        const tasks = data.tasks || [];
+        const createdTasks = tasks.filter(t => t.event_type === 'created');
+        if (createdTasks.length > 0) {
+            html += '<h4>Tasks</h4>';
+            html += '<table class="panel-table"><tbody>';
+            for (const task of createdTasks.slice(0, 15)) {
+                const taskName = this.escapeHtml(task.task_name || 'unknown');
+                const coroName = this.escapeHtml(task.coro_name || '');
+                const taskId = task.task_id || '';
+                const completion = tasks.find(t => t.task_id === taskId &&
+                    ['completed', 'cancelled', 'error'].includes(t.event_type));
+                let status = 'running';
+                let statusClass = 'async-status-running';
+                let duration = 0;
+                if (completion) {
+                    status = completion.event_type;
+                    statusClass = 'async-status-' + status;
+                    duration = completion.duration_ms || 0;
+                }
+                html += '<tr>';
+                html += '<td class="key">' + taskName + '<br><small class="coro-name">' + coroName + '</small></td>';
+                html += '<td class="value">';
+                html += '<span class="task-status ' + statusClass + '">' + status + '</span>';
+                if (duration > 0) {
+                    html += '<span class="task-duration">' + duration.toFixed(2) + 'ms</span>';
+                }
+                html += '</td></tr>';
+            }
+            html += '</tbody></table>';
+        }
+
+        const timeline = data.timeline || {};
+        if (timeline.events && timeline.events.length > 0) {
+            html += '<h4>Timeline</h4>';
+            html += '<div class="timeline-info">';
+            html += '<span>Duration: ' + (timeline.total_duration_ms || 0).toFixed(2) + 'ms</span>';
+            html += '<span>Max Concurrent: ' + (timeline.max_concurrent || 0) + '</span>';
+            html += '</div>';
+        }
+
         html += '</div>';
         return html;
     }
