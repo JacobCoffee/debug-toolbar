@@ -1,10 +1,13 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["debug-toolbar", "jinja2>=3.1.0"]
+# ///
 """Example demonstrating the Templates Panel with Jinja2 templates.
 
 This example shows how the Templates Panel tracks template rendering
 performance across Jinja2 templates.
 
-Run with:
-    uv run python examples/templates_panel_example.py
+Run with: uv run examples/templates_panel_example.py
 """
 
 from __future__ import annotations

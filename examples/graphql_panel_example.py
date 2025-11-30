@@ -1,13 +1,18 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "debug-toolbar[litestar,strawberry]",
+#   "uvicorn>=0.30.0",
+# ]
+# ///
 """GraphQL Panel example with Strawberry integration.
 
 This example demonstrates using the debug toolbar's GraphQL Panel with
 Strawberry GraphQL to track operations, resolvers, detect N+1 patterns,
 and identify duplicate queries.
 
-Run with: litestar --app examples.graphql_panel_example:app run --reload
-
-Requirements: Install with strawberry extra:
-    pip install debug-toolbar[litestar,strawberry]
+Run with: uv run examples/graphql_panel_example.py
+    or:   litestar --app examples.graphql_panel_example:app run --reload
 """
 
 from __future__ import annotations
@@ -284,3 +289,8 @@ app = Litestar(
     plugins=[DebugToolbarPlugin(toolbar_config)],
     debug=True,
 )
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("examples.graphql_panel_example:app", host="127.0.0.1", port=8003, reload=True)

@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["debug-toolbar"]
+# ///
 """Example demonstrating the Alerts Panel usage."""
 
 # ruff: noqa: T201, INP001, PLR0912, C901

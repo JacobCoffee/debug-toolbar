@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["debug-toolbar"]
+# ///
 """Example demonstrating Flame Graph generation with cProfile.
 
 This example shows how to use the FlameGraphGenerator to create

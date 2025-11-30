@@ -1,3 +1,10 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "debug-toolbar[litestar,advanced-alchemy]",
+#   "uvicorn>=0.30.0",
+# ]
+# ///
 """Litestar + Advanced-Alchemy application with debug toolbar.
 
 This example demonstrates using debug-toolbar with Advanced-Alchemy
@@ -8,7 +15,8 @@ UI Features:
 - Request history: Visit /_debug_toolbar/ to see all recorded requests
 - Panel details: Click panel buttons to expand and view detailed data
 
-Run with: litestar --app examples.litestar_advanced_alchemy.app:app run --reload
+Run with: uv run examples/litestar_advanced_alchemy/app.py
+    or:   litestar --app examples.litestar_advanced_alchemy.app:app run --reload
 """
 
 from __future__ import annotations
@@ -555,3 +563,10 @@ app = Litestar(
     after_request=after_request_handler,
     debug=True,
 )
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(
+        "examples.litestar_advanced_alchemy.app:app", host="127.0.0.1", port=8002, reload=True
+    )
