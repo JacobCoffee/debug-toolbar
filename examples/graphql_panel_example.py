@@ -14,26 +14,21 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import TYPE_CHECKING
-
 import strawberry
 from strawberry.litestar import make_graphql_controller
 
-from debug_toolbar.core.context import get_request_context
 from debug_toolbar.extras.strawberry import DebugToolbarExtension, GraphQLPanel
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-from litestar import Litestar, MediaType, get
-
-if TYPE_CHECKING:
-    from debug_toolbar.core.context import RequestContext
+from litestar import Litestar, MediaType, Request, get
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-async def get_context() -> dict:
-    """Get GraphQL context with debug toolbar request context injected."""
-    return {"debug_toolbar_context": get_request_context()}
+async def get_context(request: Request) -> dict:
+    """Get GraphQL context with debug toolbar request context from scope."""
+    state = request.scope.get("state", {})
+    return {"debug_toolbar_context": state.get("debug_toolbar_context")}
 
 
 USERS_DB = [

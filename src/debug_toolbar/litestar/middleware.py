@@ -86,6 +86,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             return
 
         context = await self.toolbar.process_request()
+        scope["state"]["debug_toolbar_context"] = context  # type: ignore[typeddict-unknown-key]
         self._populate_request_metadata(request, context)
         self._populate_events_metadata(request, context)
 
