@@ -66,7 +66,7 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
                 continue
 
             timing = data.get("timing_data", {})
-            duration = timing.get("total_time_ms", 0)
+            duration = timing.get("total_time", 0) * 1000  # Convert seconds to ms
             if min_duration_ms and duration < min_duration_ms:
                 continue
 
@@ -434,8 +434,8 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
         sql_a = panels_a.get("SQLAlchemyPanel", {})
         sql_b = panels_b.get("SQLAlchemyPanel", {})
 
-        duration_a = timing_a.get("total_time_ms", 0)
-        duration_b = timing_b.get("total_time_ms", 0)
+        duration_a = timing_a.get("total_time", 0) * 1000  # seconds to ms
+        duration_b = timing_b.get("total_time", 0) * 1000  # seconds to ms
         duration_diff = duration_b - duration_a
         if duration_a > 0:
             duration_pct: float | None = duration_diff / duration_a * 100
@@ -643,7 +643,7 @@ def register_tools(mcp: FastMCP) -> None:  # noqa: C901
 
         for _rid, data in requests_data:
             timing = data.get("timing_data", {})
-            total_duration += timing.get("total_time_ms", 0)
+            total_duration += timing.get("total_time", 0) * 1000  # seconds to ms
 
             panels = data.get("panel_data", {})
 

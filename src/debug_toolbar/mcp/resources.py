@@ -45,7 +45,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
                 "method": metadata.get("method", ""),
                 "path": metadata.get("path", ""),
                 "status_code": metadata.get("status_code"),
-                "duration_ms": timing.get("total_time_ms", 0),
+                "duration_ms": timing.get("total_time", 0) * 1000,  # seconds to ms
                 "timestamp": metadata.get("timestamp"),
             }
 
