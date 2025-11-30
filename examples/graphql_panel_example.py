@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import strawberry
@@ -32,16 +31,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class GraphQLContext:
-    """Custom GraphQL context with debug toolbar integration."""
-
-    debug_toolbar_context: RequestContext | None = None
-
-
-async def get_context() -> GraphQLContext:
+async def get_context() -> dict:
     """Get GraphQL context with debug toolbar request context injected."""
-    return GraphQLContext(debug_toolbar_context=get_request_context())
+    return {"debug_toolbar_context": get_request_context()}
 
 
 USERS_DB = [
