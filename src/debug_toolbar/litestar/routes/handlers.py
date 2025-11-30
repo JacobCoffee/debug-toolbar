@@ -19,6 +19,7 @@ DEFAULT_DISPLAY_DEPTH = 10
 DEFAULT_MAX_ITEMS = 100
 DEFAULT_MAX_STRING = 1000
 BYTES_PER_KB = 1024
+QUERY_PREVIEW_LENGTH = 200
 
 
 def _escape_html(text: str) -> str:
@@ -74,26 +75,30 @@ def _format_value(  # noqa: PLR0911, PLR0912, C901
     return f"<span class='unknown'>{_escape_html(str(value)[:max_string])}</span>"
 
 
+_PANEL_RENDERERS: dict[str, Any] = {}
+
+
 def _render_panel_content(stats: dict[str, Any], panel_id: str = "") -> str:
     """Render panel content as HTML with special handling for certain panels."""
     if not stats:
         return "<p class='empty'>No data</p>"
 
-    # Special rendering for Alerts panel
-    if panel_id == "AlertsPanel":
-        return _render_alerts_panel(stats)
+    # Initialize renderers lazily to avoid circular imports
+    if not _PANEL_RENDERERS:
+        _PANEL_RENDERERS.update(
+            {
+                "AlertsPanel": _render_alerts_panel,
+                "MemoryPanel": _render_memory_panel,
+                "ProfilingPanel": _render_profiling_panel,
+                "AsyncProfilerPanel": _render_async_profiler_panel,
+                "GraphQLPanel": _render_graphql_panel,
+            }
+        )
 
-    # Special rendering for Memory panel
-    if panel_id == "MemoryPanel":
-        return _render_memory_panel(stats)
-
-    # Special rendering for Profiling panel (show flame graph button)
-    if panel_id == "ProfilingPanel":
-        return _render_profiling_panel(stats)
-
-    # Special rendering for Async Profiler panel
-    if panel_id == "AsyncProfilerPanel":
-        return _render_async_profiler_panel(stats)
+    # Use specialized renderer if available
+    renderer = _PANEL_RENDERERS.get(panel_id)
+    if renderer:
+        return renderer(stats)
 
     # Default table rendering
     rows = []
@@ -397,6 +402,147 @@ def _render_async_profiler_panel(stats: dict[str, Any]) -> str:
             <span>Max Concurrent: {timeline.get("max_concurrent", 0)}</span>
         </div>
         """
+
+    html += "</div>"
+    return html
+
+
+def _render_graphql_panel(stats: dict[str, Any]) -> str:  # noqa: C901, PLR0912
+    """Render GraphQL panel with operations, resolvers, and analysis."""
+    html = "<div class='graphql-panel'>"
+
+    # Summary stats
+    op_count = stats.get("operation_count", 0)
+    total_time = stats.get("total_time_ms", 0.0)
+    resolver_count = stats.get("resolver_count", 0)
+    n1_count = stats.get("n_plus_one_count", 0)
+    dup_count = stats.get("duplicate_count", 0)
+    slow_count = stats.get("slow_operation_count", 0)
+    has_issues = stats.get("has_issues", False)
+
+    html += f"""
+    <div class='graphql-summary'>
+        <div class='graphql-stat'>
+            <span class='stat-value'>{op_count}</span>
+            <span class='stat-label'>Operations</span>
+        </div>
+        <div class='graphql-stat'>
+            <span class='stat-value'>{total_time:.2f}ms</span>
+            <span class='stat-label'>Total Time</span>
+        </div>
+        <div class='graphql-stat'>
+            <span class='stat-value'>{resolver_count}</span>
+            <span class='stat-label'>Resolvers</span>
+        </div>
+        <div class='graphql-stat {"graphql-warning" if n1_count > 0 else ""}'>
+            <span class='stat-value'>{n1_count}</span>
+            <span class='stat-label'>N+1 Issues</span>
+        </div>
+        <div class='graphql-stat {"graphql-warning" if dup_count > 0 else ""}'>
+            <span class='stat-value'>{dup_count}</span>
+            <span class='stat-label'>Duplicates</span>
+        </div>
+        <div class='graphql-stat {"graphql-warning" if slow_count > 0 else ""}'>
+            <span class='stat-value'>{slow_count}</span>
+            <span class='stat-label'>Slow Ops</span>
+        </div>
+    </div>
+    """
+
+    if has_issues:
+        html += """
+        <div class='graphql-warning-banner'>
+            <span class='warning-icon'>⚠️</span>
+            <span>Performance issues detected! Check N+1 patterns and duplicates below.</span>
+        </div>
+        """
+
+    # N+1 Patterns
+    n1_patterns = stats.get("n_plus_one_patterns", [])
+    if n1_patterns:
+        html += "<h4>N+1 Query Patterns</h4>"
+        html += "<div class='n1-patterns-list'>"
+        for pattern in n1_patterns:
+            field = _escape_html(pattern.get("field_name", "unknown"))
+            parent = _escape_html(pattern.get("parent_type", ""))
+            count = pattern.get("count", 0)
+            duration = pattern.get("total_duration_ms", 0.0)
+            suggestion = _escape_html(pattern.get("suggestion", ""))
+            html += f"""
+            <div class='n1-pattern-item'>
+                <div class='n1-header'>
+                    <span class='n1-field'>{parent}.{field}</span>
+                    <span class='n1-count'>Called {count}x</span>
+                    <span class='n1-duration'>{duration:.2f}ms total</span>
+                </div>
+                <div class='n1-suggestion'>💡 {suggestion}</div>
+            </div>
+            """
+        html += "</div>"
+
+    # Duplicate Operations
+    dups = stats.get("duplicate_operations", [])
+    if dups:
+        html += f"<h4>Duplicate Operations ({len(dups)} queries)</h4>"
+        html += "<p class='dup-hint'>These queries were executed multiple times with the same parameters.</p>"
+
+    # Operations list
+    operations = stats.get("operations", [])
+    if operations:
+        html += "<h4>Operations</h4>"
+        html += "<div class='operations-list'>"
+        for op in operations:
+            if isinstance(op, dict):
+                op_data = op
+            else:
+                op_data = op.to_dict() if hasattr(op, "to_dict") else {}
+
+            op_type = _escape_html(op_data.get("operation_type", "query"))
+            op_name = _escape_html(op_data.get("operation_name") or "Anonymous")
+            duration = op_data.get("duration_ms", 0.0)
+            raw_query = op_data.get("query", "")
+            query = _escape_html(raw_query[:QUERY_PREVIEW_LENGTH])
+            truncated = "..." if len(raw_query) > QUERY_PREVIEW_LENGTH else ""
+            resolvers = op_data.get("resolvers", [])
+            errors = op_data.get("errors", [])
+
+            op_class = f"op-{op_type}"
+            error_class = " op-error" if errors else ""
+
+            html += f"""
+            <div class='operation-item {op_class}{error_class}'>
+                <div class='op-header'>
+                    <span class='op-type'>{op_type}</span>
+                    <span class='op-name'>{op_name}</span>
+                    <span class='op-duration'>{duration:.2f}ms</span>
+                    <span class='op-resolvers'>{len(resolvers)} resolvers</span>
+                </div>
+                <pre class='op-query'>{query}{truncated}</pre>
+            """
+
+            if errors:
+                html += "<div class='op-errors'>"
+                for err in errors[:3]:
+                    msg = _escape_html(str(err.get("message", "Unknown error")))
+                    html += f"<div class='op-error-msg'>❌ {msg}</div>"
+                html += "</div>"
+
+            # Show slow resolvers
+            slow_resolvers = [r for r in resolvers if isinstance(r, dict) and r.get("is_slow")]
+            if slow_resolvers:
+                html += "<div class='slow-resolvers'>"
+                html += "<span class='slow-label'>Slow resolvers:</span>"
+                for r in slow_resolvers[:5]:
+                    r_name = _escape_html(r.get("field_path", r.get("field_name", "?")))
+                    r_dur = r.get("duration_ms", 0.0)
+                    html += f"<span class='slow-resolver'>{r_name} ({r_dur:.2f}ms)</span>"
+                html += "</div>"
+
+            html += "</div>"
+        html += "</div>"
+
+    if not operations:
+        html += "<p class='empty'>No GraphQL operations recorded</p>"
 
     html += "</div>"
     return html
@@ -1994,6 +2140,191 @@ body {
     font-family: var(--dt-font-mono);
     font-size: 12px;
     color: var(--dt-text-secondary);
+}
+
+/* GraphQL Panel Styles */
+.graphql-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
+
+.graphql-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.graphql-stat {
+    background: var(--dt-bg-secondary);
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.graphql-stat.graphql-warning .stat-value { color: var(--dt-warning); }
+
+.graphql-warning-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    color: var(--dt-warning);
+    font-size: 13px;
+}
+
+.n1-patterns-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.n1-pattern-item {
+    background: var(--dt-bg-secondary);
+    border-left: 3px solid var(--dt-warning);
+    padding: 10px 12px;
+    border-radius: 0 4px 4px 0;
+}
+
+.n1-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.n1-field {
+    font-family: var(--dt-font-mono);
+    font-weight: 600;
+    color: var(--dt-text-primary);
+}
+
+.n1-count {
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-warning);
+    font-weight: 600;
+}
+
+.n1-duration {
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-text-muted);
+}
+
+.n1-suggestion {
+    font-size: 12px;
+    color: var(--dt-text-secondary);
+}
+
+.dup-hint {
+    font-size: 12px;
+    color: var(--dt-text-muted);
+    margin-bottom: 12px;
+}
+
+.operations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.operation-item {
+    background: var(--dt-bg-secondary);
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid var(--dt-accent);
+}
+
+.operation-item.op-mutation { border-left-color: var(--dt-warning); }
+.operation-item.op-subscription { border-left-color: #c678dd; }
+.operation-item.op-error { border-left-color: var(--dt-error); }
+
+.op-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.op-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: rgba(0, 122, 204, 0.2);
+    color: var(--dt-accent);
+}
+
+.op-mutation .op-type { background: rgba(220, 220, 170, 0.2); color: var(--dt-warning); }
+.op-subscription .op-type { background: rgba(198, 120, 221, 0.2); color: #c678dd; }
+
+.op-name {
+    font-family: var(--dt-font-mono);
+    font-weight: 600;
+    color: var(--dt-text-primary);
+}
+
+.op-duration {
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-success);
+}
+
+.op-resolvers {
+    font-size: 12px;
+    color: var(--dt-text-muted);
+}
+
+.op-query {
+    font-family: var(--dt-font-mono);
+    font-size: 11px;
+    background: var(--dt-bg-primary);
+    padding: 8px;
+    border-radius: 4px;
+    margin: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--dt-text-secondary);
+}
+
+.op-errors {
+    margin-top: 8px;
+}
+
+.op-error-msg {
+    font-size: 12px;
+    color: var(--dt-error);
+    padding: 4px 0;
+}
+
+.slow-resolvers {
+    margin-top: 8px;
+    font-size: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.slow-label {
+    color: var(--dt-text-muted);
+}
+
+.slow-resolver {
+    font-family: var(--dt-font-mono);
+    background: rgba(241, 76, 76, 0.15);
+    color: var(--dt-error);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
 }
 """
 
