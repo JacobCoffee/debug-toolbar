@@ -341,4 +341,4 @@ app = Litestar(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("examples.websocket_panel_example:app", host="127.0.0.1", port=8002, reload=True)
+    uvicorn.run(app, host="127.0.0.1", port=8002)

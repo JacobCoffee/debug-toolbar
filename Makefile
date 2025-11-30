@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql example-mcp example-mcp-server act act-ci act-test
+.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql example-websocket example-mcp example-mcp-server act act-ci act-test
 
 # ==================================================================================== #
 # VARIABLES
@@ -129,16 +129,19 @@ upgrade: ## Upgrade all dependencies
 example: example-litestar ## Alias for example-litestar
 
 example-asgi: ## Run ASGI example app (http://localhost:8000)
-	@uv run examples/asgi_basic/app.py
+	@uv run python examples/asgi_basic/app.py
 
 example-litestar: ## Run Litestar example app (http://localhost:8001)
-	@uv run examples/litestar_basic/app.py
+	@uv run python examples/litestar_basic/app.py
 
 example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
-	@uv run examples/litestar_advanced_alchemy/app.py
+	@uv run python examples/litestar_advanced_alchemy/app.py
 
 example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
-	@uv run examples/graphql_panel_example.py
+	@uv run python examples/graphql_panel_example.py
+
+example-websocket: ## Run WebSocket example app (http://localhost:8002)
+	@uv run python examples/websocket_panel_example.py
 
 example-mcp: ## Run MCP server example (http://localhost:8004)
 	@uv run python examples/mcp_server_example.py
