@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="../">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Reference - Async Debug Toolbar 0.2.0 documentation</title><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="debug_toolbar.core.config" href="_autosummary/debug_toolbar.core.config.html" /><link rel="prev" title="Creating Custom Panels" href="../custom-panels.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="../_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="../_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="API Reference"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="../index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom-panels.html">Creating Custom Panels</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../comparison.html">Debug Toolbar Comparison</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#core">Core</a><ul>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.config.DebugToolbarConfig"><code class="docutils literal notranslate">core.config.DebugToolbarConfig</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#panel-base-class">Panel Base Class</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panel.Panel"><code class="docutils literal notranslate">core.panel.Panel</span></code></a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panel.Panel.generate_stats"><code class="docutils literal notranslate">core.panel.Panel.generate_stats()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.panel.Panel.generate_server_timing"><code class="docutils literal notranslate">core.panel.Panel.generate_server_timing()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#request-context">Request Context</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.context.RequestContext"><code class="docutils literal notranslate">core.context.RequestContext</span></code></a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.context.RequestContext.get_current"><code class="docutils literal notranslate">core.context.RequestContext.get_current()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.context.RequestContext.set_current"><code class="docutils literal notranslate">core.context.RequestContext.set_current()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#storage">Storage</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.storage.RequestStorage"><code class="docutils literal notranslate">core.storage.RequestStorage</span></code></a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.storage.RequestStorage.store"><code class="docutils literal notranslate">core.storage.RequestStorage.store()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.storage.RequestStorage.get"><code class="docutils literal notranslate">core.storage.RequestStorage.get()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.storage.RequestStorage.list_requests"><code class="docutils literal notranslate">core.storage.RequestStorage.list_requests()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#litestar-integration">Litestar Integration</a><ul>
+<li><a class="reference internal" href="#plugin">Plugin</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.litestar.plugin.DebugToolbarPlugin"><code class="docutils literal notranslate">litestar.plugin.DebugToolbarPlugin</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id1">Configuration</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.litestar.config.LitestarDebugToolbarConfig"><code class="docutils literal notranslate">litestar.config.LitestarDebugToolbarConfig</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#middleware">Middleware</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.litestar.middleware.DebugToolbarMiddleware"><code class="docutils literal notranslate">litestar.middleware.DebugToolbarMiddleware</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#built-in-panels">Built-in Panels</a><ul>
+<li><a class="reference internal" href="#timer-panel">Timer Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.timer.TimerPanel"><code class="docutils literal notranslate">core.panels.timer.TimerPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#request-panel">Request Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.request.RequestPanel"><code class="docutils literal notranslate">core.panels.request.RequestPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#response-panel">Response Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.response.ResponsePanel"><code class="docutils literal notranslate">core.panels.response.ResponsePanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#headers-panel">Headers Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.headers.HeadersPanel"><code class="docutils literal notranslate">core.panels.headers.HeadersPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging-panel">Logging Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.logging.LoggingPanel"><code class="docutils literal notranslate">core.panels.logging.LoggingPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#profiling-panel">Profiling Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.profiling.ProfilingPanel"><code class="docutils literal notranslate">core.panels.profiling.ProfilingPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#alerts-panel">Alerts Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.alerts.AlertsPanel"><code class="docutils literal notranslate">core.panels.alerts.AlertsPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#memory-panel">Memory Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.memory.MemoryPanel"><code class="docutils literal notranslate">core.panels.memory.MemoryPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sqlalchemy-panel">SQLAlchemy Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.extras.advanced_alchemy.panel.SQLAlchemyPanel"><code class="docutils literal notranslate">extras.advanced_alchemy.panel.SQLAlchemyPanel</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#litestar-specific-panels">Litestar-Specific Panels</a><ul>
+<li><a class="reference internal" href="#routes-panel">Routes Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.litestar.panels.routes.RoutesPanel"><code class="docutils literal notranslate">litestar.panels.routes.RoutesPanel</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#events-panel">Events Panel</a><ul>
+<li><a class="reference internal" href="#debug_toolbar.litestar.panels.events.EventsPanel"><code class="docutils literal notranslate">litestar.panels.events.EventsPanel</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-reference">Module Reference</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="../index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">API Reference</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">¶</a></h1>
+<p>Complete API documentation for debug-toolbar.</p>
+<section id="core">
+<h2>Core<a class="headerlink" href="#core" title="Link to this heading">¶</a></h2>
+<section id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.config.DebugToolbarConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.config.</span></span><span class="sig-name descname"><span class="pre">DebugToolbarConfig</span></span><a class="headerlink" href="#debug_toolbar.core.config.DebugToolbarConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Base configuration for the debug toolbar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enabled</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Enable/disable the toolbar (default: True)</p></li>
+<li><p><strong>exclude_paths</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Paths to exclude from toolbar (default: [“/_debug_toolbar”, “/static”])</p></li>
+<li><p><strong>max_request_history</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum requests to store (default: 50)</p></li>
+<li><p><strong>panels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – List of panel class paths to enable</p></li>
+<li><p><strong>extra_panels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Additional panels to add</p></li>
+<li><p><strong>exclude_panels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Panels to exclude</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="panel-base-class">
+<h3>Panel Base Class<a class="headerlink" href="#panel-base-class" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panel.Panel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panel.</span></span><span class="sig-name descname"><span class="pre">Panel</span></span><a class="headerlink" href="#debug_toolbar.core.panel.Panel" title="Link to this definition">¶</a></dt>
+<dd><p>Base class for debug toolbar panels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>panel_id</strong> – Unique identifier for the panel</p></li>
+<li><p><strong>title</strong> – Display title</p></li>
+<li><p><strong>template</strong> – Template name for rendering</p></li>
+<li><p><strong>has_content</strong> – Whether panel has expandable content</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panel.Panel.generate_stats">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><span class="pre">RequestContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#debug_toolbar.core.panel.Panel.generate_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Generate statistics for this panel.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panel.Panel.generate_server_timing">
+<span class="sig-name descname"><span class="pre">generate_server_timing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><span class="pre">RequestContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#debug_toolbar.core.panel.Panel.generate_server_timing" title="Link to this definition">¶</a></dt>
+<dd><p>Generate Server-Timing header value.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="request-context">
+<h3>Request Context<a class="headerlink" href="#request-context" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.context.RequestContext">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.context.</span></span><span class="sig-name descname"><span class="pre">RequestContext</span></span><a class="headerlink" href="#debug_toolbar.core.context.RequestContext" title="Link to this definition">¶</a></dt>
+<dd><p>Request-scoped context using contextvars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request_id</strong> (<em>UUID</em>) – Unique request identifier</p></li>
+<li><p><strong>start_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Request start timestamp</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.context.RequestContext.get_current">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_current</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><span class="pre">RequestContext</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#debug_toolbar.core.context.RequestContext.get_current" title="Link to this definition">¶</a></dt>
+<dd><p>Get the current request context.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.context.RequestContext.set_current">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_current</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#debug_toolbar.core.context.RequestContext" title="debug_toolbar.core.context.RequestContext"><span class="pre">RequestContext</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#debug_toolbar.core.context.RequestContext.set_current" title="Link to this definition">¶</a></dt>
+<dd><p>Set the current request context.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="storage">
+<h3>Storage<a class="headerlink" href="#storage" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.storage.RequestStorage">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.storage.</span></span><span class="sig-name descname"><span class="pre">RequestStorage</span></span><a class="headerlink" href="#debug_toolbar.core.storage.RequestStorage" title="Link to this definition">¶</a></dt>
+<dd><p>LRU storage for request history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of requests to store</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.storage.RequestStorage.store">
+<span class="sig-name descname"><span class="pre">store</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UUID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#debug_toolbar.core.storage.RequestStorage.store" title="Link to this definition">¶</a></dt>
+<dd><p>Store request data.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.storage.RequestStorage.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UUID</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#debug_toolbar.core.storage.RequestStorage.get" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieve request data by ID.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.storage.RequestStorage.list_requests">
+<span class="sig-name descname"><span class="pre">list_requests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#debug_toolbar.core.storage.RequestStorage.list_requests" title="Link to this definition">¶</a></dt>
+<dd><p>List all stored requests (newest first).</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="litestar-integration">
+<h2>Litestar Integration<a class="headerlink" href="#litestar-integration" title="Link to this heading">¶</a></h2>
+<section id="plugin">
+<h3>Plugin<a class="headerlink" href="#plugin" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.litestar.plugin.DebugToolbarPlugin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.litestar.plugin.</span></span><span class="sig-name descname"><span class="pre">DebugToolbarPlugin</span></span><a class="headerlink" href="#debug_toolbar.litestar.plugin.DebugToolbarPlugin" title="Link to this definition">¶</a></dt>
+<dd><p>Litestar plugin for the debug toolbar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="#debug_toolbar.litestar.config.LitestarDebugToolbarConfig" title="debug_toolbar.litestar.config.LitestarDebugToolbarConfig"><em>LitestarDebugToolbarConfig</em></a>) – Toolbar configuration</p>
+</dd>
+</dl>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Litestar</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarPlugin</span><span class="p">,</span> <span class="n">LitestarDebugToolbarConfig</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="5"><span class="n">app</span> <span class="o">=</span> <span class="n">Litestar</span><span class="p">(</span><span class="n">plugins</span><span class="o">=</span><span class="p">[</span><span class="n">DebugToolbarPlugin</span><span class="p">(</span><span class="n">config</span><span class="p">)])</span>
+</span></pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="id1">
+<h3>Configuration<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.litestar.config.LitestarDebugToolbarConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.litestar.config.</span></span><span class="sig-name descname"><span class="pre">LitestarDebugToolbarConfig</span></span><a class="headerlink" href="#debug_toolbar.litestar.config.LitestarDebugToolbarConfig" title="Link to this definition">¶</a></dt>
+<dd><p>Litestar-specific configuration extending DebugToolbarConfig.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_toolbar_callback</strong> (<em>Callable</em><em>[</em><em>[</em><em>Request</em><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>] </em><em>| </em><em>None</em>) – Callable to determine if toolbar should show</p></li>
+<li><p><strong>intercept_redirects</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Intercept redirects to show toolbar</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="middleware">
+<h3>Middleware<a class="headerlink" href="#middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.litestar.middleware.DebugToolbarMiddleware">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.litestar.middleware.</span></span><span class="sig-name descname"><span class="pre">DebugToolbarMiddleware</span></span><a class="headerlink" href="#debug_toolbar.litestar.middleware.DebugToolbarMiddleware" title="Link to this definition">¶</a></dt>
+<dd><p>ASGI middleware that injects the toolbar into HTML responses.</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="built-in-panels">
+<h2>Built-in Panels<a class="headerlink" href="#built-in-panels" title="Link to this heading">¶</a></h2>
+<section id="timer-panel">
+<h3>Timer Panel<a class="headerlink" href="#timer-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.timer.TimerPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.timer.</span></span><span class="sig-name descname"><span class="pre">TimerPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.timer.TimerPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Displays request timing information.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">total_time</span></code>: Total request duration (ms)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">user_cpu_time</span></code>: User CPU time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">system_cpu_time</span></code>: System CPU time</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="request-panel">
+<h3>Request Panel<a class="headerlink" href="#request-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.request.RequestPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.request.</span></span><span class="sig-name descname"><span class="pre">RequestPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.request.RequestPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Displays HTTP request information.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code>: HTTP method</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code>: Request path</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">query_params</span></code>: Query string parameters</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">headers</span></code>: Request headers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cookies</span></code>: Request cookies</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="response-panel">
+<h3>Response Panel<a class="headerlink" href="#response-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.response.ResponsePanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.response.</span></span><span class="sig-name descname"><span class="pre">ResponsePanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.response.ResponsePanel" title="Link to this definition">¶</a></dt>
+<dd><p>Displays HTTP response information.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">status_code</span></code>: Response status</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">headers</span></code>: Response headers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">content_length</span></code>: Response size</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="headers-panel">
+<h3>Headers Panel<a class="headerlink" href="#headers-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.headers.HeadersPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.headers.</span></span><span class="sig-name descname"><span class="pre">HeadersPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.headers.HeadersPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Categorized display of HTTP headers with security analysis.</p>
+<p><strong>Categories:</strong></p>
+<ul class="simple">
+<li><p>Security headers (CSP, HSTS, X-Frame-Options)</p></li>
+<li><p>Caching headers</p></li>
+<li><p>CORS headers</p></li>
+<li><p>Authentication headers (redacted)</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="logging-panel">
+<h3>Logging Panel<a class="headerlink" href="#logging-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.logging.LoggingPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.logging.</span></span><span class="sig-name descname"><span class="pre">LoggingPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.logging.LoggingPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Captures log records during request processing.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">records</span></code>: List of log records with level, message, timestamp</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="profiling-panel">
+<h3>Profiling Panel<a class="headerlink" href="#profiling-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.profiling.ProfilingPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.profiling.</span></span><span class="sig-name descname"><span class="pre">ProfilingPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.profiling.ProfilingPanel" title="Link to this definition">¶</a></dt>
+<dd><p>CPU profiling with cProfile or pyinstrument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>profiler_backend</strong> – “cprofile” or “pyinstrument”</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="alerts-panel">
+<h3>Alerts Panel<a class="headerlink" href="#alerts-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.alerts.AlertsPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.alerts.</span></span><span class="sig-name descname"><span class="pre">AlertsPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.alerts.AlertsPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Proactive issue detection panel.</p>
+<p><strong>Detection Categories:</strong></p>
+<ul class="simple">
+<li><p>Security: Missing headers, insecure cookies, CSRF issues</p></li>
+<li><p>Performance: Large responses, slow queries</p></li>
+<li><p>Database: N+1 patterns, query optimization</p></li>
+<li><p>Configuration: Debug mode in production</p></li>
+</ul>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">alerts</span></code>: List of detected alerts with severity and suggestions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_alerts</span></code>: Total alert count</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">by_severity</span></code>: Counts by severity level</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">by_category</span></code>: Counts by category</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="memory-panel">
+<h3>Memory Panel<a class="headerlink" href="#memory-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.memory.MemoryPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.memory.</span></span><span class="sig-name descname"><span class="pre">MemoryPanel</span></span><a class="headerlink" href="#debug_toolbar.core.panels.memory.MemoryPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Memory profiling with multiple backend support.</p>
+<p><strong>Backends:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tracemalloc</span></code>: Built-in Python tracer (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memray</span></code>: Advanced profiler (Linux/macOS, requires install)</p></li>
+</ul>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">memory_before</span></code>: Memory at request start</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memory_after</span></code>: Memory at request end</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memory_delta</span></code>: Memory change during request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">top_allocations</span></code>: Largest allocations by file/line</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="sqlalchemy-panel">
+<h3>SQLAlchemy Panel<a class="headerlink" href="#sqlalchemy-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.extras.advanced_alchemy.panel.SQLAlchemyPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.extras.advanced_alchemy.panel.</span></span><span class="sig-name descname"><span class="pre">SQLAlchemyPanel</span></span><a class="headerlink" href="#debug_toolbar.extras.advanced_alchemy.panel.SQLAlchemyPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Tracks SQLAlchemy queries with timing and EXPLAIN support.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">queries</span></code>: List of executed queries</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_queries</span></code>: Query count</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">total_time</span></code>: Total query time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">duplicate_queries</span></code>: Detected duplicate queries</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_plus_one_groups</span></code>: Detected N+1 query patterns</p></li>
+</ul>
+<p><strong>Features:</strong></p>
+<ul class="simple">
+<li><p>Query timing</p></li>
+<li><p>Parameter display</p></li>
+<li><p>Duplicate detection</p></li>
+<li><p>N+1 query detection with fix suggestions</p></li>
+<li><p>EXPLAIN query plans (PostgreSQL, SQLite, MySQL, MariaDB)</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+<section id="litestar-specific-panels">
+<h2>Litestar-Specific Panels<a class="headerlink" href="#litestar-specific-panels" title="Link to this heading">¶</a></h2>
+<section id="routes-panel">
+<h3>Routes Panel<a class="headerlink" href="#routes-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.litestar.panels.routes.RoutesPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.litestar.panels.routes.</span></span><span class="sig-name descname"><span class="pre">RoutesPanel</span></span><a class="headerlink" href="#debug_toolbar.litestar.panels.routes.RoutesPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Displays all registered routes in the Litestar application.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">routes</span></code>: List of all routes with methods and handlers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">current_route</span></code>: The matched route for this request</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="events-panel">
+<h3>Events Panel<a class="headerlink" href="#events-panel" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="debug_toolbar.litestar.panels.events.EventsPanel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.litestar.panels.events.</span></span><span class="sig-name descname"><span class="pre">EventsPanel</span></span><a class="headerlink" href="#debug_toolbar.litestar.panels.events.EventsPanel" title="Link to this definition">¶</a></dt>
+<dd><p>Tracks Litestar lifecycle events and hooks.</p>
+<p><strong>Stats:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lifecycle_hooks</span></code>: on_startup, on_shutdown handlers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">request_hooks</span></code>: before_request, after_request, after_response handlers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exception_handlers</span></code>: Registered exception handlers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">executed_hooks</span></code>: Hooks that ran during this request</p></li>
+</ul>
+</dd></dl>
+
+</section>
+</section>
+<section id="module-reference">
+<h2>Module Reference<a class="headerlink" href="#module-reference" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.config.html#module-debug_toolbar.core.config" title="debug_toolbar.core.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.config</span></code></a></p></td>
+<td><p>Configuration system for the debug toolbar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.panel.html#module-debug_toolbar.core.panel" title="debug_toolbar.core.panel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.panel</span></code></a></p></td>
+<td><p>Base panel class for debug toolbar panels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.context.html#module-debug_toolbar.core.context" title="debug_toolbar.core.context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.context</span></code></a></p></td>
+<td><p>Request context management using contextvars for async-safe data propagation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.storage.html#module-debug_toolbar.core.storage" title="debug_toolbar.core.storage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.storage</span></code></a></p></td>
+<td><p>Storage backend for toolbar request history using LRU cache.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.toolbar.html#module-debug_toolbar.core.toolbar" title="debug_toolbar.core.toolbar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.toolbar</span></code></a></p></td>
+<td><p>Main debug toolbar manager class.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.core.panels.html#module-debug_toolbar.core.panels" title="debug_toolbar.core.panels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.core.panels</span></code></a></p></td>
+<td><p>Built-in panels for the async debug toolbar.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.litestar.plugin.html#module-debug_toolbar.litestar.plugin" title="debug_toolbar.litestar.plugin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.litestar.plugin</span></code></a></p></td>
+<td><p>Debug toolbar plugin for Litestar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.litestar.config.html#module-debug_toolbar.litestar.config" title="debug_toolbar.litestar.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.litestar.config</span></code></a></p></td>
+<td><p>Litestar-specific configuration for the debug toolbar.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.litestar.middleware.html#module-debug_toolbar.litestar.middleware" title="debug_toolbar.litestar.middleware"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.litestar.middleware</span></code></a></p></td>
+<td><p>Debug toolbar middleware for Litestar.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="_autosummary/debug_toolbar.litestar.panels.html#module-debug_toolbar.litestar.panels" title="debug_toolbar.litestar.panels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug_toolbar.litestar.panels</span></code></a></p></td>
+<td><p>Litestar-specific panels for the debug toolbar.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="../custom-panels.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Creating Custom Panels</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="_autosummary/debug_toolbar.core.config.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">debug_toolbar.core.config</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=fd10adb8"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script src="../_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
