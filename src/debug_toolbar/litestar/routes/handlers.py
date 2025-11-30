@@ -369,17 +369,19 @@ def _render_async_profiler_panel(stats: dict[str, Any]) -> str:
                 (t for t in tasks if t.get("task_id") == task_id and t.get("event_type") in end_states),
                 None,
             )
+            allowed_statuses = {"completed", "cancelled", "error", "running", "unknown"}
             if completion:
                 status = completion.get("event_type", "completed")
-                status_class = "async-status-" + status
+                if status not in allowed_statuses:
+                    status = "unknown"
             else:
                 status = "running"
-                status_class = "async-status-running"
+            status_class = "async-status-" + status
             html += f"""
             <tr>
                 <td class='key'>{task_name}<br><small class='coro-name'>{coro_name}</small></td>
                 <td class='value'>
-                    <span class='task-status {status_class}'>{status}</span>
+                    <span class='task-status {status_class}'>{_escape_html(status)}</span>
                     {f"<span class='task-duration'>{duration:.2f}ms</span>" if duration else ""}
                 </td>
             </tr>
@@ -2459,18 +2461,23 @@ class DebugToolbar {
                 const taskId = task.task_id || '';
                 const completion = tasks.find(t => t.task_id === taskId &&
                     ['completed', 'cancelled', 'error'].includes(t.event_type));
+                const allowedStatuses = ['completed', 'cancelled', 'error', 'running', 'unknown'];
                 let status = 'running';
-                let statusClass = 'async-status-running';
                 let duration = 0;
                 if (completion) {
                     status = completion.event_type;
-                    statusClass = 'async-status-' + status;
+                    if (!allowedStatuses.includes(status)) {
+                        status = 'unknown';
+                    }
                     duration = completion.duration_ms || 0;
                 }
+                const statusClass = 'async-status-' + status;
+                const safeClass = this.escapeHtml(statusClass);
+                const safeStatus = this.escapeHtml(status);
                 html += '<tr>';
                 html += '<td class="key">' + taskName + '<br><small class="coro-name">' + coroName + '</small></td>';
                 html += '<td class="value">';
-                html += '<span class="task-status ' + statusClass + '">' + status + '</span>';
+                html += '<span class="task-status ' + safeClass + '">' + safeStatus + '</span>';
                 if (duration > 0) {
                     html += '<span class="task-duration">' + duration.toFixed(2) + 'ms</span>';
                 }

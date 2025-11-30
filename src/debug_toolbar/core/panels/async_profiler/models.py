@@ -12,7 +12,7 @@ class TaskEvent:
 
     task_id: str
     task_name: str
-    event_type: Literal["created", "started", "completed", "cancelled", "error"]
+    event_type: Literal["created", "completed", "cancelled", "error", "unknown"]
     timestamp: float
     coro_name: str
     parent_task_id: str | None = None
@@ -52,6 +52,6 @@ class TimelineEvent:
     event_type: Literal["task", "blocking"]
     start_time: float
     end_time: float | None
-    status: Literal["created", "running", "awaiting", "completed", "cancelled", "error", "blocking"]
+    status: Literal["running", "completed", "cancelled", "error", "blocking", "unknown"]
     parent_id: str | None = None
     details: dict[str, str | float | int] = field(default_factory=dict)

@@ -93,6 +93,39 @@ class BlockingCallDetector:
 
         loop.set_debug(True)
         loop.slow_callback_duration = self._threshold_ms / MS_TO_SECONDS
+        loop.set_exception_handler(self._exception_handler)
+
+    def _exception_handler(self, loop: asyncio.AbstractEventLoop, context: dict[str, Any]) -> None:
+        """Custom exception handler that captures slow callback warnings.
+
+        Args:
+            loop: The event loop.
+            context: Exception context dictionary.
+        """
+        message = context.get("message", "")
+        if "Executing" in message and "took" in message and "seconds" in message:
+            import re
+
+            match = re.search(r"took ([\d.]+) seconds", message)
+            if match:
+                duration_s = float(match.group(1))
+                duration_ms = duration_s * MS_TO_SECONDS
+                source = context.get("source_traceback", [])
+                if source:
+                    frame = source[-1] if source else None
+                    self.record_blocking_call(
+                        duration_ms=duration_ms,
+                        function_name=frame.name if frame else "unknown",
+                        file=frame.filename if frame else "unknown",
+                        line=frame.lineno if frame else 0,
+                    )
+                else:
+                    self.record_blocking_call(duration_ms=duration_ms)
+
+        if self._original_handler:
+            self._original_handler(loop, context)
+        else:
+            loop.default_exception_handler(context)
 
     def uninstall(self) -> None:
         """Uninstall blocking call detection and restore original settings."""
@@ -101,9 +134,7 @@ class BlockingCallDetector:
 
         self._loop.set_debug(self._original_debug)
         self._loop.slow_callback_duration = self._original_duration
-
-        if self._original_handler:
-            self._loop.set_exception_handler(self._original_handler)
+        self._loop.set_exception_handler(self._original_handler)
 
     def record_blocking_call(
         self,
@@ -229,7 +260,7 @@ class EventLoopLagMonitor:
         current = time.perf_counter()
         actual_delta = current - self._last_check
         expected_delta = self._sample_interval
-        lag_ms = (actual_delta - expected_delta) * MS_TO_SECONDS
+        lag_ms = max(0.0, (actual_delta - expected_delta) * MS_TO_SECONDS)
 
         if lag_ms > self._lag_threshold_ms:
             self._samples.append(

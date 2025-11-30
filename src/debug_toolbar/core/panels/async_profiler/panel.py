@@ -100,7 +100,7 @@ class AsyncProfilerPanel(Panel):
                 if YappiBackend.is_available():
                     return "yappi"
             except ImportError:
-                pass
+                pass  # Yappi is not installed; fall back to taskfactory backend.
             logger.info("Yappi requested but not available, falling back to taskfactory")
             return "taskfactory"
 
@@ -115,7 +115,7 @@ class AsyncProfilerPanel(Panel):
             if YappiBackend.is_available():
                 return "yappi"
         except ImportError:
-            pass
+            pass  # Yappi backend is not available; fall back to taskfactory backend.
 
         return "taskfactory"
 
@@ -142,7 +142,7 @@ class AsyncProfilerPanel(Panel):
                     max_stack_depth=max_stack_depth,
                 )
             except ImportError:
-                pass
+                pass  # Yappi not available; will use TaskFactoryBackend instead.
 
         return TaskFactoryBackend(
             capture_stacks=capture_stacks,

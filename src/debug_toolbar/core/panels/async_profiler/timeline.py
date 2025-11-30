@@ -153,6 +153,9 @@ def _calculate_max_concurrent(events: list[TimelineEvent]) -> int:
         if event.end_time is not None:
             time_points.append((event.end_time, -1))
 
+    # Sort by (timestamp, delta) so that end events (delta=-1) are processed before
+    # start events (delta=1) at the same timestamp. This ensures that a task ending
+    # and another starting at the same time are not both counted as running concurrently.
     time_points.sort(key=lambda x: (x[0], x[1]))
 
     current_concurrent = 0

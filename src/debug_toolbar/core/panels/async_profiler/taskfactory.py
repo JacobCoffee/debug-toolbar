@@ -177,15 +177,20 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         completion_time = self._loop.time() - self._start_time
         duration_ms = (completion_time - creation_time) * 1000
 
-        if task.cancelled():
-            event_type: str = "cancelled"
+        try:
+            exc = task.exception()
+            if exc is not None:
+                event_type: str = "error"
+                error = str(exc)
+            else:
+                event_type = "completed"
+                error = None
+        except asyncio.CancelledError:
+            event_type = "cancelled"
             error = None
-        elif task.exception() is not None:
-            event_type = "error"
-            error = str(task.exception())
-        else:
-            event_type = "completed"
-            error = None
+        except asyncio.InvalidStateError:
+            event_type = "unknown"
+            error = "Task not done"
 
         event = TaskEvent(
             task_id=str(id(task)),
