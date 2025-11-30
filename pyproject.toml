@@ -88,10 +88,13 @@ advanced-alchemy = [
     "sqlalchemy>=2.0.0",
 ]
 all = [
-    "debug-toolbar[litestar,advanced-alchemy,strawberry]",
+    "debug-toolbar[litestar,advanced-alchemy,strawberry,mcp]",
 ]
 litestar = [
     "litestar>=2.0.0",
+]
+mcp = [
+    "mcp>=1.0.0",
 ]
 strawberry = [
     "strawberry-graphql>=0.240.0",
