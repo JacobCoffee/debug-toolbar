@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Debug Toolbar Comparison - Async Debug Toolbar 0.2.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Changelog" href="changelog.html" /><link rel="prev" title="debug_toolbar.litestar.panels" href="api/_autosummary/debug_toolbar.litestar.panels.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Debug Toolbar Comparison"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-panels.html">Creating Custom Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP Server Integration</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debug Toolbar Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#quick-comparison-matrix">Quick Comparison Matrix</a></li>
+<li><a class="reference internal" href="#panel-comparison">Panel Comparison</a><ul>
+<li><a class="reference internal" href="#core-debugging-panels">Core Debugging Panels</a></li>
+<li><a class="reference internal" href="#database-panels">Database Panels</a></li>
+<li><a class="reference internal" href="#profiling-performance">Profiling &amp; Performance</a></li>
+<li><a class="reference internal" href="#caching-templates">Caching &amp; Templates</a></li>
+<li><a class="reference internal" href="#security-headers">Security &amp; Headers</a></li>
+<li><a class="reference internal" href="#advanced-features">Advanced Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#unique-strengths-by-tool">Unique Strengths by Tool</a><ul>
+<li><a class="reference internal" href="#debug-toolbar-ours">debug-toolbar (Ours)</a></li>
+<li><a class="reference internal" href="#django-debug-toolbar">Django Debug Toolbar</a></li>
+<li><a class="reference internal" href="#flask-debug-toolbar">Flask Debug Toolbar</a></li>
+<li><a class="reference internal" href="#fastapi-debug-toolbar">FastAPI Debug Toolbar</a></li>
+<li><a class="reference internal" href="#sentry-spotlight">Sentry Spotlight</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#feature-gap-analysis">Feature Gap Analysis</a><ul>
+<li><a class="reference internal" href="#what-we-have-that-others-don-t">What We Have That Others Don&#8217;t</a></li>
+<li><a class="reference internal" href="#what-we-re-missing-roadmap">What We&#8217;re Missing (Roadmap)</a><ul>
+<li><a class="reference internal" href="#completed-features">Completed Features</a></li>
+<li><a class="reference internal" href="#medium-priority-phase-9">Medium Priority (Phase 9)</a></li>
+<li><a class="reference internal" href="#future-vision-phase-10">Future Vision (Phase 10+)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migration-guides">Migration Guides</a><ul>
+<li><a class="reference internal" href="#from-django-debug-toolbar">From Django Debug Toolbar</a></li>
+<li><a class="reference internal" href="#from-fastapi-debug-toolbar">From FastAPI Debug Toolbar</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance-comparison">Performance Comparison</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Debug Toolbar Comparison</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="debug-toolbar-comparison">
+<h1>Debug Toolbar Comparison<a class="headerlink" href="#debug-toolbar-comparison" title="Link to this heading">¶</a></h1>
+<p>A comprehensive comparison of debug-toolbar against other popular Python debug toolbars and observability tools.</p>
+<section id="quick-comparison-matrix">
+<h2>Quick Comparison Matrix<a class="headerlink" href="#quick-comparison-matrix" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head"><p>debug-toolbar</p></th>
+<th class="head"><p>Django Debug Toolbar</p></th>
+<th class="head"><p>Flask Debug Toolbar</p></th>
+<th class="head"><p>FastAPI Debug Toolbar</p></th>
+<th class="head"><p>Sentry Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Async-First</strong></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>No (experimental)</p></td>
+<td><p>No</p></td>
+<td><p>Partial</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>ASGI Native</strong></p></td>
+<td><p><strong>Yes</strong></p></td>
+<td><p>No (WSGI)</p></td>
+<td><p>No (WSGI)</p></td>
+<td><p>Yes</p></td>
+<td><p>N/A</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Framework</strong></p></td>
+<td><p>Litestar (+ agnostic core)</p></td>
+<td><p>Django</p></td>
+<td><p>Flask</p></td>
+<td><p>FastAPI</p></td>
+<td><p>Any (SDK-based)</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>License</strong></p></td>
+<td><p>MIT</p></td>
+<td><p>BSD-3</p></td>
+<td><p>BSD-3</p></td>
+<td><p>BSD-3</p></td>
+<td><p>Apache-2.0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="panel-comparison">
+<h2>Panel Comparison<a class="headerlink" href="#panel-comparison" title="Link to this heading">¶</a></h2>
+<section id="core-debugging-panels">
+<h3>Core Debugging Panels<a class="headerlink" href="#core-debugging-panels" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Timer/Performance</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Request Info</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Response Info</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Partial</p></td>
+<td class="text-center"><p>Partial</p></td>
+<td class="text-center"><p>Partial</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Headers (categorized)</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Basic</p></td>
+<td class="text-center"><p>Basic</p></td>
+<td class="text-center"><p>Basic</p></td>
+<td class="text-center"><p>Partial</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Logging</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Versions</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Routes</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Settings/Config</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="database-panels">
+<h3>Database Panels<a class="headerlink" href="#database-panels" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>SQLAlchemy</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Django ORM</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Tortoise ORM</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>SQL Query Timing</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Query Parameters</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Duplicate Detection</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Slow Query Highlighting</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>EXPLAIN Plans</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>N+1 Detection</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="profiling-performance">
+<h3>Profiling &amp; Performance<a class="headerlink" href="#profiling-performance" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>cProfile</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>pyinstrument</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Flame Graphs</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Plugin</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>CPU Time (user/sys)</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Server-Timing Header</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Distributed Tracing</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="caching-templates">
+<h3>Caching &amp; Templates<a class="headerlink" href="#caching-templates" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Redis Tracking</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Plugin</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Memcached Tracking</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Plugin</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Cache Hit/Miss Stats</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Jinja2 Templates</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Mako Templates</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Django Templates</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Template Editor</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="security-headers">
+<h3>Security &amp; Headers<a class="headerlink" href="#security-headers" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Security Header Detection</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>CORS Analysis</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Auth Header Redaction</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Sensitive Data Redaction</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="advanced-features">
+<h3>Advanced Features<a class="headerlink" href="#advanced-features" title="Link to this heading">¶</a></h3>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Feature</p></th>
+<th class="head text-center"><p>Ours</p></th>
+<th class="head text-center"><p>Django</p></th>
+<th class="head text-center"><p>Flask</p></th>
+<th class="head text-center"><p>FastAPI</p></th>
+<th class="head text-center"><p>Spotlight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Request History</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>Yes</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Snapshot Switching</strong></p></td>
+<td class="text-center"><p>Basic</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>GraphQL Support</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>WebSocket Support</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Signals/Events Panel</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Static Files Panel</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Alerts Panel</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>AI/MCP Integration</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Desktop App</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Multi-Service</strong></p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p>No</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="unique-strengths-by-tool">
+<h2>Unique Strengths by Tool<a class="headerlink" href="#unique-strengths-by-tool" title="Link to this heading">¶</a></h2>
+<section id="debug-toolbar-ours">
+<h3>debug-toolbar (Ours)<a class="headerlink" href="#debug-toolbar-ours" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong></p>
+<ul class="simple">
+<li><p><strong>True async-first design</strong> using <code class="docutils literal notranslate"><span class="pre">contextvars</span></code> for request-scoped data</p></li>
+<li><p><strong>Full ASGI compliance</strong> without blocking operations</p></li>
+<li><p><strong>Server-Timing header support</strong> (W3C standard)</p></li>
+<li><p><strong>Security-focused</strong>: Header analysis, CORS detection, sensitive data redaction</p></li>
+<li><p><strong>Multiple profiler backends</strong>: cProfile and pyinstrument with flame graphs</p></li>
+<li><p><strong>Cache tracking</strong> for Redis and Memcached with hit/miss stats</p></li>
+<li><p><strong>Advanced SQL analysis</strong>: Duplicate detection, N+1 detection, EXPLAIN plans</p></li>
+<li><p><strong>Memory profiling</strong>: tracemalloc and memray backends</p></li>
+<li><p><strong>Proactive alerts</strong>: Automatic detection of security, performance, and database issues</p></li>
+<li><p><strong>Lifecycle tracking</strong>: Events panel for Litestar hooks and exception handlers</p></li>
+<li><p><strong>Framework-agnostic core</strong> (can support other ASGI frameworks)</p></li>
+</ul>
+<p><strong>Best For:</strong> Modern async Python applications using Litestar, SQLAlchemy, Redis</p>
+</section>
+<hr class="docutils" />
+<section id="django-debug-toolbar">
+<h3>Django Debug Toolbar<a class="headerlink" href="#django-debug-toolbar" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong></p>
+<ul class="simple">
+<li><p><strong>Most mature</strong> (10+ years of development)</p></li>
+<li><p><strong>Largest ecosystem</strong> of third-party panels</p></li>
+<li><p><strong>EXPLAIN plan integration</strong> for SQL queries</p></li>
+<li><p><strong>Signals panel</strong> for Django event debugging</p></li>
+<li><p><strong>Static files panel</strong> for asset tracking</p></li>
+<li><p><strong>Alerts panel</strong> for common mistakes (e.g., missing form enctype)</p></li>
+<li><p><strong>Request history</strong> with full snapshot switching</p></li>
+</ul>
+<p><strong>Best For:</strong> Django applications, teams familiar with Django ecosystem</p>
+</section>
+<hr class="docutils" />
+<section id="flask-debug-toolbar">
+<h3>Flask Debug Toolbar<a class="headerlink" href="#flask-debug-toolbar" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong></p>
+<ul class="simple">
+<li><p><strong>Template editor</strong> - Edit templates interactively in browser</p></li>
+<li><p><strong>Profiler dump</strong> - Export profiling data to files</p></li>
+<li><p><strong>Simple integration</strong> with Flask applications</p></li>
+</ul>
+<p><strong>Best For:</strong> Flask applications needing quick debugging setup</p>
+</section>
+<hr class="docutils" />
+<section id="fastapi-debug-toolbar">
+<h3>FastAPI Debug Toolbar<a class="headerlink" href="#fastapi-debug-toolbar" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong></p>
+<ul class="simple">
+<li><p><strong>Multi-ORM support</strong>: SQLAlchemy + Tortoise ORM</p></li>
+<li><p><strong>GraphQL/GraphiQL support</strong></p></li>
+<li><p><strong>Swagger UI integration</strong></p></li>
+<li><p><strong>FastAPI-native</strong> middleware</p></li>
+</ul>
+<p><strong>Best For:</strong> FastAPI applications using GraphQL or Tortoise ORM</p>
+</section>
+<hr class="docutils" />
+<section id="sentry-spotlight">
+<h3>Sentry Spotlight<a class="headerlink" href="#sentry-spotlight" title="Link to this heading">¶</a></h3>
+<p><strong>Strengths:</strong></p>
+<ul class="simple">
+<li><p><strong>AI/MCP integration</strong> - AI assistants can access telemetry</p></li>
+<li><p><strong>Distributed tracing</strong> across services</p></li>
+<li><p><strong>Desktop app</strong> for dedicated debugging window</p></li>
+<li><p><strong>Multi-service monitoring</strong> in single view</p></li>
+<li><p><strong>Error tracking</strong> with full context</p></li>
+<li><p><strong>User breadcrumbs</strong> for action tracking</p></li>
+<li><p><strong>Sidecar architecture</strong> - doesn’t interfere with production</p></li>
+</ul>
+<p><strong>Best For:</strong> Complex microservice architectures, teams using AI coding assistants, production-like debugging</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="feature-gap-analysis">
+<h2>Feature Gap Analysis<a class="headerlink" href="#feature-gap-analysis" title="Link to this heading">¶</a></h2>
+<section id="what-we-have-that-others-don-t">
+<h3>What We Have That Others Don’t<a class="headerlink" href="#what-we-have-that-others-don-t" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Comprehensive header security analysis</strong> with categorization</p></li>
+<li><p><strong>CORS header detection and analysis</strong></p></li>
+<li><p><strong>Server-Timing HTTP header</strong> for browser DevTools integration</p></li>
+<li><p><strong>Dual profiler support</strong> (cProfile + pyinstrument switchable)</p></li>
+<li><p><strong>SQLAlchemy duplicate query detection</strong></p></li>
+<li><p><strong>Async-safe cache tracking</strong> for Redis/Memcached</p></li>
+<li><p><strong>EXPLAIN query plans</strong> for PostgreSQL, SQLite, MySQL, MariaDB</p></li>
+<li><p><strong>Flame graph visualization</strong> in speedscope format</p></li>
+<li><p><strong>N+1 query detection</strong> with call stack and fix suggestions</p></li>
+<li><p><strong>Multi-backend memory profiling</strong> (tracemalloc + memray)</p></li>
+<li><p><strong>Proactive alerts panel</strong> for security, performance, and database issues</p></li>
+</ol>
+</section>
+<section id="what-we-re-missing-roadmap">
+<h3>What We’re Missing (Roadmap)<a class="headerlink" href="#what-we-re-missing-roadmap" title="Link to this heading">¶</a></h3>
+<section id="completed-features">
+<h4>Completed Features<a class="headerlink" href="#completed-features" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>~~EXPLAIN plan integration for SQL queries~~ Done</p></li>
+<li><p>~~N+1 query detection with call stack~~ Done</p></li>
+<li><p>~~Event/Signal panel for Litestar lifecycle events~~ Done</p></li>
+<li><p>~~Alerts panel for common issues~~ Done</p></li>
+<li><p>~~Memory profiling panel~~ Done</p></li>
+<li><p>~~Flame graph visualization~~ Done</p></li>
+</ul>
+</section>
+<section id="medium-priority-phase-9">
+<h4>Medium Priority (Phase 9)<a class="headerlink" href="#medium-priority-phase-9" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>GraphQL panel</strong> for query inspection</p></li>
+<li><p><strong>WebSocket panel</strong> for WS debugging</p></li>
+<li><p><strong>Background tasks panel</strong> (SAQ/Celery)</p></li>
+</ul>
+</section>
+<section id="future-vision-phase-10">
+<h4>Future Vision (Phase 10+)<a class="headerlink" href="#future-vision-phase-10" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p><strong>AI/MCP integration</strong> for AI-assisted debugging</p></li>
+<li><p><strong>Distributed tracing</strong> support (OpenTelemetry)</p></li>
+<li><p><strong>Desktop app/Sidecar</strong> architecture option</p></li>
+<li><p><strong>Multi-framework support</strong> (Starlette, FastAPI adapters)</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="migration-guides">
+<h2>Migration Guides<a class="headerlink" href="#migration-guides" title="Link to this heading">¶</a></h2>
+<section id="from-django-debug-toolbar">
+<h3>From Django Debug Toolbar<a class="headerlink" href="#from-django-debug-toolbar" title="Link to this heading">¶</a></h3>
+<p>If migrating from Django to Litestar:</p>
+<ul class="simple">
+<li><p>TimerPanel -&gt; TimerPanel (equivalent)</p></li>
+<li><p>SQLPanel -&gt; SQLAlchemyPanel (use Advanced-Alchemy)</p></li>
+<li><p>HeadersPanel -&gt; HeadersPanel (enhanced with security analysis)</p></li>
+<li><p>SettingsPanel -&gt; SettingsPanel (equivalent)</p></li>
+<li><p>ProfilingPanel -&gt; ProfilingPanel (enhanced with pyinstrument and flame graphs)</p></li>
+<li><p>SignalsPanel -&gt; EventsPanel (Litestar lifecycle hooks and exception handlers)</p></li>
+</ul>
+</section>
+<section id="from-fastapi-debug-toolbar">
+<h3>From FastAPI Debug Toolbar<a class="headerlink" href="#from-fastapi-debug-toolbar" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>SQLAlchemyPanel -&gt; SQLAlchemyPanel (equivalent, with N+1 detection)</p></li>
+<li><p>Default panels -&gt; Core panels (TimerPanel, RequestPanel, etc.)</p></li>
+</ul>
+<p>Added: CachePanel, TemplatesPanel, HeadersPanel (categorized), ProfilingPanel (with flame graphs), AlertsPanel, MemoryPanel, EventsPanel</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="performance-comparison">
+<h2>Performance Comparison<a class="headerlink" href="#performance-comparison" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Ours</p></th>
+<th class="head"><p>Django</p></th>
+<th class="head"><p>Flask</p></th>
+<th class="head"><p>FastAPI</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Overhead (no panels)</strong></p></td>
+<td><p>&lt;1ms</p></td>
+<td><p>~2ms</p></td>
+<td><p>~1ms</p></td>
+<td><p>~1ms</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Overhead (all panels)</strong></p></td>
+<td><p>~5-10ms</p></td>
+<td><p>~10-20ms</p></td>
+<td><p>~5-10ms</p></td>
+<td><p>~5ms</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Memory usage</strong></p></td>
+<td><p>Low</p></td>
+<td><p>Medium</p></td>
+<td><p>Low</p></td>
+<td><p>Low</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Async blocking</strong></p></td>
+<td><p>None</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Partial</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>Note: Performance varies by configuration and workload</em></p>
+</section>
+<hr class="docutils" />
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">¶</a></h2>
+<p><strong>debug-toolbar</strong> excels in:</p>
+<ul class="simple">
+<li><p>Modern async Python applications</p></li>
+<li><p>Security-conscious debugging with proactive alerts</p></li>
+<li><p>Performance analysis with W3C Server-Timing and flame graphs</p></li>
+<li><p>SQLAlchemy query optimization with N+1 detection</p></li>
+<li><p>Memory profiling with multiple backends</p></li>
+<li><p>Comprehensive lifecycle event tracking</p></li>
+</ul>
+<p><strong>Choose Django Debug Toolbar</strong> if you need:</p>
+<ul class="simple">
+<li><p>Django-specific features (static files, Django templates)</p></li>
+<li><p>Largest plugin ecosystem</p></li>
+<li><p>Long-term stability (10+ years)</p></li>
+</ul>
+<p><strong>Choose Sentry Spotlight</strong> if you need:</p>
+<ul class="simple">
+<li><p>AI-assisted debugging</p></li>
+<li><p>Distributed tracing</p></li>
+<li><p>Multi-service monitoring</p></li>
+<li><p>Production-like debugging environment</p></li>
+</ul>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="api/_autosummary/debug_toolbar.litestar.panels.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">debug_toolbar.litestar.panels</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="changelog.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Changelog</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>

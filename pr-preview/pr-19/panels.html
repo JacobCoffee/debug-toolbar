@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Built-in Panels - Async Debug Toolbar 0.2.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Creating Custom Panels" href="custom-panels.html" /><link rel="prev" title="Configuration" href="configuration.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Built-in Panels"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-panels.html">Creating Custom Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP Server Integration</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Debug Toolbar Comparison</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#panel-quick-reference">Panel Quick Reference</a></li>
+<li><a class="reference internal" href="#default-panels">Default Panels</a><ul>
+<li><a class="reference internal" href="#timer-panel">Timer Panel</a></li>
+<li><a class="reference internal" href="#request-panel">Request Panel</a></li>
+<li><a class="reference internal" href="#response-panel">Response Panel</a></li>
+<li><a class="reference internal" href="#logging-panel">Logging Panel</a></li>
+<li><a class="reference internal" href="#versions-panel">Versions Panel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#optional-core-panels">Optional Core Panels</a><ul>
+<li><a class="reference internal" href="#headers-panel">Headers Panel</a></li>
+<li><a class="reference internal" href="#settings-panel">Settings Panel</a></li>
+<li><a class="reference internal" href="#templates-panel">Templates Panel</a></li>
+<li><a class="reference internal" href="#profiling-panel">Profiling Panel</a></li>
+<li><a class="reference internal" href="#alerts-panel">Alerts Panel</a></li>
+<li><a class="reference internal" href="#memory-panel">Memory Panel</a></li>
+<li><a class="reference internal" href="#cache-panel">Cache Panel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#litestar-specific-panels">Litestar-Specific Panels</a><ul>
+<li><a class="reference internal" href="#routes-panel">Routes Panel</a></li>
+<li><a class="reference internal" href="#events-panel">Events Panel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#extra-panels">Extra Panels</a><ul>
+<li><a class="reference internal" href="#sqlalchemy-panel">SQLAlchemy Panel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recommended-configuration">Recommended Configuration</a></li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Built-in Panels</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="built-in-panels">
+<h1>Built-in Panels<a class="headerlink" href="#built-in-panels" title="Link to this heading">¶</a></h1>
+<p>The debug toolbar ships with a comprehensive set of panels for debugging and profiling your application.</p>
+<section id="panel-quick-reference">
+<h2>Panel Quick Reference<a class="headerlink" href="#panel-quick-reference" title="Link to this heading">¶</a></h2>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Panel</p></th>
+<th class="head"><p>Category</p></th>
+<th class="head"><p>Auto-Enabled</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Timer</p></td>
+<td><p>Default</p></td>
+<td><p>Yes</p></td>
+<td><p>Request timing and CPU time</p></td>
+</tr>
+<tr class="row-odd"><td><p>Request</p></td>
+<td><p>Default</p></td>
+<td><p>Yes</p></td>
+<td><p>HTTP method, path, headers, cookies</p></td>
+</tr>
+<tr class="row-even"><td><p>Response</p></td>
+<td><p>Default</p></td>
+<td><p>Yes</p></td>
+<td><p>Status code, response headers</p></td>
+</tr>
+<tr class="row-odd"><td><p>Logging</p></td>
+<td><p>Default</p></td>
+<td><p>Yes</p></td>
+<td><p>Log records captured during request</p></td>
+</tr>
+<tr class="row-even"><td><p>Versions</p></td>
+<td><p>Default</p></td>
+<td><p>Yes</p></td>
+<td><p>Python and package versions</p></td>
+</tr>
+<tr class="row-odd"><td><p>Headers</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Categorized headers with security analysis</p></td>
+</tr>
+<tr class="row-even"><td><p>Settings</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Application configuration viewer</p></td>
+</tr>
+<tr class="row-odd"><td><p>Templates</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Jinja2/Mako render tracking</p></td>
+</tr>
+<tr class="row-even"><td><p>Profiling</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>cProfile/pyinstrument with flame graphs</p></td>
+</tr>
+<tr class="row-odd"><td><p>Alerts</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Proactive issue detection</p></td>
+</tr>
+<tr class="row-even"><td><p>Memory</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Memory profiling (tracemalloc/memray)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cache</p></td>
+<td><p>Optional</p></td>
+<td><p>No</p></td>
+<td><p>Redis/memcached tracking</p></td>
+</tr>
+<tr class="row-even"><td><p>Routes</p></td>
+<td><p>Litestar</p></td>
+<td><p>Yes</p></td>
+<td><p>Application routes</p></td>
+</tr>
+<tr class="row-odd"><td><p>Events</p></td>
+<td><p>Litestar</p></td>
+<td><p>Yes</p></td>
+<td><p>Lifecycle hooks and exception handlers</p></td>
+</tr>
+<tr class="row-even"><td><p>SQLAlchemy</p></td>
+<td><p>Extra</p></td>
+<td><p>No</p></td>
+<td><p>Query tracking with N+1 detection</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="default-panels">
+<h2>Default Panels<a class="headerlink" href="#default-panels" title="Link to this heading">¶</a></h2>
+<p>These panels are enabled by default and provide essential debugging information.</p>
+<section id="timer-panel">
+<h3>Timer Panel<a class="headerlink" href="#timer-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">TimerPanel</span></code></p>
+<p>Displays request timing information:</p>
+<ul class="simple">
+<li><p>Total request duration</p></li>
+<li><p>CPU time (user + system)</p></li>
+<li><p>Server-Timing header data</p></li>
+</ul>
+</section>
+<section id="request-panel">
+<h3>Request Panel<a class="headerlink" href="#request-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">RequestPanel</span></code></p>
+<p>Shows incoming request details:</p>
+<ul class="simple">
+<li><p>HTTP method and path</p></li>
+<li><p>Query parameters</p></li>
+<li><p>Headers</p></li>
+<li><p>Cookies</p></li>
+<li><p>Client information</p></li>
+</ul>
+</section>
+<section id="response-panel">
+<h3>Response Panel<a class="headerlink" href="#response-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">ResponsePanel</span></code></p>
+<p>Displays response information:</p>
+<ul class="simple">
+<li><p>Status code</p></li>
+<li><p>Response headers</p></li>
+<li><p>Content type</p></li>
+<li><p>Content length</p></li>
+</ul>
+</section>
+<section id="logging-panel">
+<h3>Logging Panel<a class="headerlink" href="#logging-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">LoggingPanel</span></code></p>
+<p>Captures log records during the request:</p>
+<ul class="simple">
+<li><p>Log level</p></li>
+<li><p>Logger name</p></li>
+<li><p>Message</p></li>
+<li><p>Source location</p></li>
+<li><p>Error/warning counts</p></li>
+</ul>
+</section>
+<section id="versions-panel">
+<h3>Versions Panel<a class="headerlink" href="#versions-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">VersionsPanel</span></code></p>
+<p>Shows environment information:</p>
+<ul class="simple">
+<li><p>Python version</p></li>
+<li><p>Platform details</p></li>
+<li><p>Installed packages</p></li>
+</ul>
+</section>
+</section>
+<section id="optional-core-panels">
+<h2>Optional Core Panels<a class="headerlink" href="#optional-core-panels" title="Link to this heading">¶</a></h2>
+<p>These panels are available out of the box but must be explicitly enabled via <code class="docutils literal notranslate"><span class="pre">extra_panels</span></code> in your configuration.</p>
+<section id="headers-panel">
+<h3>Headers Panel<a class="headerlink" href="#headers-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">HeadersPanel</span></code></p>
+<p>Detailed HTTP header inspection with security analysis:</p>
+<ul class="simple">
+<li><p>Request headers categorized by type (content, caching, auth, CORS, etc.)</p></li>
+<li><p>Response headers with security analysis</p></li>
+<li><p>Missing security headers detection (CSP, X-Content-Type-Options, etc.)</p></li>
+<li><p>Cookie parsing and analysis</p></li>
+<li><p>Authorization header parsing (Basic, Bearer, etc.)</p></li>
+<li><p>Cache-Control directive breakdown</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.headers.HeadersPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="settings-panel">
+<h3>Settings Panel<a class="headerlink" href="#settings-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">SettingsPanel</span></code></p>
+<p>Application configuration viewer:</p>
+<ul class="simple">
+<li><p>Toolbar configuration settings</p></li>
+<li><p>App settings and environment</p></li>
+<li><p>Sensitive data redaction (passwords, secrets, API keys)</p></li>
+<li><p>Django-style settings support (when applicable)</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.settings.SettingsPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="templates-panel">
+<h3>Templates Panel<a class="headerlink" href="#templates-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">TemplatesPanel</span></code></p>
+<p>Template rendering tracking for Jinja2 and Mako:</p>
+<ul class="simple">
+<li><p>Template render times</p></li>
+<li><p>Template names and paths</p></li>
+<li><p>Context variables passed to templates</p></li>
+<li><p>Render count statistics</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.templates.TemplatesPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="profiling-panel">
+<h3>Profiling Panel<a class="headerlink" href="#profiling-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">ProfilingPanel</span></code></p>
+<p><img alt="Profiling Panel" src="_images/panel-profiling-expanded.png" /></p>
+<p>Request profiling with flame graph visualization:</p>
+<ul class="simple">
+<li><p>cProfile-based request profiling</p></li>
+<li><p>Optional pyinstrument support</p></li>
+<li><p>Interactive flame graph generation (speedscope format)</p></li>
+<li><p>Function call statistics</p></li>
+<li><p>Cumulative and per-call timing</p></li>
+</ul>
+<p><strong>Flame Graph Support</strong>:</p>
+<p>The profiling panel generates flame graphs in speedscope format. Access them via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="o">/</span><span class="n">_debug_toolbar</span><span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">flamegraph</span><span class="o">/</span><span class="p">{</span><span class="n">request_id</span><span class="p">}</span>
+</span></pre></div>
+</div>
+<p>Download and visualize at <a class="reference external" href="https://www.speedscope.app/">speedscope.app</a>.</p>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.profiling.ProfilingPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="alerts-panel">
+<h3>Alerts Panel<a class="headerlink" href="#alerts-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">AlertsPanel</span></code></p>
+<p><img alt="Alerts Panel" src="_images/panel-alerts-expanded.png" /></p>
+<p>Proactive issue detection panel that automatically identifies:</p>
+<p><strong>Security Issues</strong>:</p>
+<ul class="simple">
+<li><p>Missing security headers (CSP, X-Content-Type-Options, X-Frame-Options, etc.)</p></li>
+<li><p>Insecure cookies (missing Secure, HttpOnly, SameSite flags)</p></li>
+<li><p>CSRF protection issues on state-changing requests</p></li>
+<li><p>Debug mode enabled in production</p></li>
+</ul>
+<p><strong>Performance Issues</strong>:</p>
+<ul class="simple">
+<li><p>Large response sizes (warning at 1MB, critical at 5MB)</p></li>
+<li><p>Slow SQL queries (warning at 100ms, critical at 500ms)</p></li>
+</ul>
+<p><strong>Database Issues</strong>:</p>
+<ul class="simple">
+<li><p>N+1 query pattern detection (warning at 3+ similar queries, critical at 10+)</p></li>
+<li><p>Optimization suggestions with eager loading recommendations</p></li>
+</ul>
+<p>Each alert includes:</p>
+<ul class="simple">
+<li><p>Severity level (info, warning, critical)</p></li>
+<li><p>Category (security, performance, database, configuration)</p></li>
+<li><p>Actionable description</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.alerts.AlertsPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="memory-panel">
+<h3>Memory Panel<a class="headerlink" href="#memory-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">MemoryPanel</span></code></p>
+<p><img alt="Memory Panel" src="_images/panel-memory-expanded.png" /></p>
+<p>Memory profiling and allocation tracking:</p>
+<p><strong>Backends</strong>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tracemalloc</span></code>: Python’s built-in memory tracer (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">memray</span></code>: Advanced memory profiler (requires <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">memray</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auto</span></code>: Automatically selects the best available backend</p></li>
+</ul>
+<p><strong>Features</strong>:</p>
+<ul class="simple">
+<li><p>Memory allocation tracking per request</p></li>
+<li><p>Top allocations by size</p></li>
+<li><p>Memory snapshots comparison</p></li>
+<li><p>Peak memory usage</p></li>
+<li><p>Allocation source locations (file:line)</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.memory.MemoryPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3">    <span class="n">memory_backend</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>  <span class="c1"># &quot;tracemalloc&quot;, &quot;memray&quot;, or &quot;auto&quot;</span>
+</span><span data-line="4"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="cache-panel">
+<h3>Cache Panel<a class="headerlink" href="#cache-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">CachePanel</span></code></p>
+<p>Redis and memcached operation tracking:</p>
+<ul class="simple">
+<li><p>Cache hits and misses</p></li>
+<li><p>Operation types (GET, SET, DELETE, etc.)</p></li>
+<li><p>Operation timing</p></li>
+<li><p>Key information</p></li>
+<li><p>Backend breakdown</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.core.panels.cache.CachePanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="litestar-specific-panels">
+<h2>Litestar-Specific Panels<a class="headerlink" href="#litestar-specific-panels" title="Link to this heading">¶</a></h2>
+<section id="routes-panel">
+<h3>Routes Panel<a class="headerlink" href="#routes-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">RoutesPanel</span></code></p>
+<p>Litestar-specific panel showing:</p>
+<ul class="simple">
+<li><p>All registered routes</p></li>
+<li><p>HTTP methods</p></li>
+<li><p>Handler names</p></li>
+<li><p>Current matched route</p></li>
+</ul>
+<p><em>Automatically added for Litestar applications.</em></p>
+</section>
+<section id="events-panel">
+<h3>Events Panel<a class="headerlink" href="#events-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">EventsPanel</span></code></p>
+<p><img alt="Events Panel" src="_images/panel-events-expanded.png" /></p>
+<p>Litestar-specific panel showing lifecycle events and handlers:</p>
+<ul class="simple">
+<li><p><strong>Lifecycle hooks</strong>: <code class="docutils literal notranslate"><span class="pre">on_startup</span></code>, <code class="docutils literal notranslate"><span class="pre">on_shutdown</span></code> handlers</p></li>
+<li><p><strong>Request hooks</strong>: <code class="docutils literal notranslate"><span class="pre">before_request</span></code>, <code class="docutils literal notranslate"><span class="pre">after_request</span></code>, <code class="docutils literal notranslate"><span class="pre">after_response</span></code> handlers</p></li>
+<li><p><strong>Exception handlers</strong>: Registered exception handlers with their exception types</p></li>
+<li><p>Handler function details (name, module, file location, line number)</p></li>
+<li><p>Total hook count and execution statistics</p></li>
+</ul>
+<p>This panel helps you understand:</p>
+<ul class="simple">
+<li><p>What lifecycle hooks are registered in your application</p></li>
+<li><p>Which exception handlers are configured</p></li>
+<li><p>The source location of each handler for easy debugging</p></li>
+</ul>
+<p><em>Automatically added for Litestar applications.</em></p>
+</section>
+</section>
+<section id="extra-panels">
+<h2>Extra Panels<a class="headerlink" href="#extra-panels" title="Link to this heading">¶</a></h2>
+<section id="sqlalchemy-panel">
+<h3>SQLAlchemy Panel<a class="headerlink" href="#sqlalchemy-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">SQLAlchemyPanel</span></code></p>
+<p><img alt="SQLAlchemy Panel" src="_images/panel-sql-expanded.png" /></p>
+<p>Requires <code class="docutils literal notranslate"><span class="pre">debug-toolbar[advanced-alchemy]</span></code>:</p>
+<p><strong>Query Tracking</strong>:</p>
+<ul class="simple">
+<li><p>Query count and total time</p></li>
+<li><p>Individual query details with SQL and parameters</p></li>
+<li><p>Duplicate query detection</p></li>
+<li><p>Slow query highlighting (configurable threshold)</p></li>
+</ul>
+<p><strong>N+1 Query Detection</strong>:</p>
+<ul class="simple">
+<li><p>Automatic detection of N+1 query patterns</p></li>
+<li><p>Groups similar queries by normalized SQL pattern and origin</p></li>
+<li><p>Shows call stack for each N+1 group</p></li>
+<li><p>Provides fix suggestions (eager loading, batching)</p></li>
+<li><p>Badges on affected queries (N+1, SLOW, DUP)</p></li>
+</ul>
+<p><strong>EXPLAIN Support</strong>:</p>
+<ul class="simple">
+<li><p>Execute EXPLAIN on any query</p></li>
+<li><p>Supports PostgreSQL, SQLite, MySQL, MariaDB</p></li>
+<li><p>View query execution plans</p></li>
+</ul>
+<p>Enable in config:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel&quot;</span><span class="p">],</span>
+</span><span data-line="3"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+<section id="recommended-configuration">
+<h2>Recommended Configuration<a class="headerlink" href="#recommended-configuration" title="Link to this heading">¶</a></h2>
+<p>For comprehensive debugging, enable all panels:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.litestar</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbarPlugin</span><span class="p">,</span> <span class="n">LitestarDebugToolbarConfig</span>
+</span><span data-line="2">
+</span><span data-line="3"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="4">    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="5">    <span class="n">extra_panels</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="6">        <span class="s2">&quot;debug_toolbar.extras.advanced_alchemy.SQLAlchemyPanel&quot;</span><span class="p">,</span>  <span class="c1"># If using SQLAlchemy</span>
+</span><span data-line="7">        <span class="s2">&quot;debug_toolbar.core.panels.headers.HeadersPanel&quot;</span><span class="p">,</span>
+</span><span data-line="8">        <span class="s2">&quot;debug_toolbar.core.panels.settings.SettingsPanel&quot;</span><span class="p">,</span>
+</span><span data-line="9">        <span class="s2">&quot;debug_toolbar.core.panels.templates.TemplatesPanel&quot;</span><span class="p">,</span>
+</span><span data-line="10">        <span class="s2">&quot;debug_toolbar.core.panels.profiling.ProfilingPanel&quot;</span><span class="p">,</span>
+</span><span data-line="11">        <span class="s2">&quot;debug_toolbar.core.panels.alerts.AlertsPanel&quot;</span><span class="p">,</span>
+</span><span data-line="12">        <span class="s2">&quot;debug_toolbar.core.panels.memory.MemoryPanel&quot;</span><span class="p">,</span>
+</span><span data-line="13">        <span class="s2">&quot;debug_toolbar.core.panels.cache.CachePanel&quot;</span><span class="p">,</span>
+</span><span data-line="14">    <span class="p">],</span>
+</span><span data-line="15"><span class="p">)</span>
+</span><span data-line="16">
+</span><span data-line="17"><span class="n">app</span> <span class="o">=</span> <span class="n">Litestar</span><span class="p">(</span>
+</span><span data-line="18">    <span class="n">route_handlers</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span>
+</span><span data-line="19">    <span class="n">plugins</span><span class="o">=</span><span class="p">[</span><span class="n">DebugToolbarPlugin</span><span class="p">(</span><span class="n">config</span><span class="p">)],</span>
+</span><span data-line="20"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="configuration.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Configuration</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="custom-panels.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Creating Custom Panels</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
