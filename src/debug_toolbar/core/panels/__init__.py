@@ -15,6 +15,7 @@ from debug_toolbar.core.panels.settings import SettingsPanel
 from debug_toolbar.core.panels.templates import TemplatesPanel
 from debug_toolbar.core.panels.timer import TimerPanel
 from debug_toolbar.core.panels.versions import VersionsPanel
+from debug_toolbar.core.panels.websocket import WebSocketPanel
 
 __all__ = [
     "AlertsPanel",
@@ -30,4 +31,5 @@ __all__ = [
     "TemplatesPanel",
     "TimerPanel",
     "VersionsPanel",
+    "WebSocketPanel",
 ]

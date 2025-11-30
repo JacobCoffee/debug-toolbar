@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
+from uuid import uuid4
 
 from debug_toolbar.core import DebugToolbar, RequestContext, set_request_context
+from debug_toolbar.core.panels.websocket import WebSocketConnection, WebSocketMessage, WebSocketPanel
 from debug_toolbar.litestar.config import LitestarDebugToolbarConfig
 from debug_toolbar.litestar.panels.events import collect_events_metadata
 from litestar.middleware import AbstractMiddleware
@@ -51,7 +54,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
     - Adds Server-Timing headers
     """
 
-    scopes = {"http"}
+    scopes = {"http", "websocket"}
     exclude = ["_debug_toolbar"]
 
     def __init__(
@@ -73,6 +76,15 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Process an ASGI request."""
+        path = scope.get("path", "/")
+
+        if scope["type"] == "websocket":
+            if any(path.startswith(excluded) for excluded in self.config.exclude_paths):
+                await self.app(scope, receive, send)
+                return
+            await self._handle_websocket(scope, receive, send)
+            return
+
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -229,6 +241,163 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             await send(body_event)
         except Exception:
             logger.debug("Failed to send buffered response during exception handling", exc_info=True)
+
+    async def _handle_websocket(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Handle WebSocket connection tracking.
+
+        Args:
+            scope: ASGI scope for the WebSocket connection.
+            receive: ASGI receive callable.
+            send: ASGI send callable.
+        """
+        if not self.config.websocket_tracking_enabled:
+            await self.app(scope, receive, send)
+            return
+
+        connection = WebSocketConnection(
+            connection_id=str(uuid4()),
+            path=scope.get("path", "/"),
+            query_string=scope.get("query_string", b"").decode("utf-8", errors="replace"),
+            headers={
+                k.decode("utf-8", errors="replace"): v.decode("utf-8", errors="replace")
+                for k, v in scope.get("headers", [])
+            },
+            connected_at=time.time(),
+            state="connecting",
+        )
+
+        WebSocketPanel.track_connection(
+            connection,
+            ttl=self.config.websocket_connection_ttl,
+            max_connections=self.config.websocket_max_connections,
+        )
+        logger.debug("WebSocket tracked: %s at %s", connection.connection_id[:8], connection.path)
+
+        send_wrapper = self._create_websocket_send_wrapper(send, connection)
+        receive_wrapper = self._create_websocket_receive_wrapper(receive, connection)
+
+        try:
+            await self.app(scope, receive_wrapper, send_wrapper)
+        finally:
+            if connection.state not in ("closing", "closed"):
+                connection.state = "closed"
+                connection.disconnected_at = time.time()
+
+    def _create_websocket_message(
+        self,
+        direction: Literal["sent", "received"],
+        message_data: str | bytes,
+    ) -> WebSocketMessage:
+        """Create a WebSocketMessage from message data.
+
+        Args:
+            direction: Whether the message was sent or received.
+            message_data: The message content (text or bytes).
+
+        Returns:
+            A WebSocketMessage instance with proper type and truncation handling.
+        """
+        if isinstance(message_data, str):
+            message_type: Literal["text", "binary"] = "text"
+            content: str | bytes = message_data
+            size_bytes = len(message_data.encode("utf-8"))
+        else:
+            message_type = "binary"
+            content = message_data
+            size_bytes = len(message_data)
+
+        truncated = size_bytes > self.config.websocket_max_message_size
+        if truncated:
+            content = content[: self.config.websocket_max_message_size]
+
+        return WebSocketMessage(
+            direction=direction,
+            message_type=message_type,
+            content=content,
+            timestamp=time.time(),
+            size_bytes=size_bytes,
+            truncated=truncated,
+        )
+
+    def _create_websocket_send_wrapper(self, send: Send, connection: WebSocketConnection) -> Send:
+        """Create a send wrapper for WebSocket messages.
+
+        Args:
+            send: The original ASGI send callable.
+            connection: The WebSocket connection being tracked.
+
+        Returns:
+            A wrapped send callable that tracks WebSocket messages.
+        """
+
+        async def send_wrapper(message: Message) -> None:
+            try:
+                msg_type = message.get("type", "")
+
+                if msg_type == "websocket.accept":
+                    connection.state = "connected"
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "connected")
+
+                elif msg_type == "websocket.send":
+                    message_data = message.get("text") or message.get("bytes")
+                    if message_data is not None:
+                        ws_message = self._create_websocket_message("sent", message_data)
+                        connection.add_message(
+                            ws_message, max_messages=self.config.websocket_max_messages_per_connection
+                        )
+                        WebSocketPanel.broadcast_message(connection.connection_id, ws_message)
+
+                elif msg_type == "websocket.close":
+                    connection.state = "closing"
+                    connection.close_code = message.get("code")
+                    connection.close_reason = message.get("reason", "")
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "closing", connection.close_code)
+
+            except Exception:
+                logger.debug("Error tracking WebSocket send message", exc_info=True)
+
+            await send(message)
+
+        return send_wrapper
+
+    def _create_websocket_receive_wrapper(self, receive: Receive, connection: WebSocketConnection) -> Receive:
+        """Create a receive wrapper for WebSocket messages.
+
+        Args:
+            receive: The original ASGI receive callable.
+            connection: The WebSocket connection being tracked.
+
+        Returns:
+            A wrapped receive callable that tracks WebSocket messages.
+        """
+
+        async def receive_wrapper() -> Any:
+            message = await receive()
+
+            try:
+                msg_type = message.get("type", "")
+
+                if msg_type == "websocket.receive":
+                    message_data = message.get("text") or message.get("bytes")
+                    if message_data is not None:
+                        ws_message = self._create_websocket_message("received", message_data)
+                        connection.add_message(
+                            ws_message, max_messages=self.config.websocket_max_messages_per_connection
+                        )
+                        WebSocketPanel.broadcast_message(connection.connection_id, ws_message)
+
+                elif msg_type == "websocket.disconnect":
+                    connection.state = "closed"
+                    connection.close_code = message.get("code")
+                    connection.disconnected_at = time.time()
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "closed", connection.close_code)
+
+            except Exception:
+                logger.debug("Error tracking WebSocket receive message", exc_info=True)
+
+            return message
+
+        return receive_wrapper
 
     def _populate_request_metadata(self, request: Request, context: RequestContext) -> None:
         """Populate request metadata in the context.

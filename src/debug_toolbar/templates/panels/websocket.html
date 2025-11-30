@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .panel-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .panel-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .stat-unit {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 400;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background: #f8f9fa;
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 13px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+        }
+
+        .status-dot.closed {
+            background: #6c757d;
+        }
+
+        .connection-id {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .message-timeline {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .message-item:last-child {
+            border-bottom: none;
+        }
+
+        .message-direction {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message-direction.sent {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .message-direction.received {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .message-preview {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            color: #495057;
+            word-break: break-word;
+        }
+
+        .truncation-warning {
+            color: #856404;
+            font-size: 11px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .text-success {
+            color: #28a745;
+        }
+
+        .text-info {
+            color: #17a2b8;
+        }
+
+        .text-muted {
+            color: #6c757d;
+        }
+
+        .text-warning {
+            color: #ffc107;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            opacity: 0.3;
+        }
+
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            font-size: 12px;
+            color: #e83e8c;
+        }
+
+        .close-reason {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="panel-container">
+        <h2>WebSocket Connections</h2>
+
+        <div class="panel-section">
+            <h3>Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Connections</div>
+                    <div class="stat-value">{{ stats.total_active + stats.total_closed }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Messages Sent</div>
+                    <div class="stat-value">{{ stats.total_messages_sent }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Messages Received</div>
+                    <div class="stat-value">{{ stats.total_messages_received }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Data Sent</div>
+                    <div class="stat-value">
+                        {% if stats.total_bytes_sent >= 1048576 %}
+                            {{ "%.2f"|format(stats.total_bytes_sent / 1048576) }} <span class="stat-unit">MB</span>
+                        {% elif stats.total_bytes_sent >= 1024 %}
+                            {{ "%.2f"|format(stats.total_bytes_sent / 1024) }} <span class="stat-unit">KB</span>
+                        {% else %}
+                            {{ stats.total_bytes_sent }} <span class="stat-unit">B</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Data Received</div>
+                    <div class="stat-value">
+                        {% if stats.total_bytes_received >= 1048576 %}
+                            {{ "%.2f"|format(stats.total_bytes_received / 1048576) }} <span class="stat-unit">MB</span>
+                        {% elif stats.total_bytes_received >= 1024 %}
+                            {{ "%.2f"|format(stats.total_bytes_received / 1024) }} <span class="stat-unit">KB</span>
+                        {% else %}
+                            {{ stats.total_bytes_received }} <span class="stat-unit">B</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if stats.active_connections %}
+        <div class="panel-section">
+            <h3>
+                Active Connections
+                <span class="badge badge-success">{{ stats.active_connections|length }}</span>
+            </h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Connection ID</th>
+                        <th>Path</th>
+                        <th>Duration</th>
+                        <th>Messages</th>
+                        <th>Data Transfer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conn in stats.active_connections %}
+                    <tr>
+                        <td>
+                            <span class="status-indicator">
+                                <span class="status-dot connected"></span>
+                                {{ conn.state }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="connection-id" title="{{ conn.connection_id }}">
+                                {{ conn.short_id }}
+                            </span>
+                        </td>
+                        <td>
+                            <div>{{ conn.path }}</div>
+                            {% if conn.query_string %}
+                            <div class="text-muted" style="font-size: 12px;">?{{ conn.query_string }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set duration_seconds = conn.duration %}
+                            {% if duration_seconds >= 3600 %}
+                                {{ "%dh %dm"|format(duration_seconds // 3600, (duration_seconds % 3600) // 60) }}
+                            {% elif duration_seconds >= 60 %}
+                                {{ "%dm %ds"|format(duration_seconds // 60, duration_seconds % 60) }}
+                            {% else %}
+                                {{ "%.1fs"|format(duration_seconds) }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="text-info">↑ {{ conn.total_sent }}</span>
+                            <span class="text-success">↓ {{ conn.total_received }}</span>
+                        </td>
+                        <td>
+                            {% set total_bytes = conn.bytes_sent + conn.bytes_received %}
+                            {% if total_bytes >= 1048576 %}
+                                {{ "%.2f MB"|format(total_bytes / 1048576) }}
+                            {% elif total_bytes >= 1024 %}
+                                {{ "%.2f KB"|format(total_bytes / 1024) }}
+                            {% else %}
+                                {{ total_bytes }} B
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if stats.active_connections or stats.closed_connections %}
+        {% set all_messages = [] %}
+        {% for conn in stats.active_connections %}
+            {% for msg in conn.messages %}
+                {% set _ = all_messages.append(msg) %}
+            {% endfor %}
+        {% endfor %}
+        {% for conn in stats.closed_connections %}
+            {% for msg in conn.messages %}
+                {% set _ = all_messages.append(msg) %}
+            {% endfor %}
+        {% endfor %}
+
+        {% if all_messages %}
+        <div class="panel-section">
+            <h3>
+                Recent Messages
+                <span class="badge badge-info">Last {{ [all_messages|length, 20]|min }}</span>
+            </h3>
+            <div class="message-timeline">
+                {% for message in all_messages[-20:] %}
+                <div class="message-item">
+                    <div class="message-direction {{ message.direction }}">
+                        {% if message.direction == 'sent' %}
+                            →
+                        {% else %}
+                            ←
+                        {% endif %}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-meta">
+                            <span>
+                                {% if message.direction == 'sent' %}
+                                    <strong class="text-info">Sent</strong>
+                                {% else %}
+                                    <strong class="text-success">Received</strong>
+                                {% endif %}
+                            </span>
+                            <span>{{ message.timestamp }}</span>
+                            <span>Type: <code>{{ message.type }}</code></span>
+                            <span>
+                                Size:
+                                {% if message.size >= 1024 %}
+                                    {{ "%.2f KB"|format(message.size / 1024) }}
+                                {% else %}
+                                    {{ message.size }} B
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="message-preview">{{ message.preview }}</div>
+                        {% if message.truncated %}
+                        <div class="truncation-warning">⚠ Message content truncated</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if stats.closed_connections %}
+        <div class="panel-section">
+            <h3>
+                Closed Connections
+                <span class="badge">{{ stats.closed_connections|length }}</span>
+            </h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Connection ID</th>
+                        <th>Path</th>
+                        <th>Duration</th>
+                        <th>Messages</th>
+                        <th>Close Info</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for conn in stats.closed_connections %}
+                    <tr>
+                        <td>
+                            <span class="status-indicator">
+                                <span class="status-dot closed"></span>
+                                {{ conn.state }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="connection-id" title="{{ conn.connection_id }}">
+                                {{ conn.short_id }}
+                            </span>
+                        </td>
+                        <td>
+                            <div>{{ conn.path }}</div>
+                            {% if conn.query_string %}
+                            <div class="text-muted" style="font-size: 12px;">?{{ conn.query_string }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if conn.duration %}
+                                {% set duration_seconds = conn.duration %}
+                                {% if duration_seconds >= 3600 %}
+                                    {{ "%dh %dm"|format(duration_seconds // 3600, (duration_seconds % 3600) // 60) }}
+                                {% elif duration_seconds >= 60 %}
+                                    {{ "%dm %ds"|format(duration_seconds // 60, duration_seconds % 60) }}
+                                {% else %}
+                                    {{ "%.1fs"|format(duration_seconds) }}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="text-info">↑ {{ conn.total_sent }}</span>
+                            <span class="text-success">↓ {{ conn.total_received }}</span>
+                            {% if conn.messages_dropped > 0 %}
+                            <span class="text-warning" title="Messages dropped due to buffer limit">
+                                ({{ conn.messages_dropped }} dropped)
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if conn.close_code %}
+                            <div class="close-reason">
+                                <code>{{ conn.close_code }}</code>
+                                {% if conn.close_reason %}
+                                <span class="text-muted">{{ conn.close_reason }}</span>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">Normal closure</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if not stats.active_connections and not stats.closed_connections %}
+        <div class="panel-section">
+            <div class="empty-state">
+                <div class="empty-state-icon">🔌</div>
+                <p>No WebSocket connections detected in this request</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -8,8 +8,8 @@
 
 ## Current Status: v0.3.0 RELEASED ✅
 
-### Test Coverage: 529 tests passing
-### Panels Implemented: 17 panels (15 core + 2 Litestar-specific)
+### Test Coverage: 574+ tests passing
+### Panels Implemented: 18 panels (16 core + 2 Litestar-specific)
 ### Latest Release: v0.3.0 (2025-11-30)
 - MCP Server for AI Assistant Integration
 - FileToolbarStorage for cross-process data sharing
@@ -19,6 +19,7 @@
 - PR #16 - MCP Server for AI Assistant Integration
 - PR #17 - Release v0.3.0 version bump
 - PR #18 - Documentation updates (MCP screenshot, API docs)
+- PR #19 - WebSocket Panel for real-time connection tracking
 
 ---
 
@@ -26,7 +27,8 @@
 
 | Feature Category | Our Status | Industry Best |
 |-----------------|------------|---------------|
-| Core Panels | **17 panels** | Django (15 panels) |
+| Core Panels | **18 panels** | Django (15 panels) |
+| WebSocket Debugging | **Best-in-class** (live tracking, message inspection) | **Unique - nobody else has this** |
 | Async Support | **Best-in-class** | Spotlight (also async) |
 | Database Debugging | **Best-in-class** (EXPLAIN + N+1) | Django (EXPLAIN only) |
 | Security Features | **Best-in-class** (Alerts Panel) | We lead here |
@@ -45,11 +47,11 @@
 
 All foundational work complete:
 - Core architecture (config, context, storage, panels)
-- 17 panels implemented (Timer, Request, Response, Logging, Versions, Routes, SQLAlchemy, Profiling, Headers, Settings, Cache, Templates, Events, Alerts, Memory, AsyncProfiler, GraphQL)
+- 18 panels implemented (Timer, Request, Response, Logging, Versions, Routes, SQLAlchemy, Profiling, Headers, Settings, Cache, Templates, Events, Alerts, Memory, AsyncProfiler, GraphQL, WebSocket)
 - Litestar integration (middleware, plugin, routes)
 - Full UI with history, positioning, resizing, themes
 - CI/CD pipelines configured
-- 524+ tests passing
+- 574+ tests passing
 
 ### Phase 6: Testing & Documentation 🔄 PARTIAL
 - [x] Unit tests (524 tests)
@@ -111,20 +113,28 @@ All foundational work complete:
 - [ ] API documentation expansion
 - [ ] Usage guides for each panel
 
-### Phase 10.3: WebSocket Panel (deferred)
-- [ ] WebSocket connection tracking
-- [ ] Message logging
-- [ ] Connection lifecycle
+### Phase 10.3: WebSocket Panel ✅ COMPLETE (PR #19)
+- [x] WebSocket connection tracking
+- [x] Message logging (sent/received with expandable content)
+- [x] Connection lifecycle (connect, disconnect, close codes)
+- [x] Real-time panel rendering with custom JS
+- [x] WebSocket statistics (bytes sent/received, message counts)
+- [x] Live updates via WebSocket endpoint (`/_debug_toolbar/ws/live`)
+- [x] Event broadcasting to live subscribers
+- [x] Max connections enforcement to prevent memory growth
+- [x] Example application with Echo and Chat WebSocket demos
+- [x] Unit and integration tests (45+ new tests)
 
 ---
 
 ## Success Metrics
 
 ### Achieved:
-- ✅ 17 panels (more than any competitor)
+- ✅ 18 panels (more than any competitor)
 - ✅ Best-in-class async profiling
 - ✅ GraphQL debugging
 - ✅ MCP server for AI integration
+- ✅ WebSocket debugging with live updates (unique feature)
 
 ### Remaining:
 - Multi-framework support (FastAPI, Starlette)

@@ -329,6 +329,8 @@ max-complexity = 12
     "TRY",
     "UP006",
 ]
+# Litestar needs WebSocket import at runtime for route handler DI
+"src/debug_toolbar/litestar/routes/handlers.py" = ["TC001", "TC002", "TCH001", "TCH002"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
