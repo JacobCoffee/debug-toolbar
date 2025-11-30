@@ -134,6 +134,7 @@ data-aria-dark="Switch to auto color mode">
 <li><a class="reference internal" href="#litestar-specific-panels">Litestar-Specific Panels</a><ul>
 <li><a class="reference internal" href="#routes-panel">Routes Panel</a></li>
 <li><a class="reference internal" href="#events-panel">Events Panel</a></li>
+<li><a class="reference internal" href="#websocket-panel">WebSocket Panel</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#extra-panels">Extra Panels</a><ul>
@@ -246,17 +247,22 @@ data-aria-dark="Switch to auto color mode">
 <td><p>No</p></td>
 <td><p>Redis/memcached tracking</p></td>
 </tr>
-<tr class="row-even"><td><p>Routes</p></td>
+<tr class="row-even"><td><p>WebSocket</p></td>
+<td><p>Auto</p></td>
+<td><p>Yes*</p></td>
+<td><p>Real-time WebSocket connection tracking</p></td>
+</tr>
+<tr class="row-odd"><td><p>Routes</p></td>
 <td><p>Litestar</p></td>
 <td><p>Yes</p></td>
 <td><p>Application routes</p></td>
 </tr>
-<tr class="row-odd"><td><p>Events</p></td>
+<tr class="row-even"><td><p>Events</p></td>
 <td><p>Litestar</p></td>
 <td><p>Yes</p></td>
 <td><p>Lifecycle hooks and exception handlers</p></td>
 </tr>
-<tr class="row-even"><td><p>SQLAlchemy</p></td>
+<tr class="row-odd"><td><p>SQLAlchemy</p></td>
 <td><p>Extra</p></td>
 <td><p>No</p></td>
 <td><p>Query tracking with N+1 detection</p></td>
@@ -519,6 +525,43 @@ data-aria-dark="Switch to auto color mode">
 <li><p>The source location of each handler for easy debugging</p></li>
 </ul>
 <p><em>Automatically added for Litestar applications.</em></p>
+</section>
+<section id="websocket-panel">
+<h3>WebSocket Panel<a class="headerlink" href="#websocket-panel" title="Link to this heading">¶</a></h3>
+<p><strong>ID</strong>: <code class="docutils literal notranslate"><span class="pre">WebSocketPanel</span></code></p>
+<p><img alt="WebSocket Panel" src="_images/toolbar-websocket-panel.png" /></p>
+<p>Real-time WebSocket connection tracking and message inspection:</p>
+<p><strong>Connection Tracking</strong>:</p>
+<ul class="simple">
+<li><p>Active and closed connections with lifecycle states</p></li>
+<li><p>Connection path, query string, and headers</p></li>
+<li><p>Connection duration and close codes/reasons</p></li>
+<li><p>Bytes sent/received per connection</p></li>
+</ul>
+<p><strong>Message Inspection</strong>:</p>
+<ul class="simple">
+<li><p>Bidirectional message logging (sent/received)</p></li>
+<li><p>Message content preview with expandable full content</p></li>
+<li><p>Message size and timestamp</p></li>
+<li><p>Support for text and binary messages</p></li>
+</ul>
+<p><strong>Live Updates</strong>:</p>
+<ul class="simple">
+<li><p>Real-time updates via <code class="docutils literal notranslate"><span class="pre">/_debug_toolbar/ws/live</span></code> WebSocket endpoint</p></li>
+<li><p>Click “Go Live” to stream connection and message events</p></li>
+<li><p>Statistics update in real-time as WebSocket activity occurs</p></li>
+</ul>
+<p><strong>Configuration</strong>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="n">config</span> <span class="o">=</span> <span class="n">LitestarDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="2">    <span class="n">websocket_tracking_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>           <span class="c1"># Enable WebSocket tracking</span>
+</span><span data-line="3">    <span class="n">websocket_max_connections</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>              <span class="c1"># Max connections to track</span>
+</span><span data-line="4">    <span class="n">websocket_max_messages_per_connection</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># Max messages per connection</span>
+</span><span data-line="5">    <span class="n">websocket_max_message_size</span><span class="o">=</span><span class="mi">10240</span><span class="p">,</span>          <span class="c1"># Max message size (bytes)</span>
+</span><span data-line="6">    <span class="n">websocket_connection_ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>             <span class="c1"># TTL for closed connections</span>
+</span><span data-line="7"><span class="p">)</span>
+</span></pre></div>
+</div>
+<p><em>Automatically added when WebSocket handlers are detected in your application.</em></p>
 </section>
 </section>
 <section id="extra-panels">

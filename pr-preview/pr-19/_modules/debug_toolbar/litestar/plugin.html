@@ -308,7 +308,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="153">                <span class="k">return</span> <span class="kc">True</span>
 </span><span data-line="154">
 </span><span data-line="155">            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;__wrapped__&quot;</span><span class="p">):</span>
-</span><span data-line="156">                <span class="n">wrapped</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">__wrapped__</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="s2">&quot;__wrapped__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">handler</span>
+</span><span data-line="156">                <span class="n">wrapped</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">__wrapped__</span>
 </span><span data-line="157">                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wrapped</span><span class="p">,</span> <span class="n">WebsocketRouteHandler</span><span class="p">):</span>
 </span><span data-line="158">                    <span class="k">return</span> <span class="kc">True</span>
 </span><span data-line="159">

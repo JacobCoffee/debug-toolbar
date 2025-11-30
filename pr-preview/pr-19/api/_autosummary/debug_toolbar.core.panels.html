@@ -292,15 +292,20 @@ data-aria-dark="Switch to auto color mode">
 </ul>
 </li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel"><code class="docutils literal notranslate"><span class="pre">WebSocketPanel</span></code></a><ul>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.broadcast_message"><code class="docutils literal notranslate">broadcast_message()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.broadcast_state_change"><code class="docutils literal notranslate">broadcast_state_change()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.generate_stats"><code class="docutils literal notranslate">generate_stats()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.get_connection"><code class="docutils literal notranslate">get_connection()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.get_current_stats"><code class="docutils literal notranslate">get_current_stats()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.get_nav_subtitle"><code class="docutils literal notranslate">get_nav_subtitle()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.has_content"><code class="docutils literal notranslate">has_content</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.nav_title"><code class="docutils literal notranslate">nav_title</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.panel_id"><code class="docutils literal notranslate">panel_id</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.subscribe"><code class="docutils literal notranslate">subscribe()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.template"><code class="docutils literal notranslate">template</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.title"><code class="docutils literal notranslate">title</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.track_connection"><code class="docutils literal notranslate">track_connection()</span></code></a></li>
+<li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.unsubscribe"><code class="docutils literal notranslate">unsubscribe()</span></code></a></li>
 <li><a class="reference internal" href="#debug_toolbar.core.panels.WebSocketPanel.untrack_connection"><code class="docutils literal notranslate">untrack_connection()</span></code></a></li>
 </ul>
 </li>
@@ -1620,6 +1625,41 @@ capture timing data transparently.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">debug_toolbar.core.panels.</span></span><span class="sig-name descname"><span class="pre">WebSocketPanel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toolbar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel" title="Link to this definition">¶</a></dt>
 <dd><p>Panel for displaying WebSocket connection and message information.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.broadcast_message">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">broadcast_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.broadcast_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.broadcast_message" title="Link to this definition">¶</a></dt>
+<dd><p>Broadcast a message event to live subscribers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The connection ID the message belongs to.</p></li>
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebSocketMessage</span></code></span>) – The WebSocket message that was sent/received.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.broadcast_state_change">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">broadcast_state_change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.broadcast_state_change"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.broadcast_state_change" title="Link to this definition">¶</a></dt>
+<dd><p>Broadcast a connection state change to live subscribers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>connection_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The connection ID.</p></li>
+<li><p><strong>state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – New connection state.</p></li>
+<li><p><strong>close_code</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – WebSocket close code if applicable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.generate_stats">
 <em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.generate_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.generate_stats" title="Link to this definition">¶</a></dt>
 <dd><p>Generate WebSocket statistics.</p>
@@ -1654,6 +1694,21 @@ capture timing data transparently.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.get_current_stats">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_current_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.get_current_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.get_current_stats" title="Link to this definition">¶</a></dt>
+<dd><p>Get current WebSocket statistics without a context.</p>
+<p>This is used for live updates via WebSocket.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dictionary containing current WebSocket statistics.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.get_nav_subtitle">
 <span class="sig-name descname"><span class="pre">get_nav_subtitle</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.get_nav_subtitle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.get_nav_subtitle" title="Link to this definition">¶</a></dt>
 <dd><p>Get the navigation subtitle showing active connection count.</p>
@@ -1682,6 +1737,20 @@ capture timing data transparently.</p>
 <span class="sig-name descname"><span class="pre">panel_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'WebSocketPanel'</span></em><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.panel_id" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.subscribe">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.subscribe" title="Link to this definition">¶</a></dt>
+<dd><p>Subscribe to live WebSocket panel updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Queue</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An asyncio.Queue that will receive JSON-encoded event messages.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.template">
 <span class="sig-name descname"><span class="pre">template</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'panels/websocket.html'</span></em><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.template" title="Link to this definition">¶</a></dt>
@@ -1694,14 +1763,29 @@ capture timing data transparently.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.track_connection">
-<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">track_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.track_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.track_connection" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">track_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.track_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.track_connection" title="Link to this definition">¶</a></dt>
 <dd><p>Track a new WebSocket connection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>connection</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">WebSocketConnection</span></code></span>) – The connection to track.</p></li>
 <li><p><strong>ttl</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Time-to-live in seconds for disconnected connections. Defaults to 3600.</p></li>
+<li><p><strong>max_connections</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Maximum connections to track. Oldest are dropped when exceeded.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="debug_toolbar.core.panels.WebSocketPanel.unsubscribe">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queue</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/debug_toolbar/core/panels/websocket.html#WebSocketPanel.unsubscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#debug_toolbar.core.panels.WebSocketPanel.unsubscribe" title="Link to this definition">¶</a></dt>
+<dd><p>Unsubscribe from live updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>queue</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Queue</span></code>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – The queue to remove from subscribers.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>

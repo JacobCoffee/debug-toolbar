@@ -18,6 +18,7 @@ The debug toolbar ships with a comprehensive set of panels for debugging and pro
 | Alerts | Optional | No | Proactive issue detection |
 | Memory | Optional | No | Memory profiling (tracemalloc/memray) |
 | Cache | Optional | No | Redis/memcached tracking |
+| WebSocket | Auto | Yes* | Real-time WebSocket connection tracking |
 | Routes | Litestar | Yes | Application routes |
 | Events | Litestar | Yes | Lifecycle hooks and exception handlers |
 | SQLAlchemy | Extra | No | Query tracking with N+1 detection |
@@ -295,6 +296,45 @@ This panel helps you understand:
 - The source location of each handler for easy debugging
 
 *Automatically added for Litestar applications.*
+
+### WebSocket Panel
+
+**ID**: `WebSocketPanel`
+
+![WebSocket Panel](../assets/toolbar-websocket-panel.png)
+
+Real-time WebSocket connection tracking and message inspection:
+
+**Connection Tracking**:
+- Active and closed connections with lifecycle states
+- Connection path, query string, and headers
+- Connection duration and close codes/reasons
+- Bytes sent/received per connection
+
+**Message Inspection**:
+- Bidirectional message logging (sent/received)
+- Message content preview with expandable full content
+- Message size and timestamp
+- Support for text and binary messages
+
+**Live Updates**:
+- Real-time updates via `/_debug_toolbar/ws/live` WebSocket endpoint
+- Click "Go Live" to stream connection and message events
+- Statistics update in real-time as WebSocket activity occurs
+
+**Configuration**:
+
+```python
+config = LitestarDebugToolbarConfig(
+    websocket_tracking_enabled=True,           # Enable WebSocket tracking
+    websocket_max_connections=50,              # Max connections to track
+    websocket_max_messages_per_connection=100, # Max messages per connection
+    websocket_max_message_size=10240,          # Max message size (bytes)
+    websocket_connection_ttl=3600,             # TTL for closed connections
+)
+```
+
+*Automatically added when WebSocket handlers are detected in your application.*
 
 ## Extra Panels
 
