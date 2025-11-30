@@ -1,0 +1,223 @@
+"""Strawberry SchemaExtension for debug toolbar integration."""
+
+from __future__ import annotations
+
+import time
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, Any
+from uuid import uuid4
+
+from debug_toolbar.extras.strawberry.models import TrackedOperation, TrackedResolver
+from debug_toolbar.extras.strawberry.utils import StackCapture, get_operation_type_from_query
+
+if TYPE_CHECKING:
+    from graphql import GraphQLResolveInfo
+    from strawberry.types import ExecutionContext
+    from strawberry.utils.await_maybe import AwaitableOrValue
+
+try:
+    from strawberry.extensions import SchemaExtension as _SchemaExtension
+
+    STRAWBERRY_AVAILABLE = True
+except ImportError:
+    STRAWBERRY_AVAILABLE = False
+    _SchemaExtension = object  # type: ignore[assignment, misc]
+
+
+class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
+    """Strawberry extension for tracking GraphQL operations and resolvers.
+
+    Integrates with debug toolbar's RequestContext to store operation and
+    resolver timing data for display in the GraphQL panel.
+
+    Usage:
+        schema = strawberry.Schema(
+            query=Query,
+            extensions=[DebugToolbarExtension()],
+        )
+
+    Args:
+        slow_operation_threshold_ms: Threshold for marking operations as slow.
+        slow_resolver_threshold_ms: Threshold for marking resolvers as slow.
+        capture_stacks: Whether to capture stack traces for resolvers.
+    """
+
+    __slots__ = (
+        "_capture_stacks",
+        "_slow_operation_threshold_ms",
+        "_slow_resolver_threshold_ms",
+    )
+
+    def __init__(
+        self,
+        *,
+        slow_operation_threshold_ms: float = 100.0,
+        slow_resolver_threshold_ms: float = 10.0,
+        capture_stacks: bool = True,
+    ) -> None:
+        """Initialize the extension.
+
+        Args:
+            slow_operation_threshold_ms: Threshold for marking operations as slow.
+            slow_resolver_threshold_ms: Threshold for marking resolvers as slow.
+            capture_stacks: Whether to capture stack traces for resolvers.
+        """
+        self._slow_operation_threshold_ms = slow_operation_threshold_ms
+        self._slow_resolver_threshold_ms = slow_resolver_threshold_ms
+        self._capture_stacks = capture_stacks
+
+    def on_operation(self) -> Generator[None, None, None]:
+        """Track GraphQL operation (query/mutation/subscription).
+
+        Runs before and after the entire GraphQL operation executes.
+
+        Yields:
+            None
+        """
+        from debug_toolbar.core.context import get_request_context
+
+        context = get_request_context()
+        if context is None:
+            yield
+            return
+
+        exec_ctx: ExecutionContext = self.execution_context
+        query = exec_ctx.query or ""
+
+        operation = TrackedOperation(
+            operation_id=str(uuid4()),
+            query=query,
+            variables=exec_ctx.variables or {},
+            operation_name=exec_ctx.operation_name,
+            operation_type=get_operation_type_from_query(query),  # type: ignore[arg-type]
+            start_time=time.perf_counter(),
+        )
+
+        context.store_panel_data("GraphQLPanel", "current_operation", operation)
+
+        yield
+
+        operation.end_time = time.perf_counter()
+        operation.duration_ms = (operation.end_time - operation.start_time) * 1000
+
+        if hasattr(exec_ctx, "result") and exec_ctx.result is not None:
+            result = exec_ctx.result
+            if hasattr(result, "errors") and result.errors:
+                operation.errors = [
+                    {
+                        "message": str(getattr(err, "message", str(err))),
+                        "path": list(err.path) if hasattr(err, "path") and err.path else None,
+                        "locations": (
+                            [{"line": loc.line, "column": loc.column} for loc in (err.locations or [])]
+                            if hasattr(err, "locations")
+                            else None
+                        ),
+                    }
+                    for err in result.errors
+                ]
+
+        panel_data = context.get_panel_data("GraphQLPanel")
+        operations = panel_data.get("operations", [])
+        operations.append(operation)
+        context.store_panel_data("GraphQLPanel", "operations", operations)
+        context.store_panel_data("GraphQLPanel", "current_operation", None)
+
+    def resolve(
+        self,
+        _next: Callable[..., Any],
+        root: Any,
+        info: GraphQLResolveInfo,
+        *args: str,
+        **kwargs: Any,
+    ) -> AwaitableOrValue[object]:
+        """Track individual resolver execution.
+
+        Called for every field resolver. Measures timing and captures metadata.
+
+        Args:
+            _next: Next resolver in chain.
+            root: Parent object.
+            info: GraphQL resolve info.
+            *args: Positional arguments to resolver.
+            **kwargs: Keyword arguments to resolver.
+
+        Returns:
+            Resolver result.
+        """
+        from debug_toolbar.core.context import get_request_context
+
+        context = get_request_context()
+        if context is None:
+            return _next(root, info, *args, **kwargs)
+
+        start_time = time.perf_counter()
+
+        parent_type_name = "Unknown"
+        if info.parent_type is not None:
+            parent_type_name = info.parent_type.name
+
+        field_name = info.field_name
+        field_path = self._build_field_path(info)
+        return_type_str = str(info.return_type) if info.return_type else "Unknown"
+
+        resolver = TrackedResolver(
+            resolver_id=str(uuid4()),
+            field_name=field_name,
+            field_path=field_path,
+            resolver_function=f"{parent_type_name}.{field_name}",
+            parent_type=parent_type_name,
+            return_type=return_type_str,
+            arguments=dict(kwargs),
+        )
+
+        if self._capture_stacks:
+            resolver.stack_trace = StackCapture.capture()
+
+        try:
+            result = _next(root, info, *args, **kwargs)
+        except Exception:
+            resolver.end_time = time.perf_counter()
+            resolver.duration_ms = (resolver.end_time - start_time) * 1000
+            resolver.is_slow = resolver.duration_ms >= self._slow_resolver_threshold_ms
+
+            current_op = context.get_panel_data("GraphQLPanel").get("current_operation")
+            if current_op:
+                current_op.resolvers.append(resolver)
+
+            raise
+
+        resolver.end_time = time.perf_counter()
+        resolver.duration_ms = (resolver.end_time - start_time) * 1000
+        resolver.is_slow = resolver.duration_ms >= self._slow_resolver_threshold_ms
+
+        current_op = context.get_panel_data("GraphQLPanel").get("current_operation")
+        if current_op:
+            current_op.resolvers.append(resolver)
+
+        return result
+
+    def _build_field_path(self, info: GraphQLResolveInfo) -> str:
+        """Build field path from Info.path.
+
+        Args:
+            info: GraphQL resolve info.
+
+        Returns:
+            Dot-separated field path (e.g., 'Query.user.posts.0.title').
+        """
+        path_parts = []
+        current = info.path
+        while current:
+            if current.key is not None:
+                path_parts.append(str(current.key))
+            current = current.prev
+        return ".".join(reversed(path_parts)) if path_parts else info.field_name
+
+    @classmethod
+    def is_available(cls) -> bool:
+        """Check if Strawberry is available.
+
+        Returns:
+            True if strawberry-graphql is installed.
+        """
+        return STRAWBERRY_AVAILABLE

@@ -119,6 +119,7 @@ async def index() -> str:
         <li><strong>Alerts Panel</strong> - Proactive issue detection</li>
         <li><strong>Memory Panel</strong> - Memory allocation tracking</li>
         <li><strong>Async Profiler Panel</strong> - Async task tracking, blocking call detection</li>
+        <li><strong>GraphQL Panel</strong> - Strawberry GraphQL operations with N+1 detection</li>
     </ul>
     <h2>Toolbar Controls</h2>
     <ul>

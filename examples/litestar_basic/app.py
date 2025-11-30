@@ -54,6 +54,7 @@ INDEX_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Alerts Panel</strong> - Proactive detection of security, performance, and configuration issues</li>
         <li><strong>Memory Panel</strong> - Track memory allocations and usage (tracemalloc/memray)</li>
         <li><strong>Async Profiler Panel</strong> - Track async tasks, detect blocking calls, monitor event loop lag</li>
+        <li><strong>GraphQL Panel</strong> - Track Strawberry GraphQL operations, resolvers, N+1 detection</li>
     </ul>
     <h2>Flame Graph Visualization</h2>
     <p>The Profiling Panel now supports interactive flame graph generation!</p>
@@ -101,6 +102,7 @@ ABOUT_TEMPLATE = Template("""<!DOCTYPE html>
         <li><strong>Memory Panel</strong> - Memory profiling with tracemalloc/memray backends</li>
         <li><strong>Cache Panel</strong> - Redis/memcached operation tracking (when configured)</li>
         <li><strong>Async Profiler Panel</strong> - Track async tasks, blocking calls, and event loop lag</li>
+        <li><strong>GraphQL Panel</strong> - Strawberry GraphQL operation tracking with N+1 detection</li>
     </ul>
     <h2>Flame Graph Support</h2>
     <p>The Profiling Panel generates interactive flame graphs in speedscope format:</p>
