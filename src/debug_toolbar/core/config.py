@@ -42,8 +42,6 @@ class DebugToolbarConfig:
         websocket_max_connections: Maximum number of connections to track. Defaults to 50.
         websocket_max_messages_per_connection: Maximum messages per connection. Defaults to 100.
         websocket_max_message_size: Maximum message size to store in bytes. Defaults to 10240.
-        websocket_binary_preview_size: Size of binary message preview in bytes. Defaults to 256.
-        websocket_show_binary_preview: Whether to show binary message preview. Defaults to False.
         websocket_connection_ttl: Connection time-to-live in seconds. Defaults to 3600.
     """
 
@@ -83,8 +81,6 @@ class DebugToolbarConfig:
     websocket_max_connections: int = 50
     websocket_max_messages_per_connection: int = 100
     websocket_max_message_size: int = 10240
-    websocket_binary_preview_size: int = 256
-    websocket_show_binary_preview: bool = False
     websocket_connection_ttl: int = 3600
 
     storage: ToolbarStorage | None = None

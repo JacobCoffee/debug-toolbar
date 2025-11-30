@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
+import json
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 from uuid import uuid4
@@ -13,6 +16,8 @@ if TYPE_CHECKING:
     from debug_toolbar.core.context import RequestContext
 
 __all__ = ["WebSocketMessage", "WebSocketConnection", "WebSocketPanel"]
+
+EventCallback = Callable[[dict[str, Any]], None]
 
 
 @dataclass(slots=True)
@@ -173,20 +178,116 @@ class WebSocketPanel(Panel):
 
     _active_connections: ClassVar[dict[str, WebSocketConnection]] = {}
     _connections_lock: ClassVar[threading.Lock] = threading.Lock()
+    _live_subscribers: ClassVar[set[asyncio.Queue[str]]] = set()
+    _subscribers_lock: ClassVar[threading.Lock] = threading.Lock()
 
     __slots__ = ()
 
     @classmethod
-    def track_connection(cls, connection: WebSocketConnection, ttl: int = 3600) -> None:
+    def subscribe(cls) -> asyncio.Queue[str]:
+        """Subscribe to live WebSocket panel updates.
+
+        Returns:
+            An asyncio.Queue that will receive JSON-encoded event messages.
+        """
+        queue: asyncio.Queue[str] = asyncio.Queue()
+        with cls._subscribers_lock:
+            cls._live_subscribers.add(queue)
+        return queue
+
+    @classmethod
+    def unsubscribe(cls, queue: asyncio.Queue[str]) -> None:
+        """Unsubscribe from live updates.
+
+        Args:
+            queue: The queue to remove from subscribers.
+        """
+        with cls._subscribers_lock:
+            cls._live_subscribers.discard(queue)
+
+    @classmethod
+    def _broadcast_event(cls, event_type: str, data: dict[str, Any]) -> None:
+        """Broadcast an event to all live subscribers.
+
+        Args:
+            event_type: Type of event (connection, message, disconnect).
+            data: Event data to broadcast.
+        """
+        with cls._subscribers_lock:
+            if not cls._live_subscribers:
+                return
+            message = json.dumps({"type": event_type, "data": data})
+            dead_queues = []
+            for queue in cls._live_subscribers:
+                try:
+                    queue.put_nowait(message)
+                except asyncio.QueueFull:  # noqa: PERF203 - queue cleanup in loop is fine
+                    dead_queues.append(queue)
+            for queue in dead_queues:
+                cls._live_subscribers.discard(queue)
+
+    @classmethod
+    def track_connection(cls, connection: WebSocketConnection, ttl: int = 3600, max_connections: int = 50) -> None:
         """Track a new WebSocket connection.
 
         Args:
             connection: The connection to track.
             ttl: Time-to-live in seconds for disconnected connections. Defaults to 3600.
+            max_connections: Maximum connections to track. Oldest are dropped when exceeded.
         """
         with cls._connections_lock:
             cls._active_connections[connection.connection_id] = connection
             cls._cleanup_old_connections(ttl)
+            cls._enforce_connection_limit(max_connections)
+
+        cls._broadcast_event(
+            "connection",
+            {
+                "connection_id": connection.connection_id,
+                "short_id": connection.get_short_id(),
+                "path": connection.path,
+                "state": connection.state,
+                "connected_at": connection.connected_at,
+            },
+        )
+
+    @classmethod
+    def broadcast_message(cls, connection_id: str, message: WebSocketMessage) -> None:
+        """Broadcast a message event to live subscribers.
+
+        Args:
+            connection_id: The connection ID the message belongs to.
+            message: The WebSocket message that was sent/received.
+        """
+        cls._broadcast_event(
+            "message",
+            {
+                "connection_id": connection_id,
+                "direction": message.direction,
+                "type": message.message_type,
+                "size": message.size_bytes,
+                "preview": message.get_content_preview(),
+                "timestamp": message.timestamp,
+            },
+        )
+
+    @classmethod
+    def broadcast_state_change(cls, connection_id: str, state: str, close_code: int | None = None) -> None:
+        """Broadcast a connection state change to live subscribers.
+
+        Args:
+            connection_id: The connection ID.
+            state: New connection state.
+            close_code: WebSocket close code if applicable.
+        """
+        cls._broadcast_event(
+            "state_change",
+            {
+                "connection_id": connection_id,
+                "state": state,
+                "close_code": close_code,
+            },
+        )
 
     @classmethod
     def untrack_connection(cls, connection_id: str) -> None:
@@ -236,6 +337,44 @@ class WebSocketPanel(Panel):
         for conn_id in to_remove:
             del cls._active_connections[conn_id]
 
+    @classmethod
+    def _enforce_connection_limit(cls, max_connections: int) -> None:
+        """Enforce maximum connection limit by dropping oldest connections.
+
+        Drops disconnected connections first (oldest first), then active if needed.
+
+        Args:
+            max_connections: Maximum number of connections to retain.
+        """
+        if len(cls._active_connections) <= max_connections:
+            return
+
+        connections = list(cls._active_connections.values())
+        disconnected = sorted(
+            [c for c in connections if c.disconnected_at is not None],
+            key=lambda c: c.disconnected_at or 0,
+        )
+        active = sorted(
+            [c for c in connections if c.disconnected_at is None],
+            key=lambda c: c.connected_at,
+        )
+
+        to_remove = []
+        excess = len(cls._active_connections) - max_connections
+
+        for conn in disconnected:
+            if len(to_remove) >= excess:
+                break
+            to_remove.append(conn.connection_id)
+
+        for conn in active:
+            if len(to_remove) >= excess:
+                break
+            to_remove.append(conn.connection_id)
+
+        for conn_id in to_remove:
+            del cls._active_connections[conn_id]
+
     async def generate_stats(self, context: RequestContext) -> dict[str, Any]:
         """Generate WebSocket statistics.
 
@@ -267,7 +406,8 @@ class WebSocketPanel(Panel):
             "total_bytes_received": total_bytes_received,
         }
 
-    def _connection_to_dict(self, conn: WebSocketConnection) -> dict[str, Any]:
+    @staticmethod
+    def _connection_to_dict(conn: WebSocketConnection) -> dict[str, Any]:
         """Convert a WebSocketConnection to a dictionary.
 
         Args:
@@ -301,6 +441,9 @@ class WebSocketPanel(Panel):
                     "size": msg.size_bytes,
                     "timestamp": msg.timestamp,
                     "preview": msg.get_content_preview(),
+                    "content": msg.content
+                    if isinstance(msg.content, str)
+                    else (msg.get_binary_preview_hex(max_bytes=256) if isinstance(msg.content, bytes) else None),
                     "truncated": msg.truncated,
                 }
                 for msg in conn.messages
@@ -319,3 +462,34 @@ class WebSocketPanel(Panel):
         if active_count > 0:
             return f"{active_count} active"
         return ""
+
+    @classmethod
+    def get_current_stats(cls) -> dict[str, Any]:
+        """Get current WebSocket statistics without a context.
+
+        This is used for live updates via WebSocket.
+
+        Returns:
+            Dictionary containing current WebSocket statistics.
+        """
+        with cls._connections_lock:
+            connections = list(cls._active_connections.values())
+
+        active_connections = [c for c in connections if c.state in ("connecting", "connected")]
+        closed_connections = [c for c in connections if c.state == "closed"]
+
+        total_messages_sent = sum(c.total_sent for c in connections)
+        total_messages_received = sum(c.total_received for c in connections)
+        total_bytes_sent = sum(c.bytes_sent for c in connections)
+        total_bytes_received = sum(c.bytes_received for c in connections)
+
+        return {
+            "active_connections": [cls._connection_to_dict(c) for c in active_connections],
+            "closed_connections": [cls._connection_to_dict(c) for c in closed_connections],
+            "total_active": len(active_connections),
+            "total_closed": len(closed_connections),
+            "total_messages_sent": total_messages_sent,
+            "total_messages_received": total_messages_received,
+            "total_bytes_sent": total_bytes_sent,
+            "total_bytes_received": total_bytes_received,
+        }

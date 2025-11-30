@@ -6,10 +6,12 @@ import json
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
+from litestar.connection import WebSocket as LitestarWebSocket  # noqa: TC002 - Litestar needs at runtime
 from litestar.exceptions import NotFoundException
 from litestar.response import Response
 
-from litestar import Request, Router, get, post
+from debug_toolbar.core.panels.websocket import WebSocketPanel
+from litestar import Request, Router, get, post, websocket
 
 if TYPE_CHECKING:
     from debug_toolbar.core.storage import ToolbarStorage
@@ -67,7 +69,7 @@ def _format_value(  # noqa: PLR0911, PLR0912, C901
         dict_items = list(value.items())[:max_items]
         for k, v in dict_items:
             items.append(
-                f"<strong>{_escape_html(str(k))}</strong>: {_format_value(v, max_depth - 1, max_items, max_string)}"
+                f"<strong>{_escape_html(str(k))}</strong>: {_format_value(v, max_depth - 1, max_items, max_string)}",
             )
         if len(value) > max_items:
             items.append(f"...{len(value) - max_items} more")
@@ -92,7 +94,7 @@ def _render_panel_content(stats: dict[str, Any], panel_id: str = "") -> str:
                 "ProfilingPanel": _render_profiling_panel,
                 "AsyncProfilerPanel": _render_async_profiler_panel,
                 "GraphQLPanel": _render_graphql_panel,
-            }
+            },
         )
 
     # Use specialized renderer if available
@@ -832,6 +834,38 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
     css_handler = get("/static/toolbar.css")(get_static_css)
     js_handler = get("/static/toolbar.js")(get_static_js)
 
+    @get("/api/websocket/stats")
+    async def get_websocket_stats() -> dict:
+        """Get current WebSocket statistics."""
+        return WebSocketPanel.get_current_stats()
+
+    @websocket("/ws/live")
+    async def websocket_live_handler(socket: LitestarWebSocket) -> None:
+        """WebSocket endpoint for live WebSocket panel updates.
+
+        Clients connect here to receive real-time updates about WebSocket
+        connections and messages being tracked by the debug toolbar.
+        """
+        await socket.accept()
+        import logging
+
+        logger = logging.getLogger(__name__)
+
+        queue = WebSocketPanel.subscribe()
+        try:
+            initial_stats = WebSocketPanel.get_current_stats()
+            logger.debug("Live WS: Sending initial stats: %s", initial_stats)
+            await socket.send_json({"type": "init", "data": initial_stats})
+
+            while True:
+                message = await queue.get()
+                try:
+                    await socket.send_text(message)
+                except Exception:
+                    break
+        finally:
+            WebSocketPanel.unsubscribe(queue)
+
     return Router(
         path="/_debug_toolbar",
         route_handlers=[
@@ -841,8 +875,10 @@ def create_debug_toolbar_router(storage: ToolbarStorage) -> Router:  # noqa: C90
             api_request_handler,
             api_explain_handler,
             api_flamegraph_handler,
+            get_websocket_stats,
             css_handler,
             js_handler,
+            websocket_live_handler,
         ],
         tags=["Debug Toolbar"],
     )
@@ -2143,6 +2179,185 @@ body {
     color: var(--dt-text-secondary);
 }
 
+/* WebSocket Panel Styles */
+.websocket-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
+
+.ws-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.ws-stat {
+    background: var(--dt-bg-secondary);
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.ws-no-connections { color: var(--dt-text-muted); }
+.ws-hint { color: var(--dt-text-muted); font-size: 12px; margin-top: 8px; }
+
+.ws-connections { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+.ws-connection {
+    background: var(--dt-bg-secondary);
+    border-radius: 6px;
+    padding: 12px;
+    border-left: 3px solid var(--dt-accent);
+}
+
+.ws-connection-active { border-left-color: var(--dt-success); }
+.ws-connection-closed { border-left-color: var(--dt-text-muted); opacity: 0.8; }
+
+.ws-conn-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.ws-conn-id {
+    font-family: var(--dt-font-mono);
+    background: var(--dt-bg-tertiary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--dt-text-secondary);
+}
+
+.ws-conn-path {
+    font-family: var(--dt-font-mono);
+    font-weight: 600;
+    color: var(--dt-text-primary);
+}
+
+.ws-conn-state {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+.ws-state-connected, .ws-state-connecting { background: rgba(78, 201, 176, 0.2); color: var(--dt-success); }
+.ws-state-closing { background: rgba(220, 220, 170, 0.2); color: var(--dt-warning); }
+.ws-state-closed { background: rgba(128, 128, 128, 0.2); color: var(--dt-text-muted); }
+
+.ws-conn-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: var(--dt-font-mono);
+    font-size: 12px;
+    color: var(--dt-text-secondary);
+}
+
+.ws-conn-close { color: var(--dt-text-muted); }
+
+.ws-messages { margin-top: 10px; }
+.ws-messages summary { cursor: pointer; color: var(--dt-text-secondary); font-size: 12px; }
+.ws-messages summary:hover { color: var(--dt-text-primary); }
+
+.ws-message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding-left: 10px;
+    border-left: 2px solid var(--dt-border);
+}
+
+.ws-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--dt-font-mono);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--dt-bg-tertiary);
+}
+
+.ws-msg-sent { border-left: 2px solid var(--dt-accent); }
+.ws-msg-received { border-left: 2px solid var(--dt-success); }
+
+.ws-msg-dir { color: var(--dt-text-muted); font-size: 10px; }
+.ws-msg-type { color: var(--dt-text-muted); }
+.ws-msg-preview {
+    flex: 1; color: var(--dt-text-primary); overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+}
+.ws-msg-size { color: var(--dt-text-muted); font-size: 10px; }
+
+.ws-msg-content-details { flex: 1; min-width: 0; }
+.ws-msg-content-details summary { cursor: pointer; }
+.ws-msg-content-details summary::-webkit-details-marker { display: none; }
+.ws-msg-content-details summary::before {
+    content: '\u25b6 ';
+    font-size: 8px;
+    color: var(--dt-text-muted);
+}
+.ws-msg-content-details[open] summary::before { content: '\u25bc '; }
+.ws-msg-full-content {
+    margin: 8px 0 0 16px;
+    padding: 8px;
+    background: var(--dt-bg-primary);
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 200px;
+    overflow-y: auto;
+    color: var(--dt-text-primary);
+}
+
+.ws-live-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--dt-border);
+}
+
+.ws-live-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--dt-border);
+    border-radius: 4px;
+    background: var(--dt-bg-secondary);
+    color: var(--dt-text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.ws-live-btn:hover {
+    background: var(--dt-bg-tertiary);
+    color: var(--dt-text-primary);
+}
+
+.ws-live-btn.ws-live-active {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.5);
+    color: #22c55e;
+}
+
+.ws-live-status {
+    font-size: 11px;
+    color: #22c55e;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 /* GraphQL Panel Styles */
 .graphql-panel h4 { margin: 16px 0 12px; color: var(--dt-text-secondary); font-size: 13px; }
 
@@ -2591,6 +2806,8 @@ class DebugToolbar {
                 return this.renderAsyncProfilerPanel(data);
             case 'SQLAlchemyPanel':
                 return this.renderSqlPanel(data);
+            case 'WebSocketPanel':
+                return this.renderWebSocketPanel(data);
             default:
                 return this.renderPanelData(data);
         }
@@ -2824,6 +3041,302 @@ class DebugToolbar {
             html += '<div class="timeline-info">';
             html += '<span>Duration: ' + (timeline.total_duration_ms || 0).toFixed(2) + 'ms</span>';
             html += '<span>Max Concurrent: ' + (timeline.max_concurrent || 0) + '</span>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    renderWebSocketPanel(data) {
+        let html = '<div class="websocket-panel" id="ws-panel-content">';
+
+        const isLive = this.wsLiveConnection &&
+            this.wsLiveConnection.readyState === WebSocket.OPEN;
+        html += '<div class="ws-live-controls">';
+        const liveClass = isLive ? 'ws-live-active' : '';
+        html += '<button class="ws-live-btn ' + liveClass + '" ';
+        html += 'onclick="window.debugToolbar.toggleWsLive()">';
+        html += isLive ? '\u25cf Live' : '\u25cb Go Live';
+        html += '</button>';
+        if (isLive) {
+            html += '<span class="ws-live-status">Streaming updates...</span>';
+        }
+        html += '</div>';
+
+        const totalActive = data.total_active || 0;
+        const totalClosed = data.total_closed || 0;
+        const msgsSent = data.total_messages_sent || 0;
+        const msgsReceived = data.total_messages_received || 0;
+        const bytesSent = data.total_bytes_sent || 0;
+        const bytesReceived = data.total_bytes_received || 0;
+
+        html += '<div class="ws-summary">';
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-active">' + totalActive + '</span>';
+        html += '<span class="stat-label">Active</span></div>';
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-closed">' + totalClosed + '</span>';
+        html += '<span class="stat-label">Closed</span></div>';
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-sent">' + msgsSent + '</span>';
+        html += '<span class="stat-label">Sent</span></div>';
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-received">' + msgsReceived + '</span>';
+        html += '<span class="stat-label">Received</span></div>';
+        const fmtBytesSent = this.formatBytes(bytesSent);
+        const fmtBytesRecv = this.formatBytes(bytesReceived);
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-bytes-sent">';
+        html += fmtBytesSent + '</span><span class="stat-label">Bytes Sent</span></div>';
+        html += '<div class="ws-stat"><span class="stat-value" id="ws-stat-bytes-recv">';
+        html += fmtBytesRecv + '</span><span class="stat-label">Bytes Recv</span></div>';
+        html += '</div>';
+
+        if (totalActive === 0 && totalClosed === 0) {
+            html += '<p class="empty ws-no-connections">No WebSocket connections tracked yet.</p>';
+            html += '<p class="ws-hint">Connect to a WebSocket endpoint. Click "Go Live" for real-time updates.</p>';
+            html += '</div>';
+            return html;
+        }
+
+        const activeConns = data.active_connections || [];
+        html += '<div id="ws-active-section">';
+        if (activeConns.length > 0) {
+            html += '<h4>Active Connections</h4>';
+            html += '<div class="ws-connections">';
+            for (const conn of activeConns) {
+                html += this.renderWebSocketConnection(conn, 'active');
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+
+        const closedConns = data.closed_connections || [];
+        html += '<div id="ws-closed-section">';
+        if (closedConns.length > 0) {
+            html += '<h4>Recent Closed Connections</h4>';
+            html += '<div class="ws-connections">';
+            for (const conn of closedConns.slice(0, 5)) {
+                html += this.renderWebSocketConnection(conn, 'closed');
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+
+        html += '</div>';
+        return html;
+    }
+
+    toggleWsLive() {
+        if (this.wsLiveConnection && this.wsLiveConnection.readyState === WebSocket.OPEN) {
+            this.wsLiveConnection.close();
+            this.wsLiveConnection = null;
+            this.refreshWsPanel();
+        } else {
+            this.connectWsLive();
+        }
+    }
+
+    connectWsLive() {
+        const wsUrl = 'ws://' + window.location.host + '/_debug_toolbar/ws/live';
+        this.wsLiveConnection = new WebSocket(wsUrl);
+
+        this.wsLiveConnection.onopen = () => {
+            const panel = document.getElementById('ws-panel-content');
+            if (panel) {
+                const liveBtn = panel.querySelector('.ws-live-btn');
+                if (liveBtn) {
+                    liveBtn.className = 'ws-live-btn ws-live-active';
+                    liveBtn.textContent = '\u25cf Live';
+                }
+                const controls = panel.querySelector('.ws-live-controls');
+                if (controls && !controls.querySelector('.ws-live-status')) {
+                    const statusEl = document.createElement('span');
+                    statusEl.className = 'ws-live-status';
+                    statusEl.textContent = 'Streaming updates...';
+                    controls.appendChild(statusEl);
+                }
+            }
+        };
+
+        this.wsLiveConnection.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'init') {
+                    this.updateWsPanelContent(msg.data);
+                } else {
+                    this.handleWsLiveEvent(msg);
+                }
+            } catch (e) {
+                console.error('Debug Toolbar: Error parsing live message', e);
+            }
+        };
+
+        this.wsLiveConnection.onclose = () => {
+            this.wsLiveConnection = null;
+            this.refreshWsPanel();
+        };
+
+        this.wsLiveConnection.onerror = (err) => {
+            console.error('Debug Toolbar: Live WebSocket error', err);
+        };
+    }
+
+    handleWsLiveEvent(msg) {
+        const details = this.element.querySelector('.toolbar-details');
+        if (!details || this.activePanel !== 'WebSocketPanel') return;
+
+        if (msg.type === 'message' || msg.type === 'connection' || msg.type === 'state_change') {
+            fetch('/_debug_toolbar/api/websocket/stats')
+                .then(res => res.json())
+                .then(data => {
+                    this.updateWsPanelContent(data);
+                })
+                .catch(() => {});
+        }
+    }
+
+    updateWsPanelContent(data) {
+        const panel = document.getElementById('ws-panel-content');
+        if (!panel) return;
+
+        const isLive = this.wsLiveConnection &&
+            this.wsLiveConnection.readyState === WebSocket.OPEN;
+        const liveBtn = panel.querySelector('.ws-live-btn');
+        if (liveBtn) {
+            liveBtn.className = 'ws-live-btn' + (isLive ? ' ws-live-active' : '');
+            liveBtn.textContent = isLive ? '\u25cf Live' : '\u25cb Go Live';
+        }
+        let statusEl = panel.querySelector('.ws-live-status');
+        if (isLive && !statusEl) {
+            const controls = panel.querySelector('.ws-live-controls');
+            if (controls && liveBtn) {
+                statusEl = document.createElement('span');
+                statusEl.className = 'ws-live-status';
+                statusEl.textContent = 'Streaming updates...';
+                controls.appendChild(statusEl);
+            }
+        } else if (!isLive && statusEl) {
+            statusEl.remove();
+        }
+
+        const activeEl = document.getElementById('ws-stat-active');
+        const closedEl = document.getElementById('ws-stat-closed');
+        const sentEl = document.getElementById('ws-stat-sent');
+        const receivedEl = document.getElementById('ws-stat-received');
+        const bytesSentEl = document.getElementById('ws-stat-bytes-sent');
+        const bytesRecvEl = document.getElementById('ws-stat-bytes-recv');
+
+        if (activeEl) activeEl.textContent = data.total_active || 0;
+        if (closedEl) closedEl.textContent = data.total_closed || 0;
+        if (sentEl) sentEl.textContent = data.total_messages_sent || 0;
+        if (receivedEl) receivedEl.textContent = data.total_messages_received || 0;
+        if (bytesSentEl) bytesSentEl.textContent = this.formatBytes(data.total_bytes_sent || 0);
+        if (bytesRecvEl) bytesRecvEl.textContent = this.formatBytes(data.total_bytes_received || 0);
+
+        const activeSection = document.getElementById('ws-active-section');
+        if (activeSection) {
+            const activeConns = data.active_connections || [];
+            if (activeConns.length > 0) {
+                let html = '<h4>Active Connections</h4><div class="ws-connections">';
+                for (const conn of activeConns) {
+                    html += this.renderWebSocketConnection(conn, 'active');
+                }
+                html += '</div>';
+                activeSection.innerHTML = html;
+            } else {
+                activeSection.innerHTML = '';
+            }
+        }
+
+        const closedSection = document.getElementById('ws-closed-section');
+        if (closedSection) {
+            const closedConns = data.closed_connections || [];
+            if (closedConns.length > 0) {
+                let html = '<h4>Recent Closed Connections</h4><div class="ws-connections">';
+                for (const conn of closedConns.slice(0, 5)) {
+                    html += this.renderWebSocketConnection(conn, 'closed');
+                }
+                html += '</div>';
+                closedSection.innerHTML = html;
+            } else {
+                closedSection.innerHTML = '';
+            }
+        }
+    }
+
+    refreshWsPanel() {
+        if (this.activePanel !== 'WebSocketPanel') {
+            return;
+        }
+        const details = this.element.querySelector('.toolbar-details');
+        const requestId = this.element.dataset.requestId;
+        if (requestId && details) {
+            fetch('/_debug_toolbar/api/requests/' + requestId)
+                .then(res => res.json())
+                .then(data => {
+                    const panelData = data.panel_data && data.panel_data['WebSocketPanel'];
+                    if (panelData) {
+                        details.innerHTML = this.renderWebSocketPanel(panelData);
+                    }
+                })
+                .catch(err => console.error('Failed to refresh WebSocket panel:', err));
+        }
+    }
+
+    renderWebSocketConnection(conn, status) {
+        const shortId = conn.short_id || conn.connection_id.substring(0, 8);
+        const path = this.escapeHtml(conn.path || '/');
+        const state = conn.state || 'unknown';
+        const duration = (conn.duration || 0).toFixed(2);
+        const sent = conn.total_sent || 0;
+        const received = conn.total_received || 0;
+        const closeCode = conn.close_code;
+        const closeReason = conn.close_reason;
+
+        let html = '<div class="ws-connection ws-connection-' + status + '">';
+        html += '<div class="ws-conn-header">';
+        html += '<span class="ws-conn-id" title="' + this.escapeHtml(conn.connection_id) + '">' + shortId + '</span>';
+        html += '<span class="ws-conn-path">' + path + '</span>';
+        html += '<span class="ws-conn-state ws-state-' + state + '">' + state + '</span>';
+        html += '</div>';
+
+        html += '<div class="ws-conn-stats">';
+        html += '<span class="ws-conn-duration">' + duration + 's</span>';
+        html += '<span class="ws-conn-msgs">' + sent + ' sent / ' + received + ' received</span>';
+        if (closeCode) {
+            html += '<span class="ws-conn-close">Close: ' + closeCode;
+            if (closeReason) html += ' (' + this.escapeHtml(closeReason) + ')';
+            html += '</span>';
+        }
+        html += '</div>';
+
+        const messages = conn.messages || [];
+        if (messages.length > 0) {
+            html += '<div class="ws-messages">';
+            html += '<details><summary>' + messages.length + ' message(s)</summary>';
+            html += '<div class="ws-message-list">';
+            for (const msg of messages.slice(-10)) {
+                const dir = msg.direction || 'unknown';
+                const preview = this.escapeHtml(msg.preview || '<empty>');
+                const content = msg.content ? this.escapeHtml(msg.content) : null;
+                const size = msg.size || 0;
+                const msgType = msg.type || 'text';
+                const hasFullContent = content && content.length > preview.length;
+
+                html += '<div class="ws-message ws-msg-' + dir + '">';
+                html += '<span class="ws-msg-dir">' + (dir === 'sent' ? '\u2192' : '\u2190') + '</span>';
+                html += '<span class="ws-msg-type">[' + msgType + ']</span>';
+
+                if (hasFullContent) {
+                    html += '<details class="ws-msg-content-details">';
+                    html += '<summary class="ws-msg-preview">' + preview + '</summary>';
+                    html += '<pre class="ws-msg-full-content">' + content + '</pre>';
+                    html += '</details>';
+                } else {
+                    html += '<span class="ws-msg-preview">' + preview + '</span>';
+                }
+
+                html += '<span class="ws-msg-size">' + this.formatBytes(size) + '</span>';
+                html += '</div>';
+            }
+            html += '</div></details>';
             html += '</div>';
         }
 

@@ -153,7 +153,7 @@ class DebugToolbarPlugin(InitPluginProtocol):
                 return True
 
             if callable(handler) and hasattr(handler, "__wrapped__"):
-                wrapped = handler.__wrapped__ if hasattr(handler, "__wrapped__") else handler
+                wrapped = handler.__wrapped__
                 if isinstance(wrapped, WebsocketRouteHandler):
                     return True
 

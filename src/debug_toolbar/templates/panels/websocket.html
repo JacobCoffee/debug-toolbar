@@ -281,7 +281,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Total Connections</div>
-                    <div class="stat-value">{{ stats.total_connections }}</div>
+                    <div class="stat-value">{{ stats.total_active + stats.total_closed }}</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Messages Sent</div>
@@ -425,17 +425,17 @@
                                 {% endif %}
                             </span>
                             <span>{{ message.timestamp }}</span>
-                            <span>Type: <code>{{ message.message_type }}</code></span>
+                            <span>Type: <code>{{ message.type }}</code></span>
                             <span>
                                 Size:
-                                {% if message.size_bytes >= 1024 %}
-                                    {{ "%.2f KB"|format(message.size_bytes / 1024) }}
+                                {% if message.size >= 1024 %}
+                                    {{ "%.2f KB"|format(message.size / 1024) }}
                                 {% else %}
-                                    {{ message.size_bytes }} B
+                                    {{ message.size }} B
                                 {% endif %}
                             </span>
                         </div>
-                        <div class="message-preview">{{ message.content_preview }}</div>
+                        <div class="message-preview">{{ message.preview }}</div>
                         {% if message.truncated %}
                         <div class="truncation-warning">⚠ Message content truncated</div>
                         {% endif %}

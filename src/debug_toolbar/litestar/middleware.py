@@ -6,7 +6,7 @@ import logging
 import re
 import time
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 from uuid import uuid4
 
 from debug_toolbar.core import DebugToolbar, RequestContext, set_request_context
@@ -16,8 +16,6 @@ from debug_toolbar.litestar.panels.events import collect_events_metadata
 from litestar.middleware import AbstractMiddleware
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from litestar.types import (
         ASGIApp,
         HTTPResponseBodyEvent,
@@ -78,7 +76,12 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Process an ASGI request."""
+        path = scope.get("path", "/")
+
         if scope["type"] == "websocket":
+            if any(path.startswith(excluded) for excluded in self.config.exclude_paths):
+                await self.app(scope, receive, send)
+                return
             await self._handle_websocket(scope, receive, send)
             return
 
@@ -263,7 +266,12 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             state="connecting",
         )
 
-        WebSocketPanel.track_connection(connection, ttl=self.config.websocket_connection_ttl)
+        WebSocketPanel.track_connection(
+            connection,
+            ttl=self.config.websocket_connection_ttl,
+            max_connections=self.config.websocket_max_connections,
+        )
+        logger.debug("WebSocket tracked: %s at %s", connection.connection_id[:8], connection.path)
 
         send_wrapper = self._create_websocket_send_wrapper(send, connection)
         receive_wrapper = self._create_websocket_receive_wrapper(receive, connection)
@@ -274,6 +282,42 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             if connection.state not in ("closing", "closed"):
                 connection.state = "closed"
                 connection.disconnected_at = time.time()
+
+    def _create_websocket_message(
+        self,
+        direction: Literal["sent", "received"],
+        message_data: str | bytes,
+    ) -> WebSocketMessage:
+        """Create a WebSocketMessage from message data.
+
+        Args:
+            direction: Whether the message was sent or received.
+            message_data: The message content (text or bytes).
+
+        Returns:
+            A WebSocketMessage instance with proper type and truncation handling.
+        """
+        if isinstance(message_data, str):
+            message_type: Literal["text", "binary"] = "text"
+            content: str | bytes = message_data
+            size_bytes = len(message_data.encode("utf-8"))
+        else:
+            message_type = "binary"
+            content = message_data
+            size_bytes = len(message_data)
+
+        truncated = size_bytes > self.config.websocket_max_message_size
+        if truncated:
+            content = content[: self.config.websocket_max_message_size]
+
+        return WebSocketMessage(
+            direction=direction,
+            message_type=message_type,
+            content=content,
+            timestamp=time.time(),
+            size_bytes=size_bytes,
+            truncated=truncated,
+        )
 
     def _create_websocket_send_wrapper(self, send: Send, connection: WebSocketConnection) -> Send:
         """Create a send wrapper for WebSocket messages.
@@ -292,42 +336,22 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
                 if msg_type == "websocket.accept":
                     connection.state = "connected"
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "connected")
 
                 elif msg_type == "websocket.send":
                     message_data = message.get("text") or message.get("bytes")
                     if message_data is not None:
-                        if isinstance(message_data, str):
-                            message_type = "text"
-                            content: str | bytes = message_data
-                            size_bytes = len(message_data.encode("utf-8"))
-                        else:
-                            message_type = "binary"
-                            content = message_data
-                            size_bytes = len(message_data)
-
-                        truncated = size_bytes > self.config.websocket_max_message_size
-                        if truncated:
-                            if isinstance(content, str):
-                                content = content[: self.config.websocket_max_message_size]
-                            else:
-                                content = content[: self.config.websocket_max_message_size]
-
-                        ws_message = WebSocketMessage(
-                            direction="sent",
-                            message_type=message_type,  # type: ignore[arg-type]
-                            content=content,
-                            timestamp=time.time(),
-                            size_bytes=size_bytes,
-                            truncated=truncated,
-                        )
+                        ws_message = self._create_websocket_message("sent", message_data)
                         connection.add_message(
                             ws_message, max_messages=self.config.websocket_max_messages_per_connection
                         )
+                        WebSocketPanel.broadcast_message(connection.connection_id, ws_message)
 
                 elif msg_type == "websocket.close":
                     connection.state = "closing"
                     connection.close_code = message.get("code")
                     connection.close_reason = message.get("reason", "")
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "closing", connection.close_code)
 
             except Exception:
                 logger.debug("Error tracking WebSocket send message", exc_info=True)
@@ -356,38 +380,17 @@ class DebugToolbarMiddleware(AbstractMiddleware):
                 if msg_type == "websocket.receive":
                     message_data = message.get("text") or message.get("bytes")
                     if message_data is not None:
-                        if isinstance(message_data, str):
-                            message_type = "text"
-                            content: str | bytes = message_data
-                            size_bytes = len(message_data.encode("utf-8"))
-                        else:
-                            message_type = "binary"
-                            content = message_data
-                            size_bytes = len(message_data)
-
-                        truncated = size_bytes > self.config.websocket_max_message_size
-                        if truncated:
-                            if isinstance(content, str):
-                                content = content[: self.config.websocket_max_message_size]
-                            else:
-                                content = content[: self.config.websocket_max_message_size]
-
-                        ws_message = WebSocketMessage(
-                            direction="received",
-                            message_type=message_type,  # type: ignore[arg-type]
-                            content=content,
-                            timestamp=time.time(),
-                            size_bytes=size_bytes,
-                            truncated=truncated,
-                        )
+                        ws_message = self._create_websocket_message("received", message_data)
                         connection.add_message(
                             ws_message, max_messages=self.config.websocket_max_messages_per_connection
                         )
+                        WebSocketPanel.broadcast_message(connection.connection_id, ws_message)
 
                 elif msg_type == "websocket.disconnect":
                     connection.state = "closed"
                     connection.close_code = message.get("code")
                     connection.disconnected_at = time.time()
+                    WebSocketPanel.broadcast_state_change(connection.connection_id, "closed", connection.close_code)
 
             except Exception:
                 logger.debug("Error tracking WebSocket receive message", exc_info=True)

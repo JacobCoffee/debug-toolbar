@@ -18,7 +18,6 @@ This example demonstrates the WebSocket Panel capabilities:
 Features demonstrated:
 1. Echo WebSocket - Simple echo server that reflects messages back
 2. Chat WebSocket - Multi-user chat room with broadcasting
-3. Binary WebSocket - Binary data handling example
 
 The WebSocket Panel is automatically added when WebSocket handlers are detected!
 
@@ -32,15 +31,13 @@ WebSocket endpoints:
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from litestar import Litestar, MediaType, get, websocket
-
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
+from litestar import Litestar, MediaType, get, websocket
 
 if TYPE_CHECKING:
     from litestar.connection import WebSocket
@@ -60,25 +57,60 @@ async def index() -> str:
 <head>
     <title>WebSocket Panel Demo</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #111827;
+            color: #f3f4f6;
+        }
         .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .panel { border: 1px solid #ccc; padding: 15px; border-radius: 8px; }
-        h2 { margin-top: 0; color: #333; }
-        .messages { height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin: 10px 0; background: #f9f9f9; }
-        .message { padding: 5px; margin: 2px 0; border-radius: 4px; }
-        .sent { background: #e3f2fd; text-align: right; }
-        .received { background: #f3e5f5; }
-        .system { background: #fff3e0; font-style: italic; }
+        .panel {
+            border: 1px solid #374151;
+            padding: 15px;
+            border-radius: 8px;
+            background: #1f2937;
+        }
+        h1 { margin-top: 0; color: #fbbf24; }
+        h2 { margin-top: 0; color: #60a5fa; }
+        p { color: #e5e7eb; }
+        li { color: #e5e7eb; }
+        a { color: #818cf8; }
+        a:hover { color: #60a5fa; }
+        strong { color: #f3f4f6; }
+        .messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #374151;
+            padding: 10px;
+            margin: 10px 0;
+            background: #111827;
+            border-radius: 4px;
+        }
+        .message { padding: 5px 8px; margin: 2px 0; border-radius: 4px; }
+        .sent { background: #1e3a5f; color: #93c5fd; text-align: right; }
+        .received { background: #3b1e5f; color: #c4b5fd; }
+        .system { background: #422006; color: #fbbf24; font-style: italic; }
         input, button { padding: 8px 12px; margin: 5px 0; }
-        input { width: 70%; }
-        button { cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; }
-        button:hover { background: #45a049; }
-        button.disconnect { background: #f44336; }
-        button.disconnect:hover { background: #da190b; }
-        .status { padding: 5px 10px; border-radius: 4px; display: inline-block; }
-        .status.connected { background: #c8e6c9; color: #2e7d32; }
-        .status.disconnected { background: #ffcdd2; color: #c62828; }
-        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        input {
+            width: 70%;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            color: #f3f4f6;
+        }
+        input::placeholder { color: #9ca3af; }
+        button { cursor: pointer; background: #10b981; color: white; border: none; border-radius: 4px; }
+        button:hover { opacity: 0.9; }
+        button.disconnect { background: #ef4444; }
+        button:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+        .status { padding: 5px 10px; border-radius: 4px; display: inline-block; font-weight: 500; }
+        .status.connected { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status.disconnected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        pre { background: #111827; padding: 10px; overflow-x: auto; border-radius: 4px; color: #d1d5db; border: 1px solid #374151; }
+        ol, ul { padding-left: 20px; }
     </style>
 </head>
 <body>
@@ -284,8 +316,8 @@ async def chat_handler(socket: WebSocket) -> None:
     for conn in chat_connections:
         try:
             await conn.send_text(join_msg)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Failed to send join message to %s: %s", getattr(conn, "client", None), e)
 
     try:
         while True:
@@ -302,8 +334,8 @@ async def chat_handler(socket: WebSocket) -> None:
                 if conn != socket:
                     try:
                         await conn.send_text(broadcast_msg)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        logger.debug("Failed to broadcast message to %s: %s", conn, exc)
     except Exception as e:
         logger.debug(f"Chat WebSocket closed for {name}: {e}")
     finally:
@@ -312,8 +344,8 @@ async def chat_handler(socket: WebSocket) -> None:
         for conn in chat_connections:
             try:
                 await conn.send_text(leave_msg)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Failed to send leave message: %s", e)
 
 
 @get("/api/connections", media_type=MediaType.JSON)

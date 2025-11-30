@@ -75,6 +75,9 @@
 ### Profiling Panel
 <img src="assets/panel-profiling-expanded.png" alt="Debug Toolbar - Profiling Panel" width="100%">
 
+### WebSocket Panel (Live Updates)
+<img src="assets/toolbar-websocket-panel.png" alt="Debug Toolbar - WebSocket Panel" width="100%">
+
 </details>
 
 ## Features
@@ -93,6 +96,7 @@
 - **Memory Profiling**: Multi-backend support (tracemalloc, memray)
 - **Proactive Alerts**: Automatic detection of security, performance, and database issues
 - **MCP Integration**: AI assistant integration for automated debugging with Claude Code
+- **WebSocket Debugging**: Real-time connection tracking with live updates and message inspection
 
 ## Installation
 
@@ -186,6 +190,7 @@ app = toolbar.wrap(your_asgi_app)
 | **Cache** | Redis/memcached operation tracking |
 | **Routes** | Application routes (Litestar-specific) |
 | **Events** | Lifecycle hooks and exception handlers (Litestar-specific) |
+| **WebSocket** | Real-time connection tracking, message inspection, live updates |
 | **SQLAlchemy** | Query tracking with N+1 detection (requires `advanced-alchemy` extra) |
 
 ## Configuration
@@ -246,7 +251,8 @@ debug_toolbar/
 │   │   ├── timer.py, request.py, response.py  # Default panels
 │   │   ├── headers.py, settings.py            # Optional panels
 │   │   ├── profiling.py, memory/, alerts.py   # Advanced panels
-│   │   └── templates.py, cache.py             # Integration panels
+│   │   ├── templates.py, cache.py             # Integration panels
+│   │   └── websocket.py                       # WebSocket debugging
 │   ├── config.py   # DebugToolbarConfig
 │   ├── context.py  # RequestContext (contextvars-based)
 │   ├── panel.py    # Panel base class
