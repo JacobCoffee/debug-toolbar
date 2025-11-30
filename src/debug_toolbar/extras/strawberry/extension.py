@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from strawberry.types import ExecutionContext
     from strawberry.utils.await_maybe import AwaitableOrValue
 
+    from debug_toolbar.core.context import RequestContext
+
 try:
     from strawberry.extensions import SchemaExtension as _SchemaExtension
 
@@ -66,6 +68,32 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         self._slow_resolver_threshold_ms = slow_resolver_threshold_ms
         self._capture_stacks = capture_stacks
 
+    def _get_debug_context(self) -> RequestContext | None:
+        """Get the debug toolbar context from contextvar or Strawberry context.
+
+        Returns:
+            RequestContext if available, None otherwise.
+        """
+        from debug_toolbar.core.context import get_request_context
+
+        # First try contextvar
+        context = get_request_context()
+        if context is not None:
+            return context
+
+        # Fall back to Strawberry's execution context
+        exec_ctx: ExecutionContext = self.execution_context
+        if hasattr(exec_ctx, "context") and exec_ctx.context:
+            strawberry_ctx = exec_ctx.context
+            # Check if debug_toolbar_context was injected
+            if hasattr(strawberry_ctx, "debug_toolbar_context"):
+                return strawberry_ctx.debug_toolbar_context
+            # Check dict-like context
+            if isinstance(strawberry_ctx, dict):
+                return strawberry_ctx.get("debug_toolbar_context")
+
+        return None
+
     def on_operation(self) -> Generator[None, None, None]:
         """Track GraphQL operation (query/mutation/subscription).
 
@@ -74,9 +102,7 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         Yields:
             None
         """
-        from debug_toolbar.core.context import get_request_context
-
-        context = get_request_context()
+        context = self._get_debug_context()
         if context is None:
             yield
             return
@@ -144,9 +170,7 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
         Returns:
             Resolver result.
         """
-        from debug_toolbar.core.context import get_request_context
-
-        context = get_request_context()
+        context = self._get_debug_context()
         if context is None:
             return _next(root, info, *args, **kwargs)
 

@@ -14,16 +14,35 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import strawberry
 from strawberry.litestar import make_graphql_controller
 
+from debug_toolbar.core.context import get_request_context
 from debug_toolbar.extras.strawberry import DebugToolbarExtension, GraphQLPanel
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, get
 
+if TYPE_CHECKING:
+    from debug_toolbar.core.context import RequestContext
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class GraphQLContext:
+    """Custom GraphQL context with debug toolbar integration."""
+
+    debug_toolbar_context: RequestContext | None = None
+
+
+async def get_context() -> GraphQLContext:
+    """Get GraphQL context with debug toolbar request context injected."""
+    return GraphQLContext(debug_toolbar_context=get_request_context())
+
 
 USERS_DB = [
     {"id": "1", "name": "Alice", "email": "alice@example.com"},
@@ -152,6 +171,7 @@ schema = strawberry.Schema(
 GraphQLController = make_graphql_controller(
     schema,
     path="/graphql",
+    context_getter=get_context,
 )
 
 
