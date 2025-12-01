@@ -113,21 +113,17 @@ class DebugToolbarMiddleware(StarletteMiddleware):
             await super().__call__(scope, receive, send)
             return
 
-        _dependency_tracking.set([])
-        _dependency_cache_stats.set({"hits": 0, "misses": 0, "total": 0})
-
         if self.fastapi_config.track_dependency_injection:
-            self._install_dependency_hooks()
+            _dependency_tracking.set([])
+            _dependency_cache_stats.set({"hits": 0, "misses": 0, "total": 0})
 
         try:
             await super().__call__(scope, receive, send)
         finally:
-            context = get_request_context()
-            if context is not None:
-                self._populate_dependency_metadata(context)
-
             if self.fastapi_config.track_dependency_injection:
-                self._uninstall_dependency_hooks()
+                context = get_request_context()
+                if context is not None:
+                    self._populate_dependency_metadata(context)
 
     def _populate_dependency_metadata(self, context: Any) -> None:
         """Populate dependency tracking data into the context."""
@@ -139,16 +135,6 @@ class DebugToolbarMiddleware(StarletteMiddleware):
             "tree": {},
             "cache_stats": stats,
         }
-
-    def _install_dependency_hooks(self) -> None:
-        """Install hooks to track dependency resolution.
-
-        Note: This is a simplified implementation. Full dependency tracking
-        would require monkey-patching FastAPI's solve_dependencies function.
-        """
-
-    def _uninstall_dependency_hooks(self) -> None:
-        """Remove dependency tracking hooks."""
 
 
 def track_dependency(

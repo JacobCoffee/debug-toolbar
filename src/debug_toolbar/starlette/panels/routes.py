@@ -22,7 +22,7 @@ class RoutesPanel(Panel):
 
     panel_id: ClassVar[str] = "StarletteRoutesPanel"
     title: ClassVar[str] = "Routes"
-    template: ClassVar[str] = "panels/routes.html"
+    template: ClassVar[str] = ""
     has_content: ClassVar[bool] = True
     nav_title: ClassVar[str] = "Routes"
 

@@ -23,7 +23,7 @@ class DependencyInjectionPanel(Panel):
 
     panel_id: ClassVar[str] = "DependencyInjectionPanel"
     title: ClassVar[str] = "Dependencies"
-    template: ClassVar[str] = "panels/dependencies.html"
+    template: ClassVar[str] = ""
     has_content: ClassVar[bool] = True
     nav_title: ClassVar[str] = "Dependencies"
 

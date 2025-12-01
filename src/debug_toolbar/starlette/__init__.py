@@ -6,6 +6,7 @@ the debug toolbar with Starlette applications.
 Example:
     >>> from starlette.applications import Starlette
     >>> from starlette.middleware import Middleware
+    >>> from debug_toolbar.core import DebugToolbar
     >>> from debug_toolbar.starlette import (
     ...     DebugToolbarMiddleware,
     ...     StarletteDebugToolbarConfig,
