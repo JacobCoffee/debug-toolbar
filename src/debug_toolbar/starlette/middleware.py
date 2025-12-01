@@ -69,6 +69,7 @@ class DebugToolbarMiddleware:
         self.app = app
         self.config = config or StarletteDebugToolbarConfig()
         self.toolbar = toolbar or DebugToolbar(self.config)
+        self._insert_pattern = re.compile(re.escape(self.config.insert_before), re.IGNORECASE)
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Process an ASGI request."""
@@ -427,8 +428,7 @@ class DebugToolbarMiddleware:
         if insert_before in html:
             html = html.replace(insert_before, toolbar_html + insert_before)
         else:
-            pattern = re.compile(re.escape(insert_before), re.IGNORECASE)
-            html = pattern.sub(toolbar_html + insert_before, html, count=1)
+            html = self._insert_pattern.sub(toolbar_html + insert_before, html, count=1)
 
         return html.encode("utf-8")
 
