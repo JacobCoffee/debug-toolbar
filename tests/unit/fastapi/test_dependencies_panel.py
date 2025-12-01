@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from debug_toolbar.core.context import RequestContext, set_request_context
+from debug_toolbar.core.context import RequestContext
 from debug_toolbar.fastapi.panels.dependencies import (
     DependencyInjectionPanel,
     _get_dependency_info,
@@ -39,8 +39,6 @@ class TestDependencyInjectionPanel:
     @pytest.mark.asyncio
     async def test_generate_stats_empty(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with no dependencies."""
-        set_request_context(None)
-
         panel = DependencyInjectionPanel(mock_toolbar)
         context.metadata["dependencies"] = {
             "resolved": [],
@@ -56,13 +54,9 @@ class TestDependencyInjectionPanel:
         assert stats["cache_hit_rate"] == 0
         assert stats["total_time_ms"] == 0
 
-        set_request_context(None)
-
     @pytest.mark.asyncio
     async def test_generate_stats_with_dependencies(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with dependencies."""
-        set_request_context(None)
-
         panel = DependencyInjectionPanel(mock_toolbar)
         context.metadata["dependencies"] = {
             "resolved": [
@@ -82,21 +76,15 @@ class TestDependencyInjectionPanel:
         assert stats["cache_hit_rate"] == pytest.approx(33.33, rel=0.1)
         assert stats["total_time_ms"] == 3.6
 
-        set_request_context(None)
-
     @pytest.mark.asyncio
     async def test_generate_stats_no_metadata(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with missing metadata."""
-        set_request_context(None)
-
         panel = DependencyInjectionPanel(mock_toolbar)
 
         stats = await panel.generate_stats(context)
 
         assert stats["total_count"] == 0
         assert stats["cache_hit_rate"] == 0
-
-        set_request_context(None)
 
     def test_get_nav_subtitle(self, mock_toolbar: MagicMock) -> None:
         """Test get_nav_subtitle returns empty string."""

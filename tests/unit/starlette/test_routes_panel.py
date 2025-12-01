@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from debug_toolbar.core.context import RequestContext, set_request_context
+from debug_toolbar.core.context import RequestContext
 from debug_toolbar.starlette.panels.routes import RoutesPanel
 
 
@@ -34,8 +34,6 @@ class TestRoutesPanel:
     @pytest.mark.asyncio
     async def test_generate_stats_empty(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with no routes."""
-        set_request_context(None)
-
         panel = RoutesPanel(mock_toolbar)
         context.metadata["routes"] = []
         context.metadata["matched_route"] = ""
@@ -46,13 +44,9 @@ class TestRoutesPanel:
         assert stats["route_count"] == 0
         assert stats["current_route"] == ""
 
-        set_request_context(None)
-
     @pytest.mark.asyncio
     async def test_generate_stats_with_routes(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with routes."""
-        set_request_context(None)
-
         panel = RoutesPanel(mock_toolbar)
         context.metadata["routes"] = [
             {"path": "/", "methods": ["GET"], "name": "home", "handler": "homepage"},
@@ -66,13 +60,9 @@ class TestRoutesPanel:
         assert stats["route_count"] == 2
         assert stats["current_route"] == "/"
 
-        set_request_context(None)
-
     @pytest.mark.asyncio
     async def test_generate_stats_no_metadata(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
         """Test generate_stats with missing metadata."""
-        set_request_context(None)
-
         panel = RoutesPanel(mock_toolbar)
 
         stats = await panel.generate_stats(context)
@@ -80,8 +70,6 @@ class TestRoutesPanel:
         assert stats["routes"] == []
         assert stats["route_count"] == 0
         assert stats["current_route"] == ""
-
-        set_request_context(None)
 
     def test_get_nav_subtitle(self, mock_toolbar: MagicMock) -> None:
         """Test get_nav_subtitle returns empty string."""
