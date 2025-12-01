@@ -114,6 +114,11 @@ data-aria-dark="Switch to auto color mode">
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#basic-litestar-usage">Basic Litestar Usage</a></li>
+<li><a class="reference internal" href="#starlette-usage">Starlette Usage</a></li>
+<li><a class="reference internal" href="#fastapi-usage">FastAPI Usage</a><ul>
+<li><a class="reference internal" href="#tracking-dependency-injection">Tracking Dependency Injection</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#configuration">Configuration</a></li>
 <li><a class="reference internal" href="#with-advanced-alchemy">With Advanced-Alchemy</a></li>
 <li><a class="reference internal" href="#next-steps">Next Steps</a></li>
@@ -156,21 +161,42 @@ data-aria-dark="Switch to auto color mode">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-0">
 pip</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># For Litestar</span>
+</span><span data-line="2">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># For Starlette</span>
+</span><span data-line="5">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>starlette<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># For FastAPI</span>
+</span><span data-line="8">pip<span class="w"> </span>install<span class="w"> </span>debug-toolbar<span class="o">[</span>fastapi<span class="o">]</span>
 </span></pre></div>
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-1">
 uv</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># For Litestar</span>
+</span><span data-line="2">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># For Starlette</span>
+</span><span data-line="5">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>starlette<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># For FastAPI</span>
+</span><span data-line="8">uv<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>fastapi<span class="o">]</span>
 </span></pre></div>
 </div>
 </div>
 <input id="sd-tab-item-2" name="sd-tab-set-0" type="radio">
 <label class="sd-tab-label" for="sd-tab-item-2">
 poetry</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="c1"># For Litestar</span>
+</span><span data-line="2">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>litestar<span class="o">]</span>
+</span><span data-line="3">
+</span><span data-line="4"><span class="c1"># For Starlette</span>
+</span><span data-line="5">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>starlette<span class="o">]</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="c1"># For FastAPI</span>
+</span><span data-line="8">poetry<span class="w"> </span>add<span class="w"> </span>debug-toolbar<span class="o">[</span>fastapi<span class="o">]</span>
 </span></pre></div>
 </div>
 </div>
@@ -197,6 +223,97 @@ poetry</label><div class="sd-tab-content docutils">
 </span></pre></div>
 </div>
 <p>The toolbar will automatically inject itself into HTML responses.</p>
+</section>
+<section id="starlette-usage">
+<h2>Starlette Usage<a class="headerlink" href="#starlette-usage" title="Link to this heading">¶</a></h2>
+<p>Add the debug toolbar middleware to your Starlette application:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.applications</span><span class="w"> </span><span class="kn">import</span> <span class="n">Starlette</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">Middleware</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
+</span><span data-line="4"><span class="kn">from</span><span class="w"> </span><span class="nn">starlette.routing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Route</span>
+</span><span data-line="5"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DebugToolbar</span>
+</span><span data-line="6"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.starlette</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span data-line="7">    <span class="n">DebugToolbarMiddleware</span><span class="p">,</span>
+</span><span data-line="8">    <span class="n">StarletteDebugToolbarConfig</span><span class="p">,</span>
+</span><span data-line="9">    <span class="n">create_debug_toolbar_routes</span><span class="p">,</span>
+</span><span data-line="10"><span class="p">)</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">homepage</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+</span><span data-line="13">    <span class="k">return</span> <span class="n">HTMLResponse</span><span class="p">(</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+</span><span data-line="14">
+</span><span data-line="15"><span class="n">config</span> <span class="o">=</span> <span class="n">StarletteDebugToolbarConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span data-line="16"><span class="n">toolbar</span> <span class="o">=</span> <span class="n">DebugToolbar</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span data-line="17">
+</span><span data-line="18"><span class="n">app</span> <span class="o">=</span> <span class="n">Starlette</span><span class="p">(</span>
+</span><span data-line="19">    <span class="n">routes</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="20">        <span class="n">Route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">homepage</span><span class="p">),</span>
+</span><span data-line="21">        <span class="o">*</span><span class="n">create_debug_toolbar_routes</span><span class="p">(</span><span class="n">toolbar</span><span class="o">.</span><span class="n">storage</span><span class="p">),</span>
+</span><span data-line="22">    <span class="p">],</span>
+</span><span data-line="23">    <span class="n">middleware</span><span class="o">=</span><span class="p">[</span>
+</span><span data-line="24">        <span class="n">Middleware</span><span class="p">(</span><span class="n">DebugToolbarMiddleware</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">toolbar</span><span class="o">=</span><span class="n">toolbar</span><span class="p">),</span>
+</span><span data-line="25">    <span class="p">],</span>
+</span><span data-line="26"><span class="p">)</span>
+</span></pre></div>
+</div>
+</section>
+<section id="fastapi-usage">
+<h2>FastAPI Usage<a class="headerlink" href="#fastapi-usage" title="Link to this heading">¶</a></h2>
+<p>Use the convenience function to set up the debug toolbar with FastAPI:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_debug_toolbar</span><span class="p">,</span> <span class="n">FastAPIDebugToolbarConfig</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+</span><span data-line="6">
+</span><span data-line="7"><span class="n">config</span> <span class="o">=</span> <span class="n">FastAPIDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="8">    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="9">    <span class="n">track_dependency_injection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># Track FastAPI DI resolution</span>
+</span><span data-line="10"><span class="p">)</span>
+</span><span data-line="11"><span class="n">toolbar</span> <span class="o">=</span> <span class="n">setup_debug_toolbar</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</span><span data-line="12">
+</span><span data-line="13"><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">)</span>
+</span><span data-line="14"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">homepage</span><span class="p">():</span>
+</span><span data-line="15">    <span class="k">return</span> <span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello World&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+</span></pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">setup_debug_toolbar</span></code> function automatically:</p>
+<ul class="simple">
+<li><p>Adds the debug toolbar middleware</p></li>
+<li><p>Registers the toolbar routes</p></li>
+<li><p>Returns the toolbar instance for further customization</p></li>
+</ul>
+<section id="tracking-dependency-injection">
+<h3>Tracking Dependency Injection<a class="headerlink" href="#tracking-dependency-injection" title="Link to this heading">¶</a></h3>
+<p>FastAPI’s dependency injection can be tracked with the DI panel:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span data-line="1"><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">FastAPI</span>
+</span><span data-line="2"><span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTMLResponse</span>
+</span><span data-line="3"><span class="kn">from</span><span class="w"> </span><span class="nn">debug_toolbar.fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_debug_toolbar</span><span class="p">,</span> <span class="n">FastAPIDebugToolbarConfig</span>
+</span><span data-line="4">
+</span><span data-line="5"><span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+</span><span data-line="6"><span class="n">config</span> <span class="o">=</span> <span class="n">FastAPIDebugToolbarConfig</span><span class="p">(</span>
+</span><span data-line="7">    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="8">    <span class="n">track_dependency_injection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span data-line="9"><span class="p">)</span>
+</span><span data-line="10"><span class="n">setup_debug_toolbar</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+</span><span data-line="11">
+</span><span data-line="12"><span class="k">def</span><span class="w"> </span><span class="nf">get_db</span><span class="p">():</span>
+</span><span data-line="13">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;connected&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</span><span data-line="14">
+</span><span data-line="15"><span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">db</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_db</span><span class="p">)):</span>
+</span><span data-line="16">    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;db&quot;</span><span class="p">:</span> <span class="n">db</span><span class="p">}</span>
+</span><span data-line="17">
+</span><span data-line="18"><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_class</span><span class="o">=</span><span class="n">HTMLResponse</span><span class="p">)</span>
+</span><span data-line="19"><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">homepage</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">Depends</span><span class="p">(</span><span class="n">get_user</span><span class="p">)):</span>
+</span><span data-line="20">    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;h1&gt;Hello </span><span class="si">{</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span>
+</span></pre></div>
+</div>
+<p>The Dependencies panel will show:</p>
+<ul class="simple">
+<li><p>All resolved dependencies</p></li>
+<li><p>Cache hit/miss rates</p></li>
+<li><p>Resolution times</p></li>
+</ul>
+</section>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
