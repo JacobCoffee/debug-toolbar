@@ -26,12 +26,12 @@ jobs:
             artifact-name: dist-litestar-debug-toolbar
     steps:
       - name: Checkout code
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v6
+        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v6
         with:
           enable-cache: true
           version: "0.9.12"
@@ -114,7 +114,7 @@ jobs:
           path: dist/
 
       - name: Sign distributions with Sigstore
-        uses: sigstore/gh-action-sigstore-python@f832326173235dcb00dd5d92cd3f353de3188e6c # v3.1.0
+        uses: sigstore/gh-action-sigstore-python@a5caf349bc536fbef3668a10ed7f5cd309a4b53d # v3.2.0
         with:
           inputs: ./dist/*
 
@@ -147,7 +147,7 @@ jobs:
           path: dist/litestar-debug-toolbar/
 
       - name: Create GitHub Release (Draft)
-        uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         with:
           draft: true
           files: |
@@ -211,7 +211,7 @@ jobs:
     needs: [publish-litestar-debug-toolbar]
     steps:
       - name: Mark Release as Published
-        uses: softprops/action-gh-release@5be0e66d93ac7ed76da52eca8bb058f665c3a5fe # v2
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2
         with:
           draft: false
 
