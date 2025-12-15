@@ -50,7 +50,7 @@ jobs:
 
       - name: Set up uv
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v6
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v6
         with:
           enable-cache: true
           version: "0.9.12"

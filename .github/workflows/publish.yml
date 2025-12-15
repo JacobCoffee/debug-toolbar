@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v6
+        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v6
         with:
           enable-cache: true
           version: "0.9.12"
@@ -83,7 +83,7 @@ jobs:
           done
 
       - name: Upload dist artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4
         with:
           name: ${{ matrix.artifact-name }}
           path: dist/
@@ -108,7 +108,7 @@ jobs:
             signed-artifact-name: dist-litestar-debug-toolbar-signed
     steps:
       - name: Download dist artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v4
         with:
           name: ${{ matrix.artifact-name }}
           path: dist/
@@ -119,7 +119,7 @@ jobs:
           inputs: ./dist/*
 
       - name: Upload signed artifacts
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v4
         with:
           name: ${{ matrix.signed-artifact-name }}
           path: dist/
@@ -135,13 +135,13 @@ jobs:
     steps:
       # TODO: Re-enable after PEP 541 name request is processed
       # - name: Download debug-toolbar signed artifacts
-      #   uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+      #   uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v4
       #   with:
       #     name: dist-debug-toolbar-signed
       #     path: dist/debug-toolbar/
 
       - name: Download litestar-debug-toolbar signed artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v4
         with:
           name: dist-litestar-debug-toolbar-signed
           path: dist/litestar-debug-toolbar/
@@ -167,7 +167,7 @@ jobs:
   #     url: https://pypi.org/project/debug-toolbar/
   #   steps:
   #     - name: Download dist artifacts
-  #       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+  #       uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v4
   #       with:
   #         name: dist-debug-toolbar
   #         path: dist/
@@ -190,7 +190,7 @@ jobs:
       url: https://pypi.org/project/litestar-debug-toolbar/
     steps:
       - name: Download dist artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v4
         with:
           name: dist-litestar-debug-toolbar
           path: dist/
