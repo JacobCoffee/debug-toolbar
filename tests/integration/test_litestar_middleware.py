@@ -5,11 +5,11 @@ from __future__ import annotations
 import gzip
 
 import pytest
+from litestar.status_codes import HTTP_200_OK
 from litestar.testing import TestClient
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, Response, get
-from litestar.status_codes import HTTP_200_OK
 
 
 @get("/", media_type=MediaType.HTML)
@@ -277,7 +277,7 @@ class TestToolbarWithLifecycleHooks:
         Note: We only verify before_request hook is called. The after_request
         hook timing varies in CI environments due to async execution order.
         """
-        from litestar import Request, Response
+        from litestar import Request
 
         hook_state: dict[str, bool] = {"before": False, "after": False}
 
@@ -456,3 +456,187 @@ class TestGzipCompression:
             assert response.status_code == 200
             assert b"debug-toolbar" in response.content
             assert b"</body>" in response.content
+
+
+class TestMultipleCompressionFormats:
+    """Test toolbar injection with various compression formats."""
+
+    def test_toolbar_injected_with_deflate_compression(self) -> None:
+        """Test that toolbar is correctly injected when response is deflate-compressed."""
+        import zlib
+
+        @get("/deflate", media_type=MediaType.HTML)
+        async def deflate_handler() -> Response:
+            """Return deflate-compressed HTML."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            compressed = zlib.compress(html.encode("utf-8"))
+            return Response(
+                content=compressed,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "deflate"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[deflate_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/deflate")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+    def test_toolbar_injected_with_brotli_compression(self) -> None:
+        """Test that toolbar is correctly injected when response is brotli-compressed."""
+        try:
+            import brotli
+        except ImportError:
+            pytest.skip("brotli library not available")
+
+        @get("/brotli", media_type=MediaType.HTML)
+        async def brotli_handler() -> Response:
+            """Return brotli-compressed HTML."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            compressed = brotli.compress(html.encode("utf-8"))
+            return Response(
+                content=compressed,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "br"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[brotli_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/brotli")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+    def test_toolbar_injected_with_zstd_compression(self) -> None:
+        """Test that toolbar is correctly injected when response is zstd-compressed."""
+        try:
+            import zstandard
+        except ImportError:
+            pytest.skip("zstandard library not available")
+
+        @get("/zstd", media_type=MediaType.HTML)
+        async def zstd_handler() -> Response:
+            """Return zstd-compressed HTML."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            cctx = zstandard.ZstdCompressor()
+            compressed = cctx.compress(html.encode("utf-8"))
+            return Response(
+                content=compressed,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "zstd"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[zstd_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/zstd")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+    def test_toolbar_with_multiple_encodings(self) -> None:
+        """Test handling of multiple comma-separated encodings."""
+
+        @get("/multi-encoding", media_type=MediaType.HTML)
+        async def multi_encoding_handler() -> Response:
+            """Return HTML with multiple encodings applied."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            # Apply gzip first
+            compressed = gzip.compress(html.encode("utf-8"))
+            return Response(
+                content=compressed,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "gzip, identity"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[multi_encoding_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/multi-encoding")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+    def test_invalid_deflate_data_with_deflate_header(self) -> None:
+        """Test handling of invalid deflate data with content-encoding: deflate header."""
+
+        @get("/invalid-deflate", media_type=MediaType.HTML)
+        async def invalid_deflate_handler() -> Response:
+            """Return invalid deflate data with deflate content-encoding header."""
+            invalid_deflate = b"This is not deflated data but pretends to be"
+            return Response(
+                content=invalid_deflate,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "deflate"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[invalid_deflate_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/invalid-deflate")
+            assert response.status_code == 200
+            # Should return original content since it couldn't be decompressed
+            assert b"This is not deflated data but pretends to be" in response.content
+
+    def test_brotli_without_library(self) -> None:
+        """Test that responses with brotli encoding are handled gracefully without the library."""
+        try:
+            import brotli  # noqa: F401
+
+            pytest.skip("brotli library is available, can't test missing library case")
+        except ImportError:
+            pass
+
+        @get("/brotli-missing", media_type=MediaType.HTML)
+        async def brotli_missing_handler() -> Response:
+            """Return content with br encoding when library is not available."""
+            # Since brotli isn't available, we can't actually compress it
+            # This simulates a response claiming to be brotli-compressed
+            html = "<html><body><h1>Test</h1></body></html>"
+            return Response(
+                content=html.encode("utf-8"),
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "br"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[brotli_missing_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/brotli-missing")
+            assert response.status_code == 200
+            # Should handle gracefully and attempt to inject toolbar
+            # (will work since the data isn't actually compressed)
+            assert b"Test" in response.content

@@ -6,6 +6,7 @@ import gzip
 import logging
 import re
 import time
+import zlib
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, cast
 from uuid import uuid4
@@ -15,6 +16,17 @@ from debug_toolbar.core.panels.websocket import WebSocketConnection, WebSocketMe
 from debug_toolbar.litestar.config import LitestarDebugToolbarConfig
 from debug_toolbar.litestar.panels.events import collect_events_metadata
 from litestar.middleware import AbstractMiddleware
+
+# Optional compression libraries
+try:
+    import brotli
+except ImportError:
+    brotli = None  # type: ignore[assignment]
+
+try:
+    import zstandard
+except ImportError:
+    zstandard = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:
     from litestar.types import (
@@ -479,34 +491,81 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             context.metadata["routes"] = []
             context.metadata["matched_route"] = ""
 
+    def _decompress_body(self, body: bytes, encodings: list[str]) -> tuple[bytes, bool]:  # noqa: PLR0912
+        """Decompress response body based on content-encoding.
+
+        Args:
+            body: The compressed response body.
+            encodings: List of encoding formats (e.g., ["gzip", "deflate"]).
+
+        Returns:
+            Tuple of (decompressed body, success flag).
+            Success flag is True if decompression succeeded, False otherwise.
+        """
+        decompressed = False
+        # Process encodings in reverse order (last applied encoding is first to remove)
+        for encoding in reversed(encodings):
+            if encoding == "gzip":
+                try:
+                    body = gzip.decompress(body)
+                    decompressed = True
+                except (gzip.BadGzipFile, OSError):
+                    # Not valid gzip, try next encoding or decode as-is
+                    break
+            elif encoding == "deflate":
+                try:
+                    body = zlib.decompress(body)
+                    decompressed = True
+                except zlib.error:
+                    # Not valid deflate, try next encoding or decode as-is
+                    break
+            elif encoding == "br":
+                if brotli is not None:
+                    try:
+                        body = brotli.decompress(body)
+                        decompressed = True
+                    except brotli.error:  # type: ignore[attr-defined]
+                        # Not valid brotli, try next encoding or decode as-is
+                        break
+                else:
+                    # Brotli not available, can't decompress
+                    logger.debug("Brotli compression detected but brotli library not installed")
+                    break
+            elif encoding == "zstd":
+                if zstandard is not None:
+                    try:
+                        dctx = zstandard.ZstdDecompressor()
+                        body = dctx.decompress(body)
+                        decompressed = True
+                    except zstandard.ZstdError:
+                        # Not valid zstd, try next encoding or decode as-is
+                        break
+                else:
+                    # Zstandard not available, can't decompress
+                    logger.debug("Zstandard compression detected but zstandard library not installed")
+                    break
+        return body, decompressed
+
     def _inject_toolbar(self, body: bytes, context: RequestContext, content_encoding: str = "") -> tuple[bytes, str]:
         """Inject the toolbar HTML into the response body.
 
         Args:
             body: The original response body (may be compressed).
             context: The request context with collected data.
-            content_encoding: The content-encoding header value (e.g., "gzip").
+            content_encoding: The content-encoding header value (e.g., "gzip", "deflate", "br", "zstd").
 
         Returns:
             Tuple of (modified body, content_encoding to use).
-            If gzip was decompressed, returns uncompressed body with empty encoding.
+            If compression was decompressed, returns uncompressed body with empty encoding.
         """
-        # Handle gzip-compressed responses
-        # Track whether we successfully decompressed the body
-        decompressed = False
+        # Handle compressed responses
         encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
-        if "gzip" in encodings:
-            try:
-                body = gzip.decompress(body)
-                decompressed = True
-            except gzip.BadGzipFile:
-                # Not valid gzip, try to decode as-is
-                pass
+        body, decompressed = self._decompress_body(body, encodings)
 
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            # Can't decode. If we successfully decompressed gzip, return the
+            # Can't decode. If we successfully decompressed, return the
             # decompressed body with no content-encoding. Otherwise, return
             # the body as-is with the original encoding.
             if decompressed:
