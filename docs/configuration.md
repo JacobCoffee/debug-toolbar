@@ -175,6 +175,59 @@ Maximum items to show in arrays/objects before truncation.
 
 Maximum string length before truncation.
 
+## Compression Support
+
+The debug toolbar middleware automatically handles compressed HTTP responses. The following compression formats are supported:
+
+### Supported Formats
+
+| Format | Encoding Header | Library | Availability |
+|--------|----------------|---------|--------------|
+| **gzip** | `gzip` | `gzip` (stdlib) | Always available |
+| **deflate** | `deflate` | `zlib` (stdlib) | Always available |
+| **Brotli** | `br` | `brotli` | Optional (install with `pip install brotli`) |
+| **Zstandard** | `zstd` | `zstandard` | Optional (install with `pip install zstandard`) |
+
+### How It Works
+
+When the middleware encounters a compressed response:
+
+1. It detects the compression format from the `Content-Encoding` header
+2. Decompresses the response body
+3. Injects the toolbar HTML
+4. Returns the modified response **uncompressed** with no `Content-Encoding` header
+
+This ensures the toolbar is correctly injected regardless of whether your application uses compression.
+
+### Multiple Encodings
+
+The middleware correctly handles comma-separated encoding values (e.g., `Content-Encoding: gzip, identity`). Encodings are processed in reverse order, as per HTTP specification (last applied encoding is first to be removed).
+
+### Optional Dependencies
+
+To enable support for Brotli and Zstandard:
+
+```bash
+# Brotli support
+pip install debug-toolbar[litestar] brotli
+
+# Zstandard support  
+pip install debug-toolbar[litestar] zstandard
+
+# Both
+pip install debug-toolbar[litestar] brotli zstandard
+```
+
+If these libraries are not installed, the middleware will gracefully skip decompression for those formats and log a debug message.
+
+### Error Handling
+
+The middleware includes robust error handling:
+
+- **Invalid compressed data**: If data claims to be compressed but isn't valid, it falls back to treating it as uncompressed
+- **UTF-8 decode errors**: If decompressed data can't be decoded as UTF-8, the response is returned as-is
+- **Missing libraries**: If optional compression libraries aren't installed, those formats are skipped gracefully
+
 ## Environment-Based Configuration
 
 Common pattern for different environments:
