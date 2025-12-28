@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import gzip
 import logging
 import re
@@ -492,26 +493,21 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             If gzip was decompressed, returns uncompressed body with empty encoding.
         """
         # Handle gzip-compressed responses
-        # Track whether we successfully decompressed the body
-        decompressed = False
+        # Store original body in case we need to return it
+        original_body = body
         encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
         if "gzip" in encodings:
-            try:
+            # Try to decompress, fall back to treating as uncompressed if invalid
+            with contextlib.suppress(gzip.BadGzipFile):
                 body = gzip.decompress(body)
-                decompressed = True
-            except gzip.BadGzipFile:
-                # Not valid gzip, try to decode as-is
-                pass
 
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            # Can't decode. If we successfully decompressed gzip, return the
-            # decompressed body with no content-encoding. Otherwise, return
-            # the body as-is with the original encoding.
-            if decompressed:
-                return body, ""
-            return body, content_encoding
+            # Can't decode as UTF-8. Return the original body with original
+            # content-encoding to preserve HTTP semantics (client expects the
+            # format they requested via Accept-Encoding).
+            return original_body, content_encoding
 
         toolbar_data = self.toolbar.get_toolbar_data(context)
         toolbar_html = self._render_toolbar(toolbar_data)
