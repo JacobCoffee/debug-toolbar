@@ -5,11 +5,11 @@ from __future__ import annotations
 import gzip
 
 import pytest
+from litestar.status_codes import HTTP_200_OK
 from litestar.testing import TestClient
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, Response, get
-from litestar.status_codes import HTTP_200_OK
 
 
 @get("/", media_type=MediaType.HTML)
@@ -277,7 +277,7 @@ class TestToolbarWithLifecycleHooks:
         Note: We only verify before_request hook is called. The after_request
         hook timing varies in CI environments due to async execution order.
         """
-        from litestar import Request, Response
+        from litestar import Request
 
         hook_state: dict[str, bool] = {"before": False, "after": False}
 
