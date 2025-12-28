@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import gzip
+
 import pytest
 from litestar.testing import TestClient
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
-from litestar import Litestar, MediaType, get
+from litestar import Litestar, MediaType, Response, get
+from litestar.status_codes import HTTP_200_OK
 
 
 @get("/", media_type=MediaType.HTML)
@@ -340,3 +343,117 @@ class TestGzipCompression:
             response = client.get("/")
             assert response.status_code == 200
             assert b"debug-toolbar" in response.content
+
+    def test_invalid_gzip_data_with_gzip_header(self) -> None:
+        """Test handling of invalid gzip data with content-encoding: gzip header.
+
+        When the response claims to be gzipped but contains invalid gzip data,
+        the middleware should gracefully fall back to treating it as uncompressed.
+        """
+
+        @get("/invalid-gzip", media_type=MediaType.HTML)
+        async def invalid_gzip_handler() -> Response:
+            """Return invalid gzip data with gzip content-encoding header."""
+            # This is not valid gzip data
+            invalid_gzip = b"This is not gzipped data but pretends to be"
+            return Response(
+                content=invalid_gzip,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "gzip"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[invalid_gzip_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/invalid-gzip")
+            assert response.status_code == 200
+            # Should return original content since it couldn't be decompressed
+            assert b"This is not gzipped data but pretends to be" in response.content
+
+    def test_gzip_decompressed_data_fails_utf8_decoding(self) -> None:
+        """Test handling of valid gzip data that fails UTF-8 decoding after decompression.
+
+        When gzipped data decompresses successfully but contains non-UTF-8 bytes,
+        the middleware should return the original compressed data.
+        """
+
+        @get("/binary-gzip", media_type=MediaType.HTML)
+        async def binary_gzip_handler() -> Response:
+            """Return gzipped binary data that's not valid UTF-8."""
+            # Binary data that's not valid UTF-8
+            binary_data = b"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
+            gzipped = gzip.compress(binary_data)
+            return Response(
+                content=gzipped,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "gzip"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[binary_gzip_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/binary-gzip")
+            assert response.status_code == 200
+            # Should return gzipped binary data since UTF-8 decode failed
+            # The response will be decompressed by TestClient, so we check for the binary content
+            assert response.content == b"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
+
+    def test_gzip_header_case_insensitive(self) -> None:
+        """Test that content-encoding header matching is case-insensitive.
+
+        The HTTP spec requires header names to be case-insensitive, so we should
+        handle various casings of "gzip" (e.g., "GZIP", "Gzip", "GzIp").
+        """
+
+        @get("/gzip-upper", media_type=MediaType.HTML)
+        async def gzip_upper_handler() -> Response:
+            """Return gzipped HTML with uppercase GZIP encoding."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            gzipped = gzip.compress(html.encode("utf-8"))
+            return Response(
+                content=gzipped,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "GZIP"},
+            )
+
+        @get("/gzip-mixed", media_type=MediaType.HTML)
+        async def gzip_mixed_handler() -> Response:
+            """Return gzipped HTML with mixed case GzIp encoding."""
+            html = "<html><body><h1>Test</h1></body></html>"
+            gzipped = gzip.compress(html.encode("utf-8"))
+            return Response(
+                content=gzipped,
+                status_code=HTTP_200_OK,
+                media_type=MediaType.HTML,
+                headers={"content-encoding": "GzIp"},
+            )
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[gzip_upper_handler, gzip_mixed_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            # Test uppercase GZIP
+            response = client.get("/gzip-upper")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+            # Test mixed case GzIp
+            response = client.get("/gzip-mixed")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
