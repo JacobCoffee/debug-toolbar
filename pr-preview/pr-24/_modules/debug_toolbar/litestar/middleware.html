@@ -653,7 +653,7 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="498">            <span class="k">try</span><span class="p">:</span>
 </span><span data-line="499">                <span class="n">body</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
 </span><span data-line="500">                <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span data-line="501">            <span class="k">except</span> <span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">BadGzipFile</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+</span><span data-line="501">            <span class="k">except</span> <span class="n">gzip</span><span class="o">.</span><span class="n">BadGzipFile</span><span class="p">:</span>
 </span><span data-line="502">                <span class="c1"># Not valid gzip, try to decode as-is</span>
 </span><span data-line="503">                <span class="k">pass</span>
 </span><span data-line="504">
