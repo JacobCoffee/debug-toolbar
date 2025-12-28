@@ -298,3 +298,45 @@ class TestToolbarWithLifecycleHooks:
             assert response.status_code == 200
             assert b"debug-toolbar" in response.content
             assert hook_state["before"], "before_request hook was not called"
+
+
+class TestGzipCompression:
+    """Test toolbar injection with gzip-compressed responses."""
+
+    def test_toolbar_injected_with_gzip_compression(self) -> None:
+        """Test that toolbar is correctly injected when response is gzip-compressed.
+
+        This tests the fix for the issue where gzip-compressed responses would
+        fail to have the toolbar injected because the middleware couldn't decode
+        the compressed bytes as UTF-8.
+        """
+        from litestar.config.compression import CompressionConfig
+
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            compression_config=CompressionConfig(backend="gzip", minimum_size=1),
+            debug=True,
+        )
+        with TestClient(app) as client:
+            # Request with Accept-Encoding to trigger compression
+            response = client.get("/", headers={"Accept-Encoding": "gzip"})
+            assert response.status_code == 200
+            # The response should now be uncompressed with toolbar injected
+            # (we strip content-encoding when we decompress to inject)
+            assert b"debug-toolbar" in response.content
+            assert b"</body>" in response.content
+
+    def test_toolbar_injected_without_compression(self) -> None:
+        """Test that toolbar injection still works without compression."""
+        config = LitestarDebugToolbarConfig(enabled=True)
+        app = Litestar(
+            route_handlers=[html_handler],
+            plugins=[DebugToolbarPlugin(config)],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/")
+            assert response.status_code == 200
+            assert b"debug-toolbar" in response.content
