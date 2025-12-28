@@ -493,13 +493,15 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         import gzip
 
         # Handle gzip-compressed responses
-        is_gzipped = content_encoding.lower() == "gzip"
-        if is_gzipped:
+        # Track whether we successfully decompressed the body
+        decompressed = False
+        if content_encoding.lower() == "gzip":
             try:
                 body = gzip.decompress(body)
+                decompressed = True
             except (gzip.BadGzipFile, OSError):
                 # Not valid gzip, try to decode as-is
-                is_gzipped = False
+                pass
 
         try:
             html = body.decode("utf-8")
@@ -507,7 +509,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             # Can't decode. If we successfully decompressed gzip, return the
             # decompressed body with no content-encoding. Otherwise, return
             # the body as-is with the original encoding.
-            if is_gzipped:
+            if decompressed:
                 return body, ""
             return body, content_encoding
 
