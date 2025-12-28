@@ -494,7 +494,8 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         # Handle gzip-compressed responses
         # Track whether we successfully decompressed the body
         decompressed = False
-        if content_encoding.lower() == "gzip":
+        encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
+        if "gzip" in encodings:
             try:
                 body = gzip.decompress(body)
                 decompressed = True
