@@ -504,9 +504,11 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            # Can't decode, return original with original encoding
+            # Can't decode. If we successfully decompressed gzip, return the
+            # decompressed body with no content-encoding. Otherwise, return
+            # the body as-is with the original encoding.
             if is_gzipped:
-                return gzip.compress(body), content_encoding
+                return body, ""
             return body, content_encoding
 
         toolbar_data = self.toolbar.get_toolbar_data(context)
