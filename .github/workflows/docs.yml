@@ -33,7 +33,7 @@ jobs:
       docs_changed: ${{ steps.filter.outputs.docs }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           persist-credentials: false
 
@@ -50,7 +50,7 @@ jobs:
 
       - name: Set up uv
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
-        uses: astral-sh/setup-uv@1e862dfacbd1d6d858c55d9b792c756523627244 # v6
+        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v6
         with:
           enable-cache: true
           version: "0.9.12"
@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload artifact for GitHub Pages
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
           path: docs/_build/html
 

@@ -1,17 +1,20 @@
 # Debug Toolbar
 
-An async-native debug toolbar for Python ASGI frameworks with first-class Litestar support.
+An async-native debug toolbar for Python ASGI frameworks with support for Litestar, Starlette, and FastAPI.
 
 ## Installation
 
 `````{tab-set}
 ````{tab-item} uv
 ```bash
-# Core package only
-uv add debug-toolbar
-
 # With Litestar integration
 uv add debug-toolbar[litestar]
+
+# With Starlette integration
+uv add debug-toolbar[starlette]
+
+# With FastAPI integration
+uv add debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
 uv add debug-toolbar[advanced-alchemy]
@@ -23,11 +26,14 @@ uv add debug-toolbar[all]
 
 ````{tab-item} pip
 ```bash
-# Core package only
-pip install debug-toolbar
-
 # With Litestar integration
 pip install debug-toolbar[litestar]
+
+# With Starlette integration
+pip install debug-toolbar[starlette]
+
+# With FastAPI integration
+pip install debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
 pip install debug-toolbar[advanced-alchemy]
@@ -39,11 +45,14 @@ pip install debug-toolbar[all]
 
 ````{tab-item} pdm
 ```bash
-# Core package only
-pdm add debug-toolbar
-
 # With Litestar integration
 pdm add debug-toolbar[litestar]
+
+# With Starlette integration
+pdm add debug-toolbar[starlette]
+
+# With FastAPI integration
+pdm add debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
 pdm add debug-toolbar[advanced-alchemy]
@@ -55,11 +64,14 @@ pdm add debug-toolbar[all]
 
 ````{tab-item} poetry
 ```bash
-# Core package only
-poetry add debug-toolbar
-
 # With Litestar integration
 poetry add debug-toolbar[litestar]
+
+# With Starlette integration
+poetry add debug-toolbar[starlette]
+
+# With FastAPI integration
+poetry add debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
 poetry add debug-toolbar[advanced-alchemy]
@@ -120,6 +132,8 @@ See how debug-toolbar compares to Django, Flask, and FastAPI debug toolbars.
 
 ## Quick Start
 
+::::{tab-set}
+:::{tab-item} Litestar
 ```python
 from litestar import Litestar, get
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
@@ -134,12 +148,55 @@ app = Litestar(
     plugins=[DebugToolbarPlugin(config)],
 )
 ```
+:::
+:::{tab-item} FastAPI
+```python
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from debug_toolbar.fastapi import setup_debug_toolbar, FastAPIDebugToolbarConfig
+
+app = FastAPI()
+config = FastAPIDebugToolbarConfig(enabled=True)
+setup_debug_toolbar(app, config)
+
+@app.get("/", response_class=HTMLResponse)
+async def index():
+    return "<html><body><h1>Hello World</h1></body></html>"
+```
+:::
+:::{tab-item} Starlette
+```python
+from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.responses import HTMLResponse
+from starlette.routing import Route
+from debug_toolbar.core import DebugToolbar
+from debug_toolbar.starlette import (
+    DebugToolbarMiddleware,
+    StarletteDebugToolbarConfig,
+    create_debug_toolbar_routes,
+)
+
+async def homepage(request):
+    return HTMLResponse("<html><body><h1>Hello World</h1></body></html>")
+
+config = StarletteDebugToolbarConfig(enabled=True)
+toolbar = DebugToolbar(config)
+
+app = Starlette(
+    routes=[Route("/", homepage), *create_debug_toolbar_routes(toolbar.storage)],
+    middleware=[Middleware(DebugToolbarMiddleware, config=config, toolbar=toolbar)],
+)
+```
+:::
+::::
 
 ## Features
 
 - **Async-Native**: Built from the ground up for async/await patterns
+- **Multi-Framework Support**: Litestar, Starlette, and FastAPI integrations
 - **Framework-Agnostic Core**: Works with any ASGI framework
-- **Litestar Integration**: First-class plugin support
+- **FastAPI DI Tracking**: Monitor dependency injection resolution and caching
 - **Pluggable Panels**: Easy to add, remove, or customize
 - **Dark/Light Themes**: Toggle between themes
 - **Flexible Positioning**: Left, right, top, or bottom
