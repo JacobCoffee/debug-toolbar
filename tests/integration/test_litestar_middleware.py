@@ -403,8 +403,8 @@ class TestGzipCompression:
         with TestClient(app) as client:
             response = client.get("/binary-gzip")
             assert response.status_code == 200
-            # Should return gzipped binary data since UTF-8 decode failed
-            # The response will be decompressed by TestClient, so we check for the binary content
+            # Should return decompressed binary data since UTF-8 decode failed
+            # The middleware has removed the gzip encoding, so we check for the raw binary content
             assert response.content == b"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
 
     def test_gzip_header_case_insensitive(self) -> None:
