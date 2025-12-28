@@ -326,8 +326,7 @@ class TestGzipCompression:
             # Request with Accept-Encoding to trigger compression
             response = client.get("/", headers={"Accept-Encoding": "gzip"})
             assert response.status_code == 200
-            # The response should now be uncompressed with toolbar injected
-            # (we strip content-encoding when we decompress to inject)
+            # At the TestClient level we see an uncompressed body with the toolbar injected.
             assert b"debug-toolbar" in response.content
             assert b"</body>" in response.content
 
