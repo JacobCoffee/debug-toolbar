@@ -498,7 +498,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             try:
                 body = gzip.decompress(body)
                 decompressed = True
-            except (gzip.BadGzipFile, OSError):
+            except gzip.BadGzipFile:
                 # Not valid gzip, try to decode as-is
                 pass
 
