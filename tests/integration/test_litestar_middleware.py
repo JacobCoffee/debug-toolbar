@@ -5,11 +5,11 @@ from __future__ import annotations
 import gzip
 
 import pytest
+from litestar.status_codes import HTTP_200_OK
 from litestar.testing import TestClient
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, Response, get
-from litestar.status_codes import HTTP_200_OK
 
 
 @get("/", media_type=MediaType.HTML)
@@ -277,7 +277,7 @@ class TestToolbarWithLifecycleHooks:
         Note: We only verify before_request hook is called. The after_request
         hook timing varies in CI environments due to async execution order.
         """
-        from litestar import Request, Response
+        from litestar import Request
 
         hook_state: dict[str, bool] = {"before": False, "after": False}
 
@@ -378,7 +378,8 @@ class TestGzipCompression:
         """Test handling of valid gzip data that fails UTF-8 decoding after decompression.
 
         When gzipped data decompresses successfully but contains non-UTF-8 bytes,
-        the middleware should return the original compressed data.
+        the middleware should return the original compressed data with the original
+        content-encoding header to preserve HTTP semantics.
         """
 
         @get("/binary-gzip", media_type=MediaType.HTML)
@@ -403,8 +404,9 @@ class TestGzipCompression:
         with TestClient(app) as client:
             response = client.get("/binary-gzip")
             assert response.status_code == 200
-            # Should return decompressed binary data since UTF-8 decode failed
-            # The middleware has removed the gzip encoding, so we check for the raw binary content
+            # Should return original compressed data since UTF-8 decode failed
+            # TestClient automatically decompresses gzip responses, so we verify
+            # the decompressed content matches the original binary data
             assert response.content == b"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
 
     def test_gzip_header_case_insensitive(self) -> None:
