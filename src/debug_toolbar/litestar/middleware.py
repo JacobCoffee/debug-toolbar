@@ -521,7 +521,9 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             pattern = re.compile(re.escape(insert_before), re.IGNORECASE)
             html = pattern.sub(toolbar_html + insert_before, html, count=1)
 
-        # Return uncompressed body - we strip content-encoding since we decompressed
+        # Return body as uncompressed UTF-8 with empty content-encoding.
+        # This applies to all successful toolbar injections, regardless of whether
+        # the input was originally compressed (we decompress before processing).
         return html.encode("utf-8"), ""
 
     def _render_toolbar(self, data: dict[str, Any]) -> str:
