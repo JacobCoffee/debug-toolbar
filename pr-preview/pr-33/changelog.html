@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" data-accent-color="violet" data-content_root="./">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Changelog - Async Debug Toolbar 0.2.0 documentation</title><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Architecture" href="architecture/index.html" /><link rel="prev" title="Debug Toolbar Comparison" href="comparison.html" /><script>
+    function setColorMode(t){let e=document.documentElement;e.setAttribute("data-color-mode",t);let a=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches,s=t;"auto"===t&&(s=a?"dark":"light"),"light"===s?(e.classList.remove("dark"),e.classList.add("light")):(e.classList.remove("light"),e.classList.add("dark"))}
+    setColorMode(localStorage._theme||"auto");
+  </script><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=e1a1ceaf" />
+    <link rel="stylesheet" type="text/css" href="_static/shibuya.css?v=14737038" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link media="print" rel="stylesheet" type="text/css" href="_static/print.css?v=20ff2c19" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sy-f-text: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+  --sy-f-heading: "Inter", var(--sy-f-sys), var(--sy-f-cjk), sans-serif;
+}
+</style>
+    <meta property="og:type" content="website"/><meta property="og:title" content="Changelog"/>
+    <meta name="twitter:card" content="summary"/>
+  </head>
+<body><div class="sy-head">
+  <div class="sy-head-blur"></div>
+  <div class="sy-head-inner sy-container mx-auto">
+    <a class="sy-head-brand" href="index.html">
+      
+      
+      <strong>Async Debug Toolbar</strong>
+    </a>
+    <div class="sy-head-nav" id="head-nav">
+      <nav class="sy-head-links"><ul><li class="link">
+          <a href="https://litestar.dev">
+            <span>Litestar</span></a>
+        </li><li class="link">
+          <a href="https://pypi.org/project/debug-toolbar">
+            <span>PyPI</span></a>
+        </li></ul></nav>
+      <div class="sy-head-extra flex items-center print:hidden"><form class="searchbox flex items-center" action="search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <kbd>/</kbd>
+</form><div class="sy-head-socials">
+  <a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+    <iconify-icon icon="simple-icons:github"></iconify-icon>
+  </a></div></div>
+    </div>
+    <div class="sy-head-actions flex items-center shrink-0 print:hidden"><button class="js-theme theme-switch flex items-center"
+data-aria-auto="Switch to light color mode"
+data-aria-light="Switch to dark color mode"
+data-aria-dark="Switch to auto color mode">
+<i class="i-lucide theme-icon"></i>
+</button><button class="md:hidden flex items-center js-menu" aria-label="Menu" type="button" aria-controls="head-nav" aria-expanded="false">
+        <div class="hamburger">
+          <span class="hamburger_1"></span>
+          <span class="hamburger_2"></span>
+          <span class="hamburger_3"></span>
+        </div>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="sy-page sy-container flex mx-auto">
+  <aside id="lside" class="sy-lside md:w-72 md:shrink-0 print:hidden">
+    <div class="sy-lside-inner md:sticky">
+      <div class="sy-scrollbar p-6">
+        <div class="globaltoc" data-expand-depth="0"><p class="caption" role="heading" aria-level="3"><span class="caption-text">Learn</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="panels.html">Built-in Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-panels.html">Creating Custom Panels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcp.html">MCP Server Integration</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.config.html">debug_toolbar.core.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panel.html">debug_toolbar.core.panel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.context.html">debug_toolbar.core.context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.storage.html">debug_toolbar.core.storage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.toolbar.html">debug_toolbar.core.toolbar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.core.panels.html">debug_toolbar.core.panels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.plugin.html">debug_toolbar.litestar.plugin</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.config.html">debug_toolbar.litestar.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.middleware.html">debug_toolbar.litestar.middleware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/_autosummary/debug_toolbar.litestar.panels.html">debug_toolbar.litestar.panels</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparison.html">Debug Toolbar Comparison</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
+</ul>
+<p class="caption" role="heading" aria-level="3"><span class="caption-text">Architecture</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="architecture/index.html">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture/ARCHITECTURE.html">Async Python Debug Toolbar - Architecture Document</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-001-dual-package-architecture.html">ADR-001: Dual Package Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-002-panel-system-design.html">ADR-002: Panel System Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture/adr/ADR-003-storage-and-context.html">ADR-003: Storage and Context Management</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="lside-overlay js-menu" role="button" aria-label="Close left sidebar" aria-controls="lside" aria-expanded="false"></div>
+  <aside id="rside" class="sy-rside pb-3 w-64 shrink-0 order-last">
+    <button class="rside-close js-menu xl:hidden" aria-label="Close Table of Contents" type="button" aria-controls="rside" aria-expanded="false">
+      <i class="i-lucide close"></i>
+    </button>
+    <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
+<li><a class="reference internal" href="#all-notable-changes-to-this-project-will-be-documented-in-this-file">All notable changes to this project will be documented in this file.</a></li>
+<li><a class="reference internal" href="#id1">0.3.0 - 2025-11-30</a><ul>
+<li><a class="reference internal" href="#bug-fixes">Bug Fixes</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#release">Release</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">0.2.0 - 2025-11-29</a><ul>
+<li><a class="reference internal" href="#id3">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id4">Documentation</a></li>
+<li><a class="reference internal" href="#id5">Features</a></li>
+<li><a class="reference internal" href="#miscellaneous-chores">Miscellaneous Chores</a></li>
+<li><a class="reference internal" href="#refactoring">Refactoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">0.1.4 - 2025-11-27</a><ul>
+<li><a class="reference internal" href="#id7">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id8">0.1.3 - 2025-11-27</a><ul>
+<li><a class="reference internal" href="#id9">Features</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">0.1.2 - 2025-11-27</a><ul>
+<li><a class="reference internal" href="#id11">Bug Fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">0.1.1 - 2025-11-27</a><ul>
+<li><a class="reference internal" href="#build">Build</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id13">[0.1.0] - 2025-11-27</a><ul>
+<li><a class="reference internal" href="#id14">Bug Fixes</a></li>
+<li><a class="reference internal" href="#id15">Documentation</a></li>
+<li><a class="reference internal" href="#id16">Features</a></li>
+<li><a class="reference internal" href="#id17">Refactoring</a></li>
+<li><a class="reference internal" href="#tests">Tests</a></li>
+<li><a class="reference internal" href="#id18">Build</a></li>
+<li><a class="reference internal" href="#ci">Ci</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+</div><div id="ethical-ad-placement" data-ea-publisher="readthedocs"></div></div>
+  </aside>
+  <div class="rside-overlay js-menu" role="button" aria-label="Close Table of Contents" aria-controls="rside" aria-expanded="false"></div>
+  <main class="sy-main w-full max-sm:max-w-full print:pt-6">
+<div class="sy-breadcrumbs" role="navigation">
+  <div class="sy-breadcrumbs-inner flex items-center">
+    <div class="md:hidden mr-3">
+      <button class="js-menu" aria-label="Menu" type="button" aria-controls="lside" aria-expanded="false">
+        <i class="i-lucide menu"></i>
+      </button>
+    </div>
+    <ol class="flex-1" itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a itemprop="item" href="index.html"><span itemprop="name">Async Debug Toolbar</span></a>
+        <span>/</span>
+        <meta itemprop="position" content="1" />
+      </li><li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <strong itemprop="name">Changelog</strong>
+        <meta itemprop="position" content="2" />
+      </li></ol>
+    <div class="xl:hidden ml-1">
+      <button class="js-menu" aria-label="Show table of contents" type="button" aria-controls="rside"
+        aria-expanded="false">
+        <i class="i-lucide outdent"></i>
+      </button>
+    </div>
+  </div>
+</div><div class="flex flex-col break-words justify-between">
+      <div class="min-w-0 max-w-6xl px-6 pb-6 pt-8 xl:px-12">
+        <article class="yue" role="main">
+          <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
+<section id="all-notable-changes-to-this-project-will-be-documented-in-this-file">
+<h2>All notable changes to this project will be documented in this file.<a class="headerlink" href="#all-notable-changes-to-this-project-will-be-documented-in-this-file" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id1">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.2.0..v0.3.0">0.3.0</a> - 2025-11-30<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="bug-fixes">
+<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(mcp)</strong> FileToolbarStorage now reloads from disk on every read - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/215f1f986672f7bd700244732495782f5f0838cc">215f1f9</a>) - Jacob Coffee</p></li>
+<li><p><strong>(mcp)</strong> convert timing from seconds to milliseconds - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/bb72f84bb4a888ab4b1161bc76f750ea4ae407d8">bb72f84</a>) - Jacob Coffee</p></li>
+<li><p>correct example to raise <code class="docutils literal notranslate"><span class="pre">n+1</span></code> error (#13) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/f6ae942aaaad2187dac4332f0fc5df1bbbaa7975">f6ae942</a>) - Cody Fincher</p></li>
+<li><p>add git-cliff changelog configuration - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/7e67e7b065f965deb234614c751ef10dd111f4a3">7e67e7b</a>) - Jacob Coffee</p></li>
+<li><p>correct MCP example panel paths and type annotations - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/80e4d1615220d66ff6488e3507756551a793bc05">80e4d16</a>) - Jacob Coffee</p></li>
+<li><p>escape CSS braces and add dark mode support to MCP example - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/c1c2e37405e1181b1412b6af6008f6158f40fba0">c1c2e37</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>update PLAN.md for MCP Server completion (PR #16) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/b737f2e29d9802032af422597f757a0cc286bc10">b737f2e</a>) - Jacob Coffee</p></li>
+<li><p>add MCP documentation and usage examples - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/34c3804e1c0c2f47605c512c1ce0d08b4353b9e0">34c3804</a>) - Jacob Coffee</p></li>
+<li><p>add MCP integration screenshot to README and docs - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/b197d299fa780efb8db1e2b6b4cdf448c3634e2b">b197d29</a>) - Jacob Coffee</p></li>
+<li><p>update PLAN.md with MCP completion status - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/652c755e600e779f49348863ddd7eb55ac600ff4">652c755</a>) - Jacob Coffee</p></li>
+<li><p>update MCP screenshot and API docs for FileToolbarStorage (#18) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/38e9a4b756f87dc2fcea03d5b6c8b5dcabc3fb3b">38e9a4b</a>) - Jacob Coffee</p></li>
+<li><p>regenerate changelog for v0.3.0 - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/8e6f21cbc5fb6f3a4f4237a453e43057c3eaf881">8e6f21c</a>) - github-actions[bot]</p></li>
+</ul>
+</section>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(mcp)</strong> add FileToolbarStorage for shared persistence between web app and MCP server - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/6afbff5faeef7c1bce3306e385dca0ed3043a3ed">6afbff5</a>) - Jacob Coffee</p></li>
+<li><p>add AsyncProfilerPanel for async task tracking (#14) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/dd92b330ea50480d5afb8ee974f01b76b79487a7">dd92b33</a>) - Jacob Coffee</p></li>
+<li><p>add GraphQL Panel with Strawberry integration (#15) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/af70e9c44529ccdbc0347008c80265800c2f6393">af70e9c</a>) - Jacob Coffee</p></li>
+<li><p>add MCP server for AI assistant integration (#16) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/fa880ba5fda9fe303aa70f9951ee45c134e67b5f">fa880ba</a>) - Jacob Coffee</p></li>
+<li><p>add interactive HTML frontend to MCP example - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/48d5bf1137660c5d545934434425297928127dca">48d5bf1</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="release">
+<h3>Release<a class="headerlink" href="#release" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>v0.3.0 with MCP Server integration (#17) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/5621580a22f12342cb7f3c46ad013e2ee3866c46">5621580</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.1.4..v0.2.0">0.2.0</a> - 2025-11-29<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h3>Bug Fixes<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(ci)</strong> disable debug-toolbar publish, fix litestar wheel build - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/88427d38c5eba97a52cb19339fda394ce027dd9a">88427d3</a>) - Jacob Coffee</p></li>
+<li><p><strong>(docs)</strong> correct GitHub URL to debug-toolbar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/3e395fdacc18ec9d2510d35014e3d8d66cce545c">3e395fd</a>) - Jacob Coffee</p></li>
+<li><p><strong>(examples)</strong> add light theme support to N+1 demo page - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/250b2fa72ac7bc4f68f71bad9739b2c4eb66b95e">250b2fa</a>) - Jacob Coffee</p></li>
+<li><p><strong>(examples)</strong> restore dark mode as default in N+1 demo - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/b644b665680a363840babdbef7ca3e8b40633a95">b644b66</a>) - Jacob Coffee</p></li>
+<li><p><strong>(examples)</strong> restore dark mode as default in N+1 demo - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/445e53e2e6d4dd0ad83be33562e17a37146b5ac0">445e53e</a>) - Jacob Coffee</p></li>
+<li><p><strong>(examples)</strong> add text color to N+1 demo link on home page - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/c65421b7c8c4b6658f5b6cfd39be0d3d959074b8">c65421b</a>) - Jacob Coffee</p></li>
+<li><p><strong>(tests)</strong> make lifecycle hook test more robust - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/5e6f3e42a1320b5085bfee0390ddc7e61f5f9a32">5e6f3e4</a>) - Jacob Coffee</p></li>
+<li><p><strong>(tests)</strong> remove flaky after_request assertion in CI - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/cfe8a3da844ecbfa09dc6b75f3d433cc0ce42f77">cfe8a3d</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id4">
+<h3>Documentation<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add comparison page to documentation - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/605e8fe25b63e3306fbee6cabbcd5e25ac32dbcd">605e8fe</a>) - Jacob Coffee</p></li>
+<li><p>restructure documentation layout (#6) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/cef823706ac9ba999ab91ced2b5f9f504e792267">cef8237</a>) - Jacob Coffee</p></li>
+<li><p>improve index page with installation tabs and card grid (#7) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/eccdc9777f33a28ad2ce59884318b78122fa3773">eccdc97</a>) - Jacob Coffee</p></li>
+<li><p>comprehensive documentation overhaul for 110% quality - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/1e07998311fb1af4370c312d6306b016ce4cd38a">1e07998</a>) - Jacob Coffee</p></li>
+<li><p>add panel screenshots to README and documentation - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/e11af1095572e40b68f146374fd000a4f6dc4843">e11af10</a>) - Jacob Coffee</p></li>
+<li><p>add panel screenshots to index page grid - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/42f31189f774ab55566ecd8e2babdaec95603093">42f3118</a>) - Jacob Coffee</p></li>
+<li><p>update version to 0.2.0 and add profiler config options - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/1453304d4d60046c0b2441afc5b1abeac7649787">1453304</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id5">
+<h3>Features<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(alerts)</strong> add proactive issue detection panel (#10) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/5de5b03c276f029b7d18f0334db2039b861bc0d0">5de5b03</a>) - Jacob Coffee</p></li>
+<li><p><strong>(ci)</strong> add documentation preview and GitHub Pages workflows (#3) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/893939848e559147fdd15eef72ac557bac0c35e0">8939398</a>) - Jacob Coffee</p></li>
+<li><p><strong>(events)</strong> add Events Panel for Litestar lifecycle tracking (#9) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/4cb8136c3b40a7aa1efbcc4501dff7dbdacdc72a">4cb8136</a>) - Jacob Coffee</p></li>
+<li><p><strong>(memory)</strong> add multi-backend memory profiling panel (#12) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/35a3f0d14d1e9222a182fe14170bbd7c9931c229">35a3f0d</a>) - Jacob Coffee</p></li>
+<li><p><strong>(profiling)</strong> add flame graph visualization support (#11) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/632fc933017b0ab15a1cad70bc8278b6b9f54aa7">632fc93</a>) - Jacob Coffee</p></li>
+<li><p><strong>(profiling)</strong> filter stdlib and prioritize user code - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/7cd29f9d6a6aa7b0b4dca6404493bbafed214727">7cd29f9</a>) - Jacob Coffee</p></li>
+<li><p><strong>(sql)</strong> add EXPLAIN query plans for SQLAlchemy panel (#5) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/7abf410f755e37882fcb686045eb70a189b88973">7abf410</a>) - Jacob Coffee</p></li>
+<li><p><strong>(sql)</strong> add N+1 query detection to SQLAlchemy panel (#8) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/bb5cfca446014e90466d9463733e15298c121cc1">bb5cfca</a>) - Jacob Coffee</p></li>
+<li><p><strong>(ui)</strong> Phase 5 - Complete toolbar UI with themes, positioning, and history (#4) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/2d5c8c0279ce4a55dafce0d0e90bcc0e3bbc1008">2d5c8c0</a>) - Jacob Coffee</p></li>
+<li><p><strong>(ui)</strong> add screenshots and fix full-width top/bottom toolbar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/7422535d4a7bbed8d43721ffa403226f54e0e083">7422535</a>) - Jacob Coffee</p></li>
+<li><p><strong>(ui)</strong> add styled panel rendering for inline toolbar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/6e554e8d20cb8fefccdaa371aba456f5ee8cbd7f">6e554e8</a>) - Jacob Coffee</p></li>
+<li><p>Phase 10 - Additional Panels (#2) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/a79128374f83db81d12ed0c477fd4d139aae6e44">a791283</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="miscellaneous-chores">
+<h3>Miscellaneous Chores<a class="headerlink" href="#miscellaneous-chores" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>bump version to 0.2.0 - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/2e222f6fa24bb2be79a27a2cc2dcf6fe8ea14660">2e222f6</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="refactoring">
+<h3>Refactoring<a class="headerlink" href="#refactoring" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(middleware)</strong> extract ResponseState and improve error handling - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/6b54458bc7a01cf96daf5ca4dd1c7af367ecda2e">6b54458</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id6">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.1.3..v0.1.4">0.1.4</a> - 2025-11-27<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<section id="id7">
+<h3>Bug Fixes<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(ci)</strong> repack wheel/sdist for litestar-debug-toolbar name - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/3ad5d68b6d1383d4d58a45037672e5caefa59095">3ad5d68</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id8">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.1.2..v0.1.3">0.1.3</a> - 2025-11-27<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<section id="id9">
+<h3>Features<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(ci)</strong> publish to both debug-toolbar and litestar-debug-toolbar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/93e29fc58a43bc8a76d656142d621eb1fc0f61ea">93e29fc</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id10">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.1.1..v0.1.2">0.1.2</a> - 2025-11-27<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<section id="id11">
+<h3>Bug Fixes<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(ci)</strong> update sigstore action to v3.1.0 - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/c37b1d53083e684ea024038475d809dc362d50d4">c37b1d5</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id12">
+<h2><a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/compare/v0.1.0..v0.1.1">0.1.1</a> - 2025-11-27<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<section id="build">
+<h3>Build<a class="headerlink" href="#build" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>(deps)</strong> bump the actions group with 6 updates (#1) - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/860811fe5031a7a04131529219dd98faabf76a4d">860811f</a>) - dependabot[bot]</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="id13">
+<h2>[0.1.0] - 2025-11-27<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h2>
+<section id="id14">
+<h3>Bug Fixes<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>update act-ci Makefile target for CI workflow jobs - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/0c550d239111b894f7b084b8cfb90a4bb31912cf">0c550d2</a>) - Jacob Coffee</p></li>
+<li><p>update test-cov target for unified debug_toolbar package - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/6daa6c507e551f0a03d5f31cbfdcc4b4940430e1">6daa6c5</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id15">
+<h3>Documentation<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add Sphinx documentation with API reference - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/82df08217771a3a504caedf04b735e2b9a00ab0d">82df082</a>) - Jacob Coffee</p></li>
+<li><p>update README with new package structure and badges - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/637bf0dddc721edc4d1b182a4a4484ee74795bcd">637bf0d</a>) - Jacob Coffee</p></li>
+<li><p>add CONTRIBUTING.rst with development guidelines - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/134f1e5fc50d1afc26cd1105a20aeecf4c980ae5">134f1e5</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id16">
+<h3>Features<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add framework-agnostic core debug toolbar package - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/21d31a25560bf31ffbae9464bd50159012697221">21d31a2</a>) - Jacob Coffee</p></li>
+<li><p>add Litestar framework integration - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/c1abc927fbee98335bc2af84cabdbacc9eb4e28e">c1abc92</a>) - Jacob Coffee</p></li>
+<li><p>add Advanced-Alchemy SQLAlchemy panel - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/1801c5f782be4f349632db308f4bada8e718c920">1801c5f</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id17">
+<h3>Refactoring<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>rename old module references to debug-toolbar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/9cb8dfe709172444443957a7bec52ae7f05d7cf4">9cb8dfe</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="tests">
+<h3>Tests<a class="headerlink" href="#tests" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add unit and integration tests - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/0604eaa09e66a2066dc78c8cb765e1e9772c1caf">0604eaa</a>) - Jacob Coffee</p></li>
+<li><p>increase coverage to 96% with comprehensive tests - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/f29de78fb66ba21ef36e2e4b943fda0416295c13">f29de78</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Build<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add project configuration with uv_build backend - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/75073ed7aa933ce837871c19968c622b58ec4079">75073ed</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="ci">
+<h3>Ci<a class="headerlink" href="#ci" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add dependabot configuration - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/63aeed42b92ce27cda58d773ae0fbfc2e8fe03bb">63aeed4</a>) - Jacob Coffee</p></li>
+<li><p>add changelog workflow - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/10af18da186137aaaf11db3c7079df844cb8a36e">10af18d</a>) - Jacob Coffee</p></li>
+<li><p>add PR title linting workflow - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/bef3addf1d7eb7ecc722fdbe1485b0d5d83a7ff5">bef3add</a>) - Jacob Coffee</p></li>
+<li><p>add release notes configuration - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/9a0e77578a174dbe50cc067c62ff3d5900c03e2f">9a0e775</a>) - Jacob Coffee</p></li>
+<li><p>add issue templates - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/9177bccdf981215044af9bbde2c8fc5d5e341406">9177bcc</a>) - Jacob Coffee</p></li>
+<li><p>add CI workflow - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/6869512f27bc4ac2ed87257cb41dc3b2b4f4c9a2">6869512</a>) - Jacob Coffee</p></li>
+<li><p>add publish workflow - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/70721ec433e28c3681e4ac9bcb20275e48a7eb20">70721ec</a>) - Jacob Coffee</p></li>
+<li><p>add PR template - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/9f56a4cc649ae66dba9184389c43943bd37a1211">9f56a4c</a>) - Jacob Coffee</p></li>
+</ul>
+</section>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>add usage examples for ASGI and Litestar - (<a class="reference external" href="https://github.com/JacobCoffee/debug-toolbar/commit/15a985420659bf7f258268ac7555a16bc2825713">15a9854</a>) - Jacob Coffee</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">debug-toolbar</span></code> Changelog</p>
+</section>
+</section>
+</section>
+
+        </article><button class="back-to-top" type="button">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+  </svg>
+  <span>Back to top</span>
+</button><div class="navigation flex print:hidden"><div class="navigation-prev">
+    <a href="comparison.html">
+      <i class="i-lucide chevron-left"></i>
+      <div class="page-info">
+        <span>Previous</span><div class="title">Debug Toolbar Comparison</div></div>
+    </a>
+  </div><div class="navigation-next">
+    <a href="architecture/index.html">
+      <div class="page-info">
+        <span>Next</span>
+        <div class="title">Architecture</div>
+      </div>
+      <i class="i-lucide chevron-right"></i>
+    </a>
+  </div></div></div>
+    </div>
+  </main>
+</div>
+<footer class="sy-foot">
+  <div class="sy-foot-inner sy-container mx-auto">
+    <div class="sy-foot-reserved md:flex justify-between items-center">
+      <div class="sy-foot-copyright"><p>2024, Jacob Coffee</p>
+  
+  <p>
+    Made with
+    
+    <a href="https://www.sphinx-doc.org/">Sphinx</a> and
+    
+    <a href="https://shibuya.lepture.com">Shibuya theme</a>.
+  </p>
+</div>
+      <div class="sy-foot-socials">
+<a href="https://github.com/JacobCoffee/debug-toolbar" aria-label="GitHub">
+  <iconify-icon icon="simple-icons:github"></iconify-icon>
+</a></div>
+    </div>
+  </div>
+</footer>
+      <script src="_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=fd10adb8"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+      <script src="_static/shibuya.js?v=c1cf1a6b"></script></body>
+</html>
