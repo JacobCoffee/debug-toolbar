@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import gzip
 import logging
 import re
 import time
@@ -490,8 +491,6 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             Tuple of (modified body, content_encoding to use).
             If gzip was decompressed, returns uncompressed body with empty encoding.
         """
-        import gzip
-
         # Handle gzip-compressed responses
         # Track whether we successfully decompressed the body
         decompressed = False
