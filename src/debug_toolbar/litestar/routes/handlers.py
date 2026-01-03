@@ -1304,19 +1304,29 @@ body {
     flex-direction: column;
 }
 
+/* Collapsed state - hide everything except collapse button */
 #debug-toolbar.collapsed .toolbar-panels,
 #debug-toolbar.collapsed .toolbar-details,
-#debug-toolbar.collapsed .toolbar-content {
-    display: none;
+#debug-toolbar.collapsed .toolbar-content,
+#debug-toolbar.collapsed .toolbar-brand,
+#debug-toolbar.collapsed .toolbar-time,
+#debug-toolbar.collapsed .toolbar-request-id,
+#debug-toolbar.collapsed .toolbar-history-link,
+#debug-toolbar.collapsed .toolbar-theme-btn,
+#debug-toolbar.collapsed .toolbar-position-btn,
+#debug-toolbar.collapsed .toolbar-position-controls,
+#debug-toolbar.collapsed .toolbar-resize-handle {
+    display: none !important;
 }
 
-/* Collapsed state for side positions */
+/* Collapsed state for side positions - shrink to just the button */
 #debug-toolbar.collapsed[data-position="right"],
 #debug-toolbar[data-position="right"].collapsed,
 #debug-toolbar.collapsed[data-position="left"],
 #debug-toolbar[data-position="left"].collapsed {
     width: auto;
     min-width: 0;
+    max-width: 50px;
 }
 
 #debug-toolbar.collapsed[data-position="top"],
@@ -1325,6 +1335,13 @@ body {
 #debug-toolbar[data-position="bottom"].collapsed {
     height: auto;
     min-height: 0;
+    max-height: 50px;
+}
+
+/* Collapsed toolbar bar should be minimal */
+#debug-toolbar.collapsed .toolbar-bar {
+    padding: 6px;
+    justify-content: center;
 }
 
 /* Resize handle */
@@ -1460,6 +1477,63 @@ body {
 
 .toolbar-theme-btn {
     font-size: 14px;
+}
+
+.toolbar-collapse-btn {
+    background: var(--dt-bg-tertiary);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    color: var(--dt-text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, transform 0.2s;
+    flex-shrink: 0;
+}
+
+.toolbar-collapse-btn:hover {
+    background: var(--dt-accent);
+    color: white;
+}
+
+/* Right position (default): expanded » (points right to collapse), collapsed « (points left to expand) */
+#debug-toolbar[data-position="right"] .toolbar-collapse-btn .collapse-icon,
+#debug-toolbar:not([data-position]) .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(180deg);
+}
+
+#debug-toolbar[data-position="right"].collapsed .toolbar-collapse-btn .collapse-icon,
+#debug-toolbar:not([data-position]).collapsed .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(0deg);
+}
+
+/* Left position: expanded « (points left to collapse), collapsed » (points right to expand) */
+#debug-toolbar[data-position="left"] .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(0deg);
+}
+
+#debug-toolbar[data-position="left"].collapsed .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(180deg);
+}
+
+#debug-toolbar[data-position="top"] .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(90deg);
+}
+
+#debug-toolbar[data-position="top"].collapsed .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+#debug-toolbar[data-position="bottom"] .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+#debug-toolbar[data-position="bottom"].collapsed .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(90deg);
 }
 
 .toolbar-brand {
@@ -2540,6 +2614,161 @@ body {
     border-radius: 4px;
     font-size: 11px;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    /* Automatically position toolbar at bottom on mobile for better UX */
+    #debug-toolbar,
+    #debug-toolbar[data-position="right"],
+    #debug-toolbar[data-position="left"],
+    #debug-toolbar[data-position="top"] {
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        height: auto;
+        max-width: 100vw !important;
+        min-height: 40px;
+        max-height: 70vh;
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+        border-top: 2px solid var(--dt-accent);
+        flex-direction: column;
+    }
+
+    /* Adjust toolbar bar for mobile */
+    .toolbar-bar {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+        font-size: 12px;
+    }
+
+    /* Make brand smaller on mobile */
+    .toolbar-brand {
+        font-size: 13px;
+    }
+
+    /* Adjust time display */
+    .toolbar-time {
+        font-size: 11px;
+    }
+
+    /* Stack panels vertically or wrap */
+    .toolbar-panels {
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .toolbar-panel-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-height: 32px;
+        flex: 1 1 auto;
+    }
+
+    /* Touch-friendly buttons - minimum 44px */
+    .toolbar-collapse-btn,
+    .toolbar-theme-btn,
+    .toolbar-position-btn {
+        min-width: 32px;
+        min-height: 32px;
+        width: 32px;
+        height: 32px;
+    }
+
+    /* Adjust details panel for mobile */
+    .toolbar-details {
+        max-height: 50vh;
+        overflow-y: auto;
+        font-size: 12px;
+    }
+
+    /* Make content scrollable */
+    .toolbar-content {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Optimize panel tables for mobile */
+    .panel-table {
+        font-size: 11px;
+    }
+
+    .panel-table td {
+        padding: 6px 8px;
+    }
+
+    /* Adjust metadata list for mobile */
+    .metadata-list {
+        grid-template-columns: 100px 1fr;
+        gap: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Better spacing for alerts on mobile */
+    .alert-card {
+        padding: 10px;
+        margin-bottom: 8px;
+    }
+
+    /* Memory stats grid adjustment */
+    .memory-summary,
+    .async-summary,
+    .graphql-summary,
+    .ws-summary {
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+        gap: 6px;
+        font-size: 11px;
+    }
+
+    /* Collapsed state on mobile - just show collapse button */
+    #debug-toolbar.collapsed {
+        max-height: 50px;
+        min-height: 40px;
+        max-width: 60px;
+        width: auto;
+        left: auto !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        border-radius: 8px;
+    }
+
+    /* Ensure resize handle is hidden on mobile */
+    .toolbar-resize-handle {
+        display: none;
+    }
+
+    /* Position controls - make them more touch-friendly */
+    .toolbar-position-controls {
+        gap: 6px;
+    }
+}
+
+/* Extra small screens - hide non-essential elements */
+@media (max-width: 480px) {
+    .toolbar-request-id {
+        display: none;
+    }
+
+    .panel-subtitle {
+        display: none;
+    }
+}
+
+/* Landscape mobile / small tablets */
+@media (max-width: 1024px) and (max-height: 600px) {
+    #debug-toolbar {
+        max-height: 50vh;
+    }
+
+    .toolbar-details {
+        max-height: 35vh;
+    }
+}
 """
 
 
@@ -2590,7 +2819,7 @@ function togglePanel(panelId) {
 class DebugToolbar {
     constructor(element) {
         this.element = element;
-        this.isCollapsed = false;
+        this.isCollapsed = localStorage.getItem('debug-toolbar-collapsed') === 'true';
         this.activePanel = null;
         this.position = localStorage.getItem('debug-toolbar-position') || 'right';
         this.theme = localStorage.getItem('debug-toolbar-theme') || 'dark';
@@ -2607,6 +2836,12 @@ class DebugToolbar {
         this.addThemeToggle();
         this.addPositionControls();
         this.addResizeHandle();
+        this.addCollapseButton();
+
+        // Apply saved collapsed state
+        if (this.isCollapsed) {
+            this.element.classList.add('collapsed');
+        }
 
         const brand = this.element.querySelector('.toolbar-brand');
         if (brand) {
@@ -2618,6 +2853,16 @@ class DebugToolbar {
                 this.showPanel(btn.dataset.panelId);
             });
         });
+    }
+
+    addCollapseButton() {
+        const collapseBtn = this.element.querySelector('.toolbar-collapse-btn');
+        if (collapseBtn) {
+            collapseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggle();
+            });
+        }
     }
 
     addThemeToggle() {
@@ -2760,6 +3005,7 @@ class DebugToolbar {
     toggle() {
         this.isCollapsed = !this.isCollapsed;
         this.element.classList.toggle('collapsed', this.isCollapsed);
+        localStorage.setItem('debug-toolbar-collapsed', String(this.isCollapsed));
     }
 
     showPanel(panelId) {

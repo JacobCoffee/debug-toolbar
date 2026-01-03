@@ -576,6 +576,10 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
         <div id="debug-toolbar" data-request-id="{request_id}">
             <div class="toolbar-bar">
+                <button class="toolbar-collapse-btn" title="Collapse toolbar"
+                        aria-label="Collapse toolbar" aria-expanded="true">
+                    <span class="collapse-icon">&laquo;</span>
+                </button>
                 <span class="toolbar-brand" title="Click to toggle">Debug Toolbar</span>
                 <span class="toolbar-time">{total_time:.2f}ms</span>
                 <div class="toolbar-panels">
@@ -588,6 +592,8 @@ class DebugToolbarMiddleware(AbstractMiddleware):
                 <a href="/_debug_toolbar/" class="toolbar-history-link" title="View request history">History</a>
             </div>
             <div class="toolbar-details"></div>
+            <!-- Reserved for future toolbar content and use by toolbar.js -->
+            <div class="toolbar-content"></div>
         </div>
         <script src="/_debug_toolbar/static/toolbar.js"></script>
         """
