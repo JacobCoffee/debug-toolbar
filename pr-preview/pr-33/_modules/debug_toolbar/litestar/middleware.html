@@ -731,26 +731,27 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="576"><span class="s2">        &lt;link rel=&quot;stylesheet&quot; href=&quot;/_debug_toolbar/static/toolbar.css&quot;&gt;</span>
 </span><span data-line="577"><span class="s2">        &lt;div id=&quot;debug-toolbar&quot; data-request-id=&quot;</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
 </span><span data-line="578"><span class="s2">            &lt;div class=&quot;toolbar-bar&quot;&gt;</span>
-</span><span data-line="579"><span class="s2">                &lt;button class=&quot;toolbar-collapse-btn&quot; title=&quot;Collapse toolbar&quot; aria-label=&quot;Collapse toolbar&quot; aria-expanded=&quot;true&quot;&gt;</span>
-</span><span data-line="580"><span class="s2">                    &lt;span class=&quot;collapse-icon&quot;&gt;&amp;laquo;&lt;/span&gt;</span>
-</span><span data-line="581"><span class="s2">                &lt;/button&gt;</span>
-</span><span data-line="582"><span class="s2">                &lt;span class=&quot;toolbar-brand&quot; title=&quot;Click to toggle&quot;&gt;Debug Toolbar&lt;/span&gt;</span>
-</span><span data-line="583"><span class="s2">                &lt;span class=&quot;toolbar-time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/span&gt;</span>
-</span><span data-line="584"><span class="s2">                &lt;div class=&quot;toolbar-panels&quot;&gt;</span>
-</span><span data-line="585"><span class="s2">                    </span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">panels_html</span><span class="p">)</span><span class="si">}</span>
-</span><span data-line="586"><span class="s2">                &lt;/div&gt;</span>
-</span><span data-line="587"><span class="s2">                &lt;span class=&quot;toolbar-request-id&quot;&gt;</span>
-</span><span data-line="588"><span class="s2">                    &lt;a href=&quot;/_debug_toolbar/</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot; class=&quot;toolbar-history-link&quot;</span>
-</span><span data-line="589"><span class="s2">                       title=&quot;View request details&quot;&gt;</span><span class="si">{</span><span class="n">request_id</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/a&gt;</span>
-</span><span data-line="590"><span class="s2">                &lt;/span&gt;</span>
-</span><span data-line="591"><span class="s2">                &lt;a href=&quot;/_debug_toolbar/&quot; class=&quot;toolbar-history-link&quot; title=&quot;View request history&quot;&gt;History&lt;/a&gt;</span>
-</span><span data-line="592"><span class="s2">            &lt;/div&gt;</span>
-</span><span data-line="593"><span class="s2">            &lt;div class=&quot;toolbar-details&quot;&gt;&lt;/div&gt;</span>
-</span><span data-line="594"><span class="s2">            &lt;!-- Reserved for future toolbar content and use by toolbar.js --&gt;</span>
-</span><span data-line="595"><span class="s2">            &lt;div class=&quot;toolbar-content&quot;&gt;&lt;/div&gt;</span>
-</span><span data-line="596"><span class="s2">        &lt;/div&gt;</span>
-</span><span data-line="597"><span class="s2">        &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
-</span><span data-line="598"><span class="s2">        &quot;&quot;&quot;</span></div>
+</span><span data-line="579"><span class="s2">                &lt;button class=&quot;toolbar-collapse-btn&quot; title=&quot;Collapse toolbar&quot;</span>
+</span><span data-line="580"><span class="s2">                        aria-label=&quot;Collapse toolbar&quot; aria-expanded=&quot;true&quot;&gt;</span>
+</span><span data-line="581"><span class="s2">                    &lt;span class=&quot;collapse-icon&quot;&gt;&amp;laquo;&lt;/span&gt;</span>
+</span><span data-line="582"><span class="s2">                &lt;/button&gt;</span>
+</span><span data-line="583"><span class="s2">                &lt;span class=&quot;toolbar-brand&quot; title=&quot;Click to toggle&quot;&gt;Debug Toolbar&lt;/span&gt;</span>
+</span><span data-line="584"><span class="s2">                &lt;span class=&quot;toolbar-time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/span&gt;</span>
+</span><span data-line="585"><span class="s2">                &lt;div class=&quot;toolbar-panels&quot;&gt;</span>
+</span><span data-line="586"><span class="s2">                    </span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">panels_html</span><span class="p">)</span><span class="si">}</span>
+</span><span data-line="587"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="588"><span class="s2">                &lt;span class=&quot;toolbar-request-id&quot;&gt;</span>
+</span><span data-line="589"><span class="s2">                    &lt;a href=&quot;/_debug_toolbar/</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot; class=&quot;toolbar-history-link&quot;</span>
+</span><span data-line="590"><span class="s2">                       title=&quot;View request details&quot;&gt;</span><span class="si">{</span><span class="n">request_id</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/a&gt;</span>
+</span><span data-line="591"><span class="s2">                &lt;/span&gt;</span>
+</span><span data-line="592"><span class="s2">                &lt;a href=&quot;/_debug_toolbar/&quot; class=&quot;toolbar-history-link&quot; title=&quot;View request history&quot;&gt;History&lt;/a&gt;</span>
+</span><span data-line="593"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="594"><span class="s2">            &lt;div class=&quot;toolbar-details&quot;&gt;&lt;/div&gt;</span>
+</span><span data-line="595"><span class="s2">            &lt;!-- Reserved for future toolbar content and use by toolbar.js --&gt;</span>
+</span><span data-line="596"><span class="s2">            &lt;div class=&quot;toolbar-content&quot;&gt;&lt;/div&gt;</span>
+</span><span data-line="597"><span class="s2">        &lt;/div&gt;</span>
+</span><span data-line="598"><span class="s2">        &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
+</span><span data-line="599"><span class="s2">        &quot;&quot;&quot;</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
