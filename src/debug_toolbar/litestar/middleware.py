@@ -484,29 +484,39 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         Args:
             body: The original response body (may be compressed).
             context: The request context with collected data.
-            content_encoding: The content-encoding header value (e.g., "gzip").
+            content_encoding: The content-encoding header value (e.g., "gzip", "br").
 
         Returns:
             Tuple of (modified body, content_encoding to use).
-            If gzip was decompressed, returns uncompressed body with empty encoding.
+            If compressed content was decompressed, returns uncompressed body with empty encoding.
         """
         import gzip
 
+        encoding = content_encoding.lower()
+
+        # Handle brotli-compressed responses
+        if encoding == "br":
+            try:
+                import brotli  # type: ignore[import-untyped]
+
+                body = brotli.decompress(body)
+            except ImportError:
+                logger.debug("Brotli decompression unavailable, toolbar injection skipped")
+                return body, content_encoding
+            except Exception:
+                logger.debug("Invalid brotli data, attempting to decode as-is")
+
         # Handle gzip-compressed responses
-        is_gzipped = content_encoding.lower() == "gzip"
-        if is_gzipped:
+        elif encoding == "gzip":
             try:
                 body = gzip.decompress(body)
             except (gzip.BadGzipFile, OSError):
-                # Not valid gzip, try to decode as-is
-                is_gzipped = False
+                logger.debug("Invalid gzip data, attempting to decode as-is")
 
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
             # Can't decode, return original with original encoding
-            if is_gzipped:
-                return gzip.compress(body), content_encoding
             return body, content_encoding
 
         toolbar_data = self.toolbar.get_toolbar_data(context)
