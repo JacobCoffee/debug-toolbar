@@ -571,6 +571,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
                 <a href="/_debug_toolbar/" class="toolbar-history-link" title="View request history">History</a>
             </div>
             <div class="toolbar-details"></div>
+            <!-- Reserved for future toolbar content and use by toolbar.js -->
             <div class="toolbar-content"></div>
         </div>
         <script src="/_debug_toolbar/static/toolbar.js"></script>
