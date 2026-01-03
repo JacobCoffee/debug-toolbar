@@ -1500,16 +1500,24 @@ body {
     color: white;
 }
 
-#debug-toolbar.collapsed .toolbar-collapse-btn .collapse-icon {
+/* Right position (default): expanded » (points right to collapse), collapsed « (points left to expand) */
+#debug-toolbar[data-position="right"] .toolbar-collapse-btn .collapse-icon,
+#debug-toolbar:not([data-position]) .toolbar-collapse-btn .collapse-icon {
     transform: rotate(180deg);
 }
 
+#debug-toolbar[data-position="right"].collapsed .toolbar-collapse-btn .collapse-icon,
+#debug-toolbar:not([data-position]).collapsed .toolbar-collapse-btn .collapse-icon {
+    transform: rotate(0deg);
+}
+
+/* Left position: expanded « (points left to collapse), collapsed » (points right to expand) */
 #debug-toolbar[data-position="left"] .toolbar-collapse-btn .collapse-icon {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
 }
 
 #debug-toolbar[data-position="left"].collapsed .toolbar-collapse-btn .collapse-icon {
-    transform: rotate(0deg);
+    transform: rotate(180deg);
 }
 
 #debug-toolbar[data-position="top"] .toolbar-collapse-btn .collapse-icon {
