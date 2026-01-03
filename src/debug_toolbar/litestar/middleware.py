@@ -556,7 +556,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
         <div id="debug-toolbar" data-request-id="{request_id}">
             <div class="toolbar-bar">
-                <button class="toolbar-collapse-btn" title="Collapse toolbar" aria-label="Collapse toolbar">
+                <button class="toolbar-collapse-btn" title="Collapse toolbar" aria-label="Collapse toolbar" aria-expanded="true">
                     <span class="collapse-icon">&laquo;</span>
                 </button>
                 <span class="toolbar-brand" title="Click to toggle">Debug Toolbar</span>
