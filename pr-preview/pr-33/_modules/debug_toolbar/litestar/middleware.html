@@ -640,96 +640,117 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="485"><span class="sd">        Args:</span>
 </span><span data-line="486"><span class="sd">            body: The original response body (may be compressed).</span>
 </span><span data-line="487"><span class="sd">            context: The request context with collected data.</span>
-</span><span data-line="488"><span class="sd">            content_encoding: The content-encoding header value (e.g., &quot;gzip&quot;).</span>
+</span><span data-line="488"><span class="sd">            content_encoding: The content-encoding header value (e.g., &quot;gzip&quot;, &quot;br&quot;, &quot;zstd&quot;).</span>
 </span><span data-line="489">
 </span><span data-line="490"><span class="sd">        Returns:</span>
 </span><span data-line="491"><span class="sd">            Tuple of (modified body, content_encoding to use).</span>
-</span><span data-line="492"><span class="sd">            If gzip was decompressed, returns uncompressed body with empty encoding.</span>
+</span><span data-line="492"><span class="sd">            If compression was handled, returns uncompressed body with empty encoding.</span>
 </span><span data-line="493"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span data-line="494">        <span class="c1"># Handle gzip-compressed responses</span>
-</span><span data-line="495">        <span class="c1"># Track whether we successfully decompressed the body</span>
-</span><span data-line="496">        <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span data-line="497">        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">content_encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span> <span class="k">if</span> <span class="n">content_encoding</span> <span class="k">else</span> <span class="p">[]</span>
-</span><span data-line="498">        <span class="k">if</span> <span class="s2">&quot;gzip&quot;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
-</span><span data-line="499">            <span class="k">try</span><span class="p">:</span>
-</span><span data-line="500">                <span class="n">body</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
-</span><span data-line="501">                <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span data-line="502">            <span class="k">except</span> <span class="n">gzip</span><span class="o">.</span><span class="n">BadGzipFile</span><span class="p">:</span>
-</span><span data-line="503">                <span class="c1"># Not valid gzip, try to decode as-is</span>
-</span><span data-line="504">                <span class="k">pass</span>
-</span><span data-line="505">
-</span><span data-line="506">        <span class="k">try</span><span class="p">:</span>
-</span><span data-line="507">            <span class="n">html</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-</span><span data-line="508">        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
-</span><span data-line="509">            <span class="c1"># Can&#39;t decode. If we successfully decompressed gzip, return the</span>
-</span><span data-line="510">            <span class="c1"># decompressed body with no content-encoding. Otherwise, return</span>
-</span><span data-line="511">            <span class="c1"># the body as-is with the original encoding.</span>
-</span><span data-line="512">            <span class="k">if</span> <span class="n">decompressed</span><span class="p">:</span>
-</span><span data-line="513">                <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
-</span><span data-line="514">            <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="n">content_encoding</span>
+</span><span data-line="494">        <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span data-line="495">        <span class="n">encodings</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">content_encoding</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span> <span class="k">if</span> <span class="n">content_encoding</span> <span class="k">else</span> <span class="p">[]</span>
+</span><span data-line="496">
+</span><span data-line="497">        <span class="k">if</span> <span class="s2">&quot;gzip&quot;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+</span><span data-line="498">            <span class="k">try</span><span class="p">:</span>
+</span><span data-line="499">                <span class="n">body</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+</span><span data-line="500">                <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="501">            <span class="k">except</span> <span class="n">gzip</span><span class="o">.</span><span class="n">BadGzipFile</span><span class="p">:</span>
+</span><span data-line="502">                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Invalid gzip data, attempting to decode as-is&quot;</span><span class="p">)</span>
+</span><span data-line="503">
+</span><span data-line="504">        <span class="k">elif</span> <span class="s2">&quot;br&quot;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+</span><span data-line="505">            <span class="k">try</span><span class="p">:</span>
+</span><span data-line="506">                <span class="kn">import</span><span class="w"> </span><span class="nn">brotli</span>  <span class="c1"># type: ignore[import-untyped]</span>
+</span><span data-line="507">
+</span><span data-line="508">                <span class="n">body</span> <span class="o">=</span> <span class="n">brotli</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+</span><span data-line="509">                <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="510">            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span data-line="511">                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Brotli not installed, skipping toolbar injection for br-encoded response&quot;</span><span class="p">)</span>
+</span><span data-line="512">                <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="n">content_encoding</span>
+</span><span data-line="513">            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+</span><span data-line="514">                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Invalid brotli data, attempting to decode as-is&quot;</span><span class="p">)</span>
 </span><span data-line="515">
-</span><span data-line="516">        <span class="n">toolbar_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">get_toolbar_data</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
-</span><span data-line="517">        <span class="n">toolbar_html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_toolbar</span><span class="p">(</span><span class="n">toolbar_data</span><span class="p">)</span>
-</span><span data-line="518">
-</span><span data-line="519">        <span class="n">insert_before</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">insert_before</span>
-</span><span data-line="520">        <span class="k">if</span> <span class="n">insert_before</span> <span class="ow">in</span> <span class="n">html</span><span class="p">:</span>
-</span><span data-line="521">            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">insert_before</span><span class="p">,</span> <span class="n">toolbar_html</span> <span class="o">+</span> <span class="n">insert_before</span><span class="p">)</span>
-</span><span data-line="522">        <span class="k">else</span><span class="p">:</span>
-</span><span data-line="523">            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">insert_before</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
-</span><span data-line="524">            <span class="n">html</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">toolbar_html</span> <span class="o">+</span> <span class="n">insert_before</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span data-line="525">
-</span><span data-line="526">        <span class="c1"># Return body as uncompressed UTF-8 with empty content-encoding.</span>
-</span><span data-line="527">        <span class="c1"># This applies to all successful toolbar injections, regardless of whether</span>
-</span><span data-line="528">        <span class="c1"># the input was originally compressed (we decompress before processing).</span>
-</span><span data-line="529">        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="s2">&quot;&quot;</span>
-</span><span data-line="530">
-</span><span data-line="531">    <span class="k">def</span><span class="w"> </span><span class="nf">_render_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span data-line="532"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the toolbar HTML.</span>
-</span><span data-line="533">
-</span><span data-line="534"><span class="sd">        Args:</span>
-</span><span data-line="535"><span class="sd">            data: Toolbar data from get_toolbar_data().</span>
-</span><span data-line="536">
-</span><span data-line="537"><span class="sd">        Returns:</span>
-</span><span data-line="538"><span class="sd">            HTML string for the toolbar.</span>
-</span><span data-line="539"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span data-line="540">        <span class="n">panels_html</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span data-line="541">        <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;panels&quot;</span><span class="p">,</span> <span class="p">[]):</span>
-</span><span data-line="542">            <span class="n">subtitle</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nav_subtitle&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-</span><span data-line="543">            <span class="n">subtitle_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;span class=&quot;panel-subtitle&quot;&gt;</span><span class="si">{</span><span class="n">subtitle</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span> <span class="k">if</span> <span class="n">subtitle</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
-</span><span data-line="544">            <span class="n">panels_html</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-</span><span data-line="545"><span class="s2">                &lt;button class=&quot;toolbar-panel-btn&quot; data-panel-id=&quot;</span><span class="si">{</span><span class="n">panel</span><span class="p">[</span><span class="s2">&quot;panel_id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
-</span><span data-line="546"><span class="s2">                    &lt;span class=&quot;panel-title&quot;&gt;</span><span class="si">{</span><span class="n">panel</span><span class="p">[</span><span class="s2">&quot;nav_title&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
-</span><span data-line="547"><span class="s2">                    </span><span class="si">{</span><span class="n">subtitle_html</span><span class="si">}</span>
-</span><span data-line="548"><span class="s2">                &lt;/button&gt;</span>
-</span><span data-line="549"><span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+</span><span data-line="516">        <span class="k">elif</span> <span class="s2">&quot;zstd&quot;</span> <span class="ow">in</span> <span class="n">encodings</span><span class="p">:</span>
+</span><span data-line="517">            <span class="k">try</span><span class="p">:</span>
+</span><span data-line="518">                <span class="kn">import</span><span class="w"> </span><span class="nn">zstandard</span>  <span class="c1"># type: ignore[import-untyped]</span>
+</span><span data-line="519">
+</span><span data-line="520">                <span class="n">dctx</span> <span class="o">=</span> <span class="n">zstandard</span><span class="o">.</span><span class="n">ZstdDecompressor</span><span class="p">()</span>
+</span><span data-line="521">                <span class="n">body</span> <span class="o">=</span> <span class="n">dctx</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+</span><span data-line="522">                <span class="n">decompressed</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span data-line="523">            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+</span><span data-line="524">                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;zstandard not installed, skipping toolbar injection for zstd-encoded response&quot;</span><span class="p">)</span>
+</span><span data-line="525">                <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="n">content_encoding</span>
+</span><span data-line="526">            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+</span><span data-line="527">                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Invalid zstd data, attempting to decode as-is&quot;</span><span class="p">)</span>
+</span><span data-line="528">
+</span><span data-line="529">        <span class="k">try</span><span class="p">:</span>
+</span><span data-line="530">            <span class="n">html</span> <span class="o">=</span> <span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+</span><span data-line="531">        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+</span><span data-line="532">            <span class="k">if</span> <span class="n">decompressed</span><span class="p">:</span>
+</span><span data-line="533">                <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+</span><span data-line="534">            <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="n">content_encoding</span>
+</span><span data-line="535">
+</span><span data-line="536">        <span class="n">toolbar_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">get_toolbar_data</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+</span><span data-line="537">        <span class="n">toolbar_html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_toolbar</span><span class="p">(</span><span class="n">toolbar_data</span><span class="p">)</span>
+</span><span data-line="538">
+</span><span data-line="539">        <span class="n">insert_before</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">insert_before</span>
+</span><span data-line="540">        <span class="k">if</span> <span class="n">insert_before</span> <span class="ow">in</span> <span class="n">html</span><span class="p">:</span>
+</span><span data-line="541">            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">insert_before</span><span class="p">,</span> <span class="n">toolbar_html</span> <span class="o">+</span> <span class="n">insert_before</span><span class="p">)</span>
+</span><span data-line="542">        <span class="k">else</span><span class="p">:</span>
+</span><span data-line="543">            <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">insert_before</span><span class="p">),</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+</span><span data-line="544">            <span class="n">html</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">toolbar_html</span> <span class="o">+</span> <span class="n">insert_before</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span data-line="545">
+</span><span data-line="546">        <span class="c1"># Return body as uncompressed UTF-8 with empty content-encoding.</span>
+</span><span data-line="547">        <span class="c1"># This applies to all successful toolbar injections, regardless of whether</span>
+</span><span data-line="548">        <span class="c1"># the input was originally compressed (we decompress before processing).</span>
+</span><span data-line="549">        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="s2">&quot;&quot;</span>
 </span><span data-line="550">
-</span><span data-line="551">        <span class="n">timing</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timing&quot;</span><span class="p">,</span> <span class="p">{})</span>
-</span><span data-line="552">        <span class="n">total_time</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
-</span><span data-line="553">        <span class="n">request_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;request_id&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
-</span><span data-line="554">
-</span><span data-line="555">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-</span><span data-line="556"><span class="s2">        &lt;link rel=&quot;stylesheet&quot; href=&quot;/_debug_toolbar/static/toolbar.css&quot;&gt;</span>
-</span><span data-line="557"><span class="s2">        &lt;div id=&quot;debug-toolbar&quot; data-request-id=&quot;</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
-</span><span data-line="558"><span class="s2">            &lt;div class=&quot;toolbar-bar&quot;&gt;</span>
-</span><span data-line="559"><span class="s2">                &lt;button class=&quot;toolbar-collapse-btn&quot; title=&quot;Collapse toolbar&quot; aria-label=&quot;Collapse toolbar&quot;&gt;</span>
-</span><span data-line="560"><span class="s2">                    &lt;span class=&quot;collapse-icon&quot;&gt;&amp;laquo;&lt;/span&gt;</span>
-</span><span data-line="561"><span class="s2">                &lt;/button&gt;</span>
-</span><span data-line="562"><span class="s2">                &lt;span class=&quot;toolbar-brand&quot; title=&quot;Click to toggle&quot;&gt;Debug Toolbar&lt;/span&gt;</span>
-</span><span data-line="563"><span class="s2">                &lt;span class=&quot;toolbar-time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/span&gt;</span>
-</span><span data-line="564"><span class="s2">                &lt;div class=&quot;toolbar-panels&quot;&gt;</span>
-</span><span data-line="565"><span class="s2">                    </span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">panels_html</span><span class="p">)</span><span class="si">}</span>
-</span><span data-line="566"><span class="s2">                &lt;/div&gt;</span>
-</span><span data-line="567"><span class="s2">                &lt;span class=&quot;toolbar-request-id&quot;&gt;</span>
-</span><span data-line="568"><span class="s2">                    &lt;a href=&quot;/_debug_toolbar/</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot; class=&quot;toolbar-history-link&quot;</span>
-</span><span data-line="569"><span class="s2">                       title=&quot;View request details&quot;&gt;</span><span class="si">{</span><span class="n">request_id</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/a&gt;</span>
-</span><span data-line="570"><span class="s2">                &lt;/span&gt;</span>
-</span><span data-line="571"><span class="s2">                &lt;a href=&quot;/_debug_toolbar/&quot; class=&quot;toolbar-history-link&quot; title=&quot;View request history&quot;&gt;History&lt;/a&gt;</span>
-</span><span data-line="572"><span class="s2">            &lt;/div&gt;</span>
-</span><span data-line="573"><span class="s2">            &lt;div class=&quot;toolbar-details&quot;&gt;&lt;/div&gt;</span>
-</span><span data-line="574"><span class="s2">            &lt;div class=&quot;toolbar-content&quot;&gt;&lt;/div&gt;</span>
-</span><span data-line="575"><span class="s2">        &lt;/div&gt;</span>
-</span><span data-line="576"><span class="s2">        &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
-</span><span data-line="577"><span class="s2">        &quot;&quot;&quot;</span></div>
+</span><span data-line="551">    <span class="k">def</span><span class="w"> </span><span class="nf">_render_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span data-line="552"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the toolbar HTML.</span>
+</span><span data-line="553">
+</span><span data-line="554"><span class="sd">        Args:</span>
+</span><span data-line="555"><span class="sd">            data: Toolbar data from get_toolbar_data().</span>
+</span><span data-line="556">
+</span><span data-line="557"><span class="sd">        Returns:</span>
+</span><span data-line="558"><span class="sd">            HTML string for the toolbar.</span>
+</span><span data-line="559"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span data-line="560">        <span class="n">panels_html</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span data-line="561">        <span class="k">for</span> <span class="n">panel</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;panels&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+</span><span data-line="562">            <span class="n">subtitle</span> <span class="o">=</span> <span class="n">panel</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nav_subtitle&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+</span><span data-line="563">            <span class="n">subtitle_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;span class=&quot;panel-subtitle&quot;&gt;</span><span class="si">{</span><span class="n">subtitle</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span> <span class="k">if</span> <span class="n">subtitle</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+</span><span data-line="564">            <span class="n">panels_html</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="565"><span class="s2">                &lt;button class=&quot;toolbar-panel-btn&quot; data-panel-id=&quot;</span><span class="si">{</span><span class="n">panel</span><span class="p">[</span><span class="s2">&quot;panel_id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
+</span><span data-line="566"><span class="s2">                    &lt;span class=&quot;panel-title&quot;&gt;</span><span class="si">{</span><span class="n">panel</span><span class="p">[</span><span class="s2">&quot;nav_title&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/span&gt;</span>
+</span><span data-line="567"><span class="s2">                    </span><span class="si">{</span><span class="n">subtitle_html</span><span class="si">}</span>
+</span><span data-line="568"><span class="s2">                &lt;/button&gt;</span>
+</span><span data-line="569"><span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
+</span><span data-line="570">
+</span><span data-line="571">        <span class="n">timing</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timing&quot;</span><span class="p">,</span> <span class="p">{})</span>
+</span><span data-line="572">        <span class="n">total_time</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;total_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+</span><span data-line="573">        <span class="n">request_id</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;request_id&quot;</span><span class="p">,</span> <span class="s2">&quot;N/A&quot;</span><span class="p">)</span>
+</span><span data-line="574">
+</span><span data-line="575">        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+</span><span data-line="576"><span class="s2">        &lt;link rel=&quot;stylesheet&quot; href=&quot;/_debug_toolbar/static/toolbar.css&quot;&gt;</span>
+</span><span data-line="577"><span class="s2">        &lt;div id=&quot;debug-toolbar&quot; data-request-id=&quot;</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
+</span><span data-line="578"><span class="s2">            &lt;div class=&quot;toolbar-bar&quot;&gt;</span>
+</span><span data-line="579"><span class="s2">                &lt;button class=&quot;toolbar-collapse-btn&quot; title=&quot;Collapse toolbar&quot; aria-label=&quot;Collapse toolbar&quot; aria-expanded=&quot;true&quot;&gt;</span>
+</span><span data-line="580"><span class="s2">                    &lt;span class=&quot;collapse-icon&quot;&gt;&amp;laquo;&lt;/span&gt;</span>
+</span><span data-line="581"><span class="s2">                &lt;/button&gt;</span>
+</span><span data-line="582"><span class="s2">                &lt;span class=&quot;toolbar-brand&quot; title=&quot;Click to toggle&quot;&gt;Debug Toolbar&lt;/span&gt;</span>
+</span><span data-line="583"><span class="s2">                &lt;span class=&quot;toolbar-time&quot;&gt;</span><span class="si">{</span><span class="n">total_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&lt;/span&gt;</span>
+</span><span data-line="584"><span class="s2">                &lt;div class=&quot;toolbar-panels&quot;&gt;</span>
+</span><span data-line="585"><span class="s2">                    </span><span class="si">{</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">panels_html</span><span class="p">)</span><span class="si">}</span>
+</span><span data-line="586"><span class="s2">                &lt;/div&gt;</span>
+</span><span data-line="587"><span class="s2">                &lt;span class=&quot;toolbar-request-id&quot;&gt;</span>
+</span><span data-line="588"><span class="s2">                    &lt;a href=&quot;/_debug_toolbar/</span><span class="si">{</span><span class="n">request_id</span><span class="si">}</span><span class="s2">&quot; class=&quot;toolbar-history-link&quot;</span>
+</span><span data-line="589"><span class="s2">                       title=&quot;View request details&quot;&gt;</span><span class="si">{</span><span class="n">request_id</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/a&gt;</span>
+</span><span data-line="590"><span class="s2">                &lt;/span&gt;</span>
+</span><span data-line="591"><span class="s2">                &lt;a href=&quot;/_debug_toolbar/&quot; class=&quot;toolbar-history-link&quot; title=&quot;View request history&quot;&gt;History&lt;/a&gt;</span>
+</span><span data-line="592"><span class="s2">            &lt;/div&gt;</span>
+</span><span data-line="593"><span class="s2">            &lt;div class=&quot;toolbar-details&quot;&gt;&lt;/div&gt;</span>
+</span><span data-line="594"><span class="s2">            &lt;!-- Reserved for future toolbar content and use by toolbar.js --&gt;</span>
+</span><span data-line="595"><span class="s2">            &lt;div class=&quot;toolbar-content&quot;&gt;&lt;/div&gt;</span>
+</span><span data-line="596"><span class="s2">        &lt;/div&gt;</span>
+</span><span data-line="597"><span class="s2">        &lt;script src=&quot;/_debug_toolbar/static/toolbar.js&quot;&gt;&lt;/script&gt;</span>
+</span><span data-line="598"><span class="s2">        &quot;&quot;&quot;</span></div>
 
 </span></pre></div>
         </article><button class="back-to-top" type="button">
