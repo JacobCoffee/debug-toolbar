@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [0.3.1](https://github.com/JacobCoffee/debug-toolbar/compare/v0.3.0..v0.3.1) - 2026-01-03
+
+### Bug Fixes
+
+- handle gzip-compressed responses in toolbar injection (#24) - ([6f15ec0](https://github.com/JacobCoffee/debug-toolbar/commit/6f15ec0ee2388807cb6b469dadf7e5fed31d0534)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v0.3.0 - ([ec85e0d](https://github.com/JacobCoffee/debug-toolbar/commit/ec85e0d3ab4c2e75dac4daee9a2d9a33fa2e5f8e)) - github-actions[bot]
+- update PLAN.md for v0.3.0 release - ([0fb354b](https://github.com/JacobCoffee/debug-toolbar/commit/0fb354bf6610026933699f5d650d6c9f93dcb4c4)) - Jacob Coffee
+
+### Features
+
+- **(adapters)** add Starlette and FastAPI framework support (#20) - ([eec0ab2](https://github.com/JacobCoffee/debug-toolbar/commit/eec0ab2392619c04e68173103c2859050227c6c3)) - Jacob Coffee
+- **(panels)** add WebSocket Panel for real-time connection tracking (#19) - ([ac1b97f](https://github.com/JacobCoffee/debug-toolbar/commit/ac1b97f91d2b02ebce182a415f61e44844f9320d)) - Jacob Coffee
+- add brotli and zstd decompression support for toolbar injection (#37) - ([4d8f3f3](https://github.com/JacobCoffee/debug-toolbar/commit/4d8f3f3f30552a51decbd88ebc605bd8a2c23235)) - Jacob Coffee
+
+### Miscellaneous Chores
+
+- bump version to 0.3.1 - ([47a5d2e](https://github.com/JacobCoffee/debug-toolbar/commit/47a5d2ecae872499f90f61f29c3c4e8db6d2c59c)) - Jacob Coffee
+
+### Build
+
+- **(deps)** bump the actions group across 1 directory with 5 updates (#22) - ([e743273](https://github.com/JacobCoffee/debug-toolbar/commit/e743273bfa75c0e7c37777646ec415ffd9801a16)) - dependabot[bot]
+- **(deps)** bump the actions group with 5 updates (#23) - ([51d51ce](https://github.com/JacobCoffee/debug-toolbar/commit/51d51ce10a5f49f412a198ed1ae076bcdea3a739)) - dependabot[bot]
+
+---
 ## [0.3.0](https://github.com/JacobCoffee/debug-toolbar/compare/v0.2.0..v0.3.0) - 2025-11-30
 
 ### Bug Fixes
