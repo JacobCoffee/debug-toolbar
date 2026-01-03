@@ -2979,7 +2979,7 @@ class DebugToolbar {
     toggle() {
         this.isCollapsed = !this.isCollapsed;
         this.element.classList.toggle('collapsed', this.isCollapsed);
-        localStorage.setItem('debug-toolbar-collapsed', this.isCollapsed);
+        localStorage.setItem('debug-toolbar-collapsed', String(this.isCollapsed));
     }
 
     showPanel(panelId) {
