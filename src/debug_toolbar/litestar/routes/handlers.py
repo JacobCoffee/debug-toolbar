@@ -1304,19 +1304,29 @@ body {
     flex-direction: column;
 }
 
+/* Collapsed state - hide everything except collapse button */
 #debug-toolbar.collapsed .toolbar-panels,
 #debug-toolbar.collapsed .toolbar-details,
-#debug-toolbar.collapsed .toolbar-content {
-    display: none;
+#debug-toolbar.collapsed .toolbar-content,
+#debug-toolbar.collapsed .toolbar-brand,
+#debug-toolbar.collapsed .toolbar-time,
+#debug-toolbar.collapsed .toolbar-request-id,
+#debug-toolbar.collapsed .toolbar-history-link,
+#debug-toolbar.collapsed .toolbar-theme-btn,
+#debug-toolbar.collapsed .toolbar-position-btn,
+#debug-toolbar.collapsed .toolbar-position-controls,
+#debug-toolbar.collapsed .toolbar-resize-handle {
+    display: none !important;
 }
 
-/* Collapsed state for side positions */
+/* Collapsed state for side positions - shrink to just the button */
 #debug-toolbar.collapsed[data-position="right"],
 #debug-toolbar[data-position="right"].collapsed,
 #debug-toolbar.collapsed[data-position="left"],
 #debug-toolbar[data-position="left"].collapsed {
     width: auto;
     min-width: 0;
+    max-width: 50px;
 }
 
 #debug-toolbar.collapsed[data-position="top"],
@@ -1325,6 +1335,13 @@ body {
 #debug-toolbar[data-position="bottom"].collapsed {
     height: auto;
     min-height: 0;
+    max-height: 50px;
+}
+
+/* Collapsed toolbar bar should be minimal */
+#debug-toolbar.collapsed .toolbar-bar {
+    padding: 6px;
+    justify-content: center;
 }
 
 /* Resize handle */
@@ -2700,15 +2717,16 @@ body {
         font-size: 11px;
     }
 
-    /* Collapsed state on mobile - just show collapse button area */
+    /* Collapsed state on mobile - just show collapse button */
     #debug-toolbar.collapsed {
-        max-height: 40px;
+        max-height: 50px;
         min-height: 40px;
-    }
-
-    #debug-toolbar.collapsed .toolbar-time,
-    #debug-toolbar.collapsed .toolbar-history-link {
-        display: none;
+        max-width: 60px;
+        width: auto;
+        left: auto !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        border-radius: 8px;
     }
 
     /* Ensure resize handle is hidden on mobile */
