@@ -2655,17 +2655,6 @@ body {
         height: 32px;
     }
 
-    /* Hide certain elements on very small screens to save space */
-    @media (max-width: 480px) {
-        .toolbar-request-id {
-            display: none;
-        }
-
-        .panel-subtitle {
-            display: none;
-        }
-    }
-
     /* Adjust details panel for mobile */
     .toolbar-details {
         max-height: 50vh;
@@ -2730,6 +2719,17 @@ body {
     /* Position controls - make them more touch-friendly */
     .toolbar-position-controls {
         gap: 6px;
+    }
+}
+
+/* Extra small screens - hide non-essential elements */
+@media (max-width: 480px) {
+    .toolbar-request-id {
+        display: none;
+    }
+
+    .panel-subtitle {
+        display: none;
     }
 }
 
