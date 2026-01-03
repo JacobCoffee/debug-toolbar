@@ -485,30 +485,50 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         Args:
             body: The original response body (may be compressed).
             context: The request context with collected data.
-            content_encoding: The content-encoding header value (e.g., "gzip").
+            content_encoding: The content-encoding header value (e.g., "gzip", "br", "zstd").
 
         Returns:
             Tuple of (modified body, content_encoding to use).
-            If gzip was decompressed, returns uncompressed body with empty encoding.
+            If compression was handled, returns uncompressed body with empty encoding.
         """
-        # Handle gzip-compressed responses
-        # Track whether we successfully decompressed the body
         decompressed = False
         encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
+
         if "gzip" in encodings:
             try:
                 body = gzip.decompress(body)
                 decompressed = True
             except gzip.BadGzipFile:
-                # Not valid gzip, try to decode as-is
-                pass
+                logger.debug("Invalid gzip data, attempting to decode as-is")
+
+        elif "br" in encodings:
+            try:
+                import brotli  # type: ignore[import-untyped]
+
+                body = brotli.decompress(body)
+                decompressed = True
+            except ImportError:
+                logger.debug("Brotli not installed, skipping toolbar injection for br-encoded response")
+                return body, content_encoding
+            except Exception:
+                logger.debug("Invalid brotli data, attempting to decode as-is")
+
+        elif "zstd" in encodings:
+            try:
+                import zstandard  # type: ignore[import-untyped]
+
+                dctx = zstandard.ZstdDecompressor()
+                body = dctx.decompress(body)
+                decompressed = True
+            except ImportError:
+                logger.debug("zstandard not installed, skipping toolbar injection for zstd-encoded response")
+                return body, content_encoding
+            except Exception:
+                logger.debug("Invalid zstd data, attempting to decode as-is")
 
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            # Can't decode. If we successfully decompressed gzip, return the
-            # decompressed body with no content-encoding. Otherwise, return
-            # the body as-is with the original encoding.
             if decompressed:
                 return body, ""
             return body, content_encoding
