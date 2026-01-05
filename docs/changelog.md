@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [0.4.1](https://github.com/JacobCoffee/debug-toolbar/compare/v0.3.1..v0.4.1) - 2026-01-05
+
+### Documentation
+
+- regenerate changelog for v0.3.1 - ([016cd83](https://github.com/JacobCoffee/debug-toolbar/commit/016cd83ff908a4c5ce339a7526617f30fecdde47)) - github-actions[bot]
+
+### Features
+
+- Add toolbar collapse button and mobile responsiveness (#33) - ([daecc00](https://github.com/JacobCoffee/debug-toolbar/commit/daecc003f21165c88af07f8bbc25d094a3feb9e5)) - Copilot
+
+### Miscellaneous Chores
+
+- bump version to 0.4.1 - ([b671d40](https://github.com/JacobCoffee/debug-toolbar/commit/b671d4057a5cc816b13c490f0a6a137a01820fc1)) - Jacob Coffee
+
+---
 ## [0.3.1](https://github.com/JacobCoffee/debug-toolbar/compare/v0.3.0..v0.3.1) - 2026-01-03
 
 ### Bug Fixes
