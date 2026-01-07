@@ -2832,16 +2832,17 @@ class DebugToolbar {
         window.debugToolbar = this;
         this.setPosition(this.position);
         this.setTheme(this.theme);
+
+        // Apply saved collapsed state before sizing
+        if (this.isCollapsed) {
+            this.element.classList.add('collapsed');
+        }
         this.applySize();
+
         this.addThemeToggle();
         this.addPositionControls();
         this.addResizeHandle();
         this.addCollapseButton();
-
-        // Apply saved collapsed state
-        if (this.isCollapsed) {
-            this.element.classList.add('collapsed');
-        }
 
         const brand = this.element.querySelector('.toolbar-brand');
         if (brand) {
@@ -2935,6 +2936,11 @@ class DebugToolbar {
     }
 
     applySize() {
+        if (this.isCollapsed) {
+            this.element.style.width = '';
+            this.element.style.height = '';
+            return;
+        }
         if (this.isHorizontal()) {
             this.element.style.width = this.size + 'px';
             this.element.style.height = '';
@@ -3006,6 +3012,7 @@ class DebugToolbar {
         this.isCollapsed = !this.isCollapsed;
         this.element.classList.toggle('collapsed', this.isCollapsed);
         localStorage.setItem('debug-toolbar-collapsed', String(this.isCollapsed));
+        this.applySize();
     }
 
     showPanel(panelId) {
