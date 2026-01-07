@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [0.4.2](https://github.com/JacobCoffee/debug-toolbar/compare/v0.4.1..v0.4.2) - 2026-01-07
+
+### Bug Fixes
+
+- issue with collapsed toolbar - ([462de98](https://github.com/JacobCoffee/debug-toolbar/commit/462de98028bd8fd73108c2dde0d74a9bd80c24aa)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v0.4.1 - ([5829d7a](https://github.com/JacobCoffee/debug-toolbar/commit/5829d7a711104cb90972c7edbf8548acfffb440f)) - github-actions[bot]
+
+### Miscellaneous Chores
+
+- bump version to 0.4.2 - ([ee8b070](https://github.com/JacobCoffee/debug-toolbar/commit/ee8b0703d5526638866e7f91c1ab661cba511189)) - Jacob Coffee
+
+---
 ## [0.4.1](https://github.com/JacobCoffee/debug-toolbar/compare/v0.3.1..v0.4.1) - 2026-01-05
 
 ### Documentation
