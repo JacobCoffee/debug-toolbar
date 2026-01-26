@@ -33,7 +33,7 @@ jobs:
       docs_changed: ${{ steps.filter.outputs.docs }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -50,14 +50,14 @@ jobs:
 
       - name: Set up uv
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
-        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v6
+        uses: astral-sh/setup-uv@61cb8a9741eeb8a550a1b8544337180c0fc8476b # v6
         with:
           enable-cache: true
           version: "0.9.12"
 
       - name: Set up Python
         if: github.event_name != 'pull_request' || steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true'
-        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v5
         with:
           python-version: "3.13"
 
@@ -77,7 +77,7 @@ jobs:
 
       - name: Deploy PR preview
         if: github.event_name == 'pull_request' && (steps.filter.outputs.docs == 'true' || steps.filter.outputs.src == 'true')
-        uses: rossjrw/pr-preview-action@8ff09e486b4c23709012eedd3b42e9f0b95dd0c5 # v1.6.3
+        uses: rossjrw/pr-preview-action@ffa7509e91a3ec8dfc2e5536c4d5c1acdf7a6de9 # v1.8.1
         with:
           source-dir: docs/_build/html
 
