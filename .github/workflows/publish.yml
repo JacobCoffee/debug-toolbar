@@ -26,12 +26,12 @@ jobs:
             artifact-name: dist-litestar-debug-toolbar
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v6
+        uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v6
         with:
           enable-cache: true
           version: "0.9.12"
@@ -134,7 +134,7 @@ jobs:
     needs: [sign]
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -154,7 +154,7 @@ jobs:
 
       - name: Generate release notes with git-cliff
         id: changelog
-        uses: orhun/git-cliff-action@14bb67f1a42c7959d1eb81ee6ba2c5a15542078a # v4
+        uses: orhun/git-cliff-action@c93ef52f3d0ddcdcc9bd5447d98d458a11cd4f72 # v4
         with:
           config: pyproject.toml
           args: --current --strip header
