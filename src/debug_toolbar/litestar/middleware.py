@@ -5,7 +5,9 @@ from __future__ import annotations
 import gzip
 import logging
 import re
+import sys
 import time
+import zlib
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, cast
 from uuid import uuid4
@@ -479,13 +481,15 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             context.metadata["routes"] = []
             context.metadata["matched_route"] = ""
 
-    def _inject_toolbar(self, body: bytes, context: RequestContext, content_encoding: str = "") -> tuple[bytes, str]:
+    def _inject_toolbar(  # noqa: C901, PLR0912
+        self, body: bytes, context: RequestContext, content_encoding: str = ""
+    ) -> tuple[bytes, str]:
         """Inject the toolbar HTML into the response body.
 
         Args:
             body: The original response body (may be compressed).
             context: The request context with collected data.
-            content_encoding: The content-encoding header value (e.g., "gzip", "br", "zstd").
+            content_encoding: The content-encoding header value (e.g., "gzip", "deflate", "br", "zstd").
 
         Returns:
             Tuple of (modified body, content_encoding to use).
@@ -511,12 +515,23 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             except Exception:
                 logger.debug("Invalid brotli data, attempting to decode as-is")
 
+        elif "deflate" in encodings:
+            try:
+                body = zlib.decompress(body)
+            except zlib.error:
+                logger.debug("Invalid deflate data, attempting to decode as-is")
+
         elif "zstd" in encodings:
             try:
-                import zstandard  # type: ignore[import-untyped]
+                if sys.version_info >= (3, 14):
+                    from compression import zstd
 
-                dctx = zstandard.ZstdDecompressor()
-                body = dctx.decompress(body)
+                    body = zstd.decompress(body)
+                else:
+                    import zstandard  # type: ignore[import-untyped]
+
+                    dctx = zstandard.ZstdDecompressor()
+                    body = dctx.decompress(body)
             except ImportError:
                 logger.debug("zstandard not installed, skipping toolbar injection for zstd-encoded response")
                 return body, content_encoding
