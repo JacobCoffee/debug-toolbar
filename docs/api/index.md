@@ -316,6 +316,20 @@ Complete API documentation for debug-toolbar.
    - ``executed_hooks``: Hooks that ran during this request
 ```
 
+### Static Files Panel
+
+```{eval-rst}
+.. py:class:: debug_toolbar.litestar.panels.static_files.StaticFilesPanel
+
+   Displays configured static file mounts in the Litestar application.
+
+   **Stats:**
+
+   - ``mounts``: List of static file mounts, each with ``url_path`` and ``directories``
+   - ``mount_count``: Number of static file mounts configured
+   - ``message``: Shown when no static file mounts are configured
+```
+
 ## Module Reference
 
 ```{eval-rst}
