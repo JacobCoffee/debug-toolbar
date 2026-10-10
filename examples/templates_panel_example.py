@@ -30,7 +30,7 @@ async def main() -> None:
     )
 
     toolbar = DebugToolbar(config)
-    templates_panel = toolbar.get_panel("templates")
+    templates_panel = toolbar.get_panel("TemplatesPanel")
 
     if not templates_panel:
         print("Templates panel not found!")

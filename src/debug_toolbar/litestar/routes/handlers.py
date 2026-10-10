@@ -229,7 +229,7 @@ def _render_profiling_panel(stats: dict[str, Any]) -> str:
 
     # Stats
     total_time = stats.get("total_time", 0)
-    function_count = stats.get("function_count", 0)
+    call_count = stats.get("function_calls", 0)
     has_flamegraph = stats.get("flamegraph_data") is not None
 
     html += f"""
@@ -239,8 +239,8 @@ def _render_profiling_panel(stats: dict[str, Any]) -> str:
             <span class='stat-label'>Total Time</span>
         </div>
         <div class='prof-stat'>
-            <span class='stat-value'>{function_count}</span>
-            <span class='stat-label'>Functions</span>
+            <span class='stat-value'>{call_count}</span>
+            <span class='stat-label'>Calls</span>
         </div>
     </div>
     """
@@ -1206,7 +1206,7 @@ body {
 
 .panel-table .value {
     font-family: var(--dt-font-mono);
-    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 .null { color: var(--dt-text-muted); font-style: italic; }
@@ -2782,10 +2782,10 @@ function togglePageTheme(btn) {
     localStorage.setItem('debug-toolbar-theme', next);
 }
 
-function downloadFlamegraph() {
+function downloadFlamegraph(id) {
     // Get request ID from URL or page
     const pathParts = window.location.pathname.split('/');
-    const requestId = pathParts[pathParts.length - 1];
+    const requestId = id || pathParts[pathParts.length - 1];
     if (!requestId || requestId === '_debug_toolbar') {
         alert('Could not determine request ID');
         return;
@@ -3144,22 +3144,24 @@ class DebugToolbar {
         let html = '<div class="profiling-panel">';
 
         const totalTime = (data.total_time || 0) * 1000;
-        const funcCount = data.function_count || 0;
-        const callCount = data.total_calls || 0;
-        const profilerType = data.profiler_type || 'cProfile';
+        const callCount = data.function_calls || 0;
+        const profilerType = data.backend || 'cprofile';
 
         html += '<div class="profiling-summary">';
         html += '<div class="profiling-stat"><span class="stat-value">' + totalTime.toFixed(2) + 'ms</span>';
         html += '<span class="stat-label">Total Time</span></div>';
-        html += '<div class="profiling-stat"><span class="stat-value">' + funcCount + '</span>';
-        html += '<span class="stat-label">Functions</span></div>';
+        if (data.user_function_count !== undefined) {
+            const funcCount = data.user_function_count + (data.library_function_count || 0);
+            html += '<div class="profiling-stat"><span class="stat-value">' + funcCount + '</span>';
+            html += '<span class="stat-label">Functions</span></div>';
+        }
         html += '<div class="profiling-stat"><span class="stat-value">' + callCount + '</span>';
         html += '<span class="stat-label">Calls</span></div>';
         html += '<div class="profiling-stat"><span class="stat-value">' + profilerType + '</span>';
         html += '<span class="stat-label">Profiler</span></div>';
         html += '</div>';
 
-        if (data.has_flamegraph && requestId) {
+        if (data.flamegraph_available && requestId) {
             html += '<div class="flamegraph-action">';
             html += '<button onclick="downloadFlamegraph(\\''+requestId+'\\')" class="flamegraph-btn">';
             html += 'Download Flame Graph (Speedscope)</button></div>';
@@ -3342,8 +3344,6 @@ class DebugToolbar {
         if (totalActive === 0 && totalClosed === 0) {
             html += '<p class="empty ws-no-connections">No WebSocket connections tracked yet.</p>';
             html += '<p class="ws-hint">Connect to a WebSocket endpoint. Click "Go Live" for real-time updates.</p>';
-            html += '</div>';
-            return html;
         }
 
         const activeConns = data.active_connections || [];
@@ -3481,6 +3481,9 @@ class DebugToolbar {
         if (receivedEl) receivedEl.textContent = data.total_messages_received || 0;
         if (bytesSentEl) bytesSentEl.textContent = this.formatBytes(data.total_bytes_sent || 0);
         if (bytesRecvEl) bytesRecvEl.textContent = this.formatBytes(data.total_bytes_received || 0);
+
+        const hasConns = (data.total_active || 0) + (data.total_closed || 0) > 0;
+        panel.querySelectorAll('.ws-no-connections, .ws-hint').forEach(el => { el.hidden = hasConns; });
 
         const activeSection = document.getElementById('ws-active-section');
         if (activeSection) {

@@ -51,6 +51,8 @@ class N1Analyzer:
 
         for operation in operations:
             for resolver in operation.resolvers:
+                if resolver.parent_type.startswith("__"):
+                    continue
                 arg_sig = self._get_argument_signature(resolver.arguments)
                 signature = f"{resolver.parent_type}.{resolver.field_name}({arg_sig})"
 
