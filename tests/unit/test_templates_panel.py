@@ -235,7 +235,7 @@ class TestTemplatesPanel:
 
         assert len(stats["renders"]) == 3
         assert stats["total_renders"] == 3
-        assert stats["total_time"] == 0.45
+        assert stats["total_time"] == pytest.approx(0.45)
         assert set(stats["engines_used"]) == {"jinja2", "mako"}
 
     @pytest.mark.asyncio
