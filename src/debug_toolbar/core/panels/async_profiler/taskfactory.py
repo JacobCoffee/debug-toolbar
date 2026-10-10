@@ -114,6 +114,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         *,
         name: str | None = None,
         context: Context | None = None,
+        **kwargs: Any,
     ) -> asyncio.Task[Any]:
         """Custom task factory that records task creation.
 
@@ -122,6 +123,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
             coro: The coroutine to wrap in a task.
             name: Optional task name.
             context: Optional context for the task.
+            **kwargs: Other task options passed by the event loop (e.g. eager_start).
 
         Returns:
             The created Task object.
@@ -131,13 +133,13 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         if self._original_factory is not None:
             # Try with kwargs first (Python 3.11+), fall back to positional only
             try:
-                task = self._original_factory(loop, coro, name=name, context=context)
+                task = self._original_factory(loop, coro, name=name, context=context, **kwargs)
             except TypeError:
                 task = self._original_factory(loop, coro)
                 if name is not None:
                     task.set_name(name)
         elif sys.version_info >= (3, 11):
-            task = asyncio.Task(coro, loop=loop, name=name, context=context)
+            task = asyncio.Task(coro, loop=loop, name=name, context=context, **kwargs)
         else:
             task = asyncio.Task(coro, loop=loop, name=name)  # type: ignore[call-arg]
         creation_time = loop.time() - self._start_time
