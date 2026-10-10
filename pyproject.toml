@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "uv_build"
-requires = ["uv_build>=0.7.5"]
+requires = ["uv_build>=0.7.5,<0.13"]
 
 [dependency-groups]
 docs = [
@@ -355,3 +355,6 @@ exclude = [
 
 [tool.uv]
 default-groups = ["dev"]
+
+[tool.uv.build-backend]
+module-name = "debug_toolbar"
