@@ -234,6 +234,32 @@ class TestN1Analyzer:
 
         assert patterns == []
 
+    def test_ignores_introspection_fields(self) -> None:
+        """Should not flag GraphQL's built-in schema fields (e.g. __Type.name)."""
+        resolvers = [
+            TrackedResolver(
+                resolver_id=f"r{i}",
+                field_name="name",
+                field_path=f"Query.__schema.types.{i}.name",
+                resolver_function="__Type.name",
+                parent_type="__Type",
+                return_type="String",
+                duration_ms=0.1,
+            )
+            for i in range(5)
+        ]
+        operation = TrackedOperation(
+            operation_id="op1",
+            query="query { __schema { types { name } } }",
+            variables={},
+            operation_name=None,
+            operation_type="query",
+            start_time=0.0,
+            resolvers=resolvers,
+        )
+
+        assert N1Analyzer(threshold=3).analyze([operation]) == []
+
 
 class TestDuplicateDetector:
     """Tests for DuplicateDetector."""
