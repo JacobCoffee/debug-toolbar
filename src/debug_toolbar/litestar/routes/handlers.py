@@ -1646,7 +1646,7 @@ body {
     margin-bottom: 8px;
 }
 
-.sql-explain-btn {
+.sql-explain-btn, .sql-copy-btn {
     background: var(--dt-accent);
     color: white;
     border: none;
@@ -1658,7 +1658,7 @@ body {
     transition: background 0.15s;
 }
 
-.sql-explain-btn:hover {
+.sql-explain-btn:hover, .sql-copy-btn:hover {
     background: var(--dt-accent-hover);
 }
 
@@ -3697,6 +3697,7 @@ class DebugToolbar {
         if (data.total_time_ms !== undefined) {
             html += '<span class="sql-total-time">Total Time: ' + data.total_time_ms.toFixed(2) + 'ms</span>';
         }
+        html += '<button class="sql-copy-btn">Copy all</button>';
         html += '</div>';
 
         // N+1 Warning Section
@@ -3776,6 +3777,7 @@ class DebugToolbar {
                 html += '<span class="query-badge badge-duplicate" title="Duplicate query">DUP</span>';
             }
 
+            html += '<button class="sql-copy-btn" data-sql="' + sqlEncoded + '">Copy</button>';
             if (supportsExplain) {
                 html += '<button class="sql-explain-btn" data-sql="' + sqlEncoded +
                         '" data-params="' + paramsEncoded + '">EXPLAIN</button>';
@@ -3799,6 +3801,18 @@ class DebugToolbar {
         html += '</div>';
 
         setTimeout(() => {
+            const decode = (s) => decodeURIComponent(escape(atob(s)));
+            document.querySelectorAll('.sql-copy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const text = btn.dataset.sql ? decode(btn.dataset.sql) : [...document.querySelectorAll(
+                        '.sql-copy-btn[data-sql]')].map(b => decode(b.dataset.sql)).join(';\\n\\n');
+                    navigator.clipboard.writeText(text).then(() => {
+                        const label = btn.textContent;
+                        btn.textContent = 'Copied!';
+                        setTimeout(() => { btn.textContent = label; }, 1000);
+                    });
+                });
+            });
             document.querySelectorAll('.sql-explain-btn[data-sql]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const sql = decodeURIComponent(escape(atob(btn.dataset.sql)));
