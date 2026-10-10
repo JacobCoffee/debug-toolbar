@@ -43,44 +43,8 @@ jobs:
       - name: Build package (litestar-debug-toolbar)
         if: matrix.package-name == 'litestar-debug-toolbar'
         run: |
-          # Build the primary package first
+          sed -i 's/^name = "debug-toolbar"$/name = "litestar-debug-toolbar"/; s/"debug-toolbar\[/"litestar-debug-toolbar[/' pyproject.toml
           uv build
-          # Rename the distributions to litestar-debug-toolbar
-          cd dist
-          for f in debug_toolbar-*.whl; do
-            new_name=$(echo "$f" | sed 's/debug_toolbar/litestar_debug_toolbar/')
-            # Unpack, modify metadata, repack
-            unzip -q "$f" -d tmp_wheel
-            # Rename dist-info directory
-            old_dist_info=$(ls -d tmp_wheel/*.dist-info)
-            new_dist_info=$(echo "$old_dist_info" | sed 's/debug_toolbar/litestar_debug_toolbar/')
-            mv "$old_dist_info" "$new_dist_info"
-            # Update METADATA
-            sed -i 's/^Name: debug-toolbar$/Name: litestar-debug-toolbar/' "$new_dist_info/METADATA"
-            # Update RECORD with new paths
-            sed -i 's/debug_toolbar-/litestar_debug_toolbar-/g' "$new_dist_info/RECORD"
-            cd tmp_wheel
-            zip -q -r "../$new_name" .
-            cd ..
-            rm -rf tmp_wheel "$f"
-          done
-          for f in debug_toolbar-*.tar.gz; do
-            new_name=$(echo "$f" | sed 's/debug_toolbar/litestar_debug_toolbar/' | sed 's/debug-toolbar/litestar-debug-toolbar/')
-            # For sdist, we need to extract, modify, and repack
-            mkdir -p tmp_sdist
-            tar -xzf "$f" -C tmp_sdist
-            cd tmp_sdist/*/
-            sed -i 's/name = "debug-toolbar"/name = "litestar-debug-toolbar"/' pyproject.toml
-            sed -i 's/"debug-toolbar\[/"litestar-debug-toolbar[/g' pyproject.toml
-            cd ..
-            # Rename directory
-            old_dir=$(ls -d */ | head -1 | tr -d '/')
-            new_dir=$(echo "$old_dir" | sed 's/debug_toolbar/litestar_debug_toolbar/')
-            mv "$old_dir" "$new_dir"
-            tar -czf "../$new_name" "$new_dir"
-            cd ..
-            rm -rf tmp_sdist "$f"
-          done
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v4
