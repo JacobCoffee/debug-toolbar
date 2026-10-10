@@ -129,25 +129,25 @@ upgrade: ## Upgrade all dependencies
 example: example-litestar ## Alias for example-litestar
 
 example-asgi: ## Run ASGI example app (http://localhost:8000)
-	@uv run python examples/asgi_basic/app.py
+	@uv run python -m examples.asgi_basic.app
 
 example-litestar: ## Run Litestar example app (http://localhost:8001)
-	@uv run python examples/litestar_basic/app.py
+	@uv run python -m examples.litestar_basic.app
 
 example-aa: ## Run Litestar + Advanced-Alchemy example (http://localhost:8002)
-	@uv run python examples/litestar_advanced_alchemy/app.py
+	@uv run python -m examples.litestar_advanced_alchemy.app
 
 example-graphql: ## Run GraphQL + Strawberry example (http://localhost:8003)
-	@uv run python examples/graphql_panel_example.py
+	@uv run python -m examples.graphql_panel_example
 
 example-websocket: ## Run WebSocket example app (http://localhost:8002)
-	@uv run python examples/websocket_panel_example.py
+	@uv run python -m examples.websocket_panel_example
 
 example-mcp: ## Run MCP server example (http://localhost:8004)
-	@uv run python examples/mcp_server_example.py
+	@uv run python -m examples.mcp_server_example
 
 example-mcp-server: ## Run MCP server (stdio transport)
-	@uv run python examples/mcp_server_example.py --mcp
+	@uv run python -m examples.mcp_server_example --mcp
 
 ##@ Git Worktrees
 

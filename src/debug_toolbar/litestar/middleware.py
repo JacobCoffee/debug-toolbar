@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import gzip
 import logging
 import re
@@ -486,28 +485,53 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         Args:
             body: The original response body (may be compressed).
             context: The request context with collected data.
-            content_encoding: The content-encoding header value (e.g., "gzip").
+            content_encoding: The content-encoding header value (e.g., "gzip", "br", "zstd").
 
         Returns:
             Tuple of (modified body, content_encoding to use).
-            If gzip was decompressed, returns uncompressed body with empty encoding.
+            If compression was handled, returns uncompressed body with empty encoding.
         """
-        # Handle gzip-compressed responses
-        # Store original body in case we need to return it
-        original_body = body
+        decompressed = False
         encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
+
         if "gzip" in encodings:
-            # Try to decompress, fall back to treating as uncompressed if invalid
-            with contextlib.suppress(gzip.BadGzipFile):
+            try:
                 body = gzip.decompress(body)
+                decompressed = True
+            except gzip.BadGzipFile:
+                logger.debug("Invalid gzip data, attempting to decode as-is")
+
+        elif "br" in encodings:
+            try:
+                import brotli  # type: ignore[import-untyped]
+
+                body = brotli.decompress(body)
+                decompressed = True
+            except ImportError:
+                logger.debug("Brotli not installed, skipping toolbar injection for br-encoded response")
+                return body, content_encoding
+            except Exception:
+                logger.debug("Invalid brotli data, attempting to decode as-is")
+
+        elif "zstd" in encodings:
+            try:
+                import zstandard  # type: ignore[import-untyped]
+
+                dctx = zstandard.ZstdDecompressor()
+                body = dctx.decompress(body)
+                decompressed = True
+            except ImportError:
+                logger.debug("zstandard not installed, skipping toolbar injection for zstd-encoded response")
+                return body, content_encoding
+            except Exception:
+                logger.debug("Invalid zstd data, attempting to decode as-is")
 
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            # Can't decode as UTF-8. Return the original body with original
-            # content-encoding to preserve HTTP semantics (client expects the
-            # format they requested via Accept-Encoding).
-            return original_body, content_encoding
+            if decompressed:
+                return body, ""
+            return body, content_encoding
 
         toolbar_data = self.toolbar.get_toolbar_data(context)
         toolbar_html = self._render_toolbar(toolbar_data)
@@ -552,6 +576,10 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
         <div id="debug-toolbar" data-request-id="{request_id}">
             <div class="toolbar-bar">
+                <button class="toolbar-collapse-btn" title="Collapse toolbar"
+                        aria-label="Collapse toolbar" aria-expanded="true">
+                    <span class="collapse-icon">&laquo;</span>
+                </button>
                 <span class="toolbar-brand" title="Click to toggle">Debug Toolbar</span>
                 <span class="toolbar-time">{total_time:.2f}ms</span>
                 <div class="toolbar-panels">
@@ -564,6 +592,8 @@ class DebugToolbarMiddleware(AbstractMiddleware):
                 <a href="/_debug_toolbar/" class="toolbar-history-link" title="View request history">History</a>
             </div>
             <div class="toolbar-details"></div>
+            <!-- Reserved for future toolbar content and use by toolbar.js -->
+            <div class="toolbar-content"></div>
         </div>
         <script src="/_debug_toolbar/static/toolbar.js"></script>
         """

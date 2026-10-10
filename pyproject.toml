@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "uv_build"
-requires = ["uv_build>=0.7.5"]
+requires = ["uv_build>=0.7.5,<0.13"]
 
 [dependency-groups]
 docs = [
@@ -54,6 +54,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Software Development :: Debuggers",
@@ -78,8 +80,8 @@ keywords = [
 license = {text = "MIT"}
 name = "debug-toolbar"
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
-version = "0.3.0"
+requires-python = ">=3.10"
+version = "0.4.2"
 
 [project.optional-dependencies]
 advanced-alchemy = [
@@ -355,3 +357,6 @@ exclude = [
 
 [tool.uv]
 default-groups = ["dev"]
+
+[tool.uv.build-backend]
+module-name = "debug_toolbar"
