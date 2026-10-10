@@ -378,7 +378,8 @@ class TestGzipCompression:
         """Test handling of valid gzip data that fails UTF-8 decoding after decompression.
 
         When gzipped data decompresses successfully but contains non-UTF-8 bytes,
-        the middleware should return the original compressed data.
+        the middleware should return the original compressed data with the original
+        content-encoding header to preserve HTTP semantics.
         """
 
         @get("/binary-gzip", media_type=MediaType.HTML)
@@ -403,8 +404,7 @@ class TestGzipCompression:
         with TestClient(app) as client:
             response = client.get("/binary-gzip")
             assert response.status_code == 200
-            # Should return decompressed binary data since UTF-8 decode failed
-            # The middleware has removed the gzip encoding, so we check for the raw binary content
+            assert response.headers.get("content-encoding") == "gzip"
             assert response.content == b"\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89"
 
     def test_gzip_header_case_insensitive(self) -> None:

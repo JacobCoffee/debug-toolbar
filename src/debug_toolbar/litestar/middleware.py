@@ -491,13 +491,12 @@ class DebugToolbarMiddleware(AbstractMiddleware):
             Tuple of (modified body, content_encoding to use).
             If compression was handled, returns uncompressed body with empty encoding.
         """
-        decompressed = False
+        original_body = body
         encodings = [e.strip() for e in content_encoding.lower().split(",")] if content_encoding else []
 
         if "gzip" in encodings:
             try:
                 body = gzip.decompress(body)
-                decompressed = True
             except gzip.BadGzipFile:
                 logger.debug("Invalid gzip data, attempting to decode as-is")
 
@@ -506,7 +505,6 @@ class DebugToolbarMiddleware(AbstractMiddleware):
                 import brotli  # type: ignore[import-untyped]
 
                 body = brotli.decompress(body)
-                decompressed = True
             except ImportError:
                 logger.debug("Brotli not installed, skipping toolbar injection for br-encoded response")
                 return body, content_encoding
@@ -519,7 +517,6 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
                 dctx = zstandard.ZstdDecompressor()
                 body = dctx.decompress(body)
-                decompressed = True
             except ImportError:
                 logger.debug("zstandard not installed, skipping toolbar injection for zstd-encoded response")
                 return body, content_encoding
@@ -529,9 +526,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         try:
             html = body.decode("utf-8")
         except UnicodeDecodeError:
-            if decompressed:
-                return body, ""
-            return body, content_encoding
+            return original_body, content_encoding
 
         toolbar_data = self.toolbar.get_toolbar_data(context)
         toolbar_html = self._render_toolbar(toolbar_data)
