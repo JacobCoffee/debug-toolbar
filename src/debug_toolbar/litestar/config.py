@@ -47,6 +47,9 @@ class LitestarDebugToolbarConfig(DebugToolbarConfig):
         if "debug_toolbar.litestar.panels.events.EventsPanel" not in default_panels:
             default_panels.append("debug_toolbar.litestar.panels.events.EventsPanel")
 
+        if "debug_toolbar.litestar.panels.static_files.StaticFilesPanel" not in default_panels:
+            default_panels.append("debug_toolbar.litestar.panels.static_files.StaticFilesPanel")
+
         self.panels = default_panels
 
     def should_show_toolbar(self, request: Request) -> bool:

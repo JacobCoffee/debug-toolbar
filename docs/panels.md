@@ -297,6 +297,19 @@ This panel helps you understand:
 
 *Automatically added for Litestar applications.*
 
+### Static Files Panel
+
+**ID**: `StaticFilesPanel`
+
+Litestar-specific panel showing where your app's static files are served from:
+
+- Each static file mount: the URL path and the folder(s) on disk it serves
+- A clear "No static files configured" message when the app has no static mounts
+
+This panel helps you understand which folder on disk a given static URL actually comes from. It does not track which static files a specific page loaded.
+
+*Automatically added for Litestar applications.*
+
 ### WebSocket Panel
 
 **ID**: `WebSocketPanel`
