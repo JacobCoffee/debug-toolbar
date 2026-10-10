@@ -9,9 +9,9 @@ The debug toolbar includes an MCP (Model Context Protocol) server that allows AI
 Install with MCP support:
 
 ```bash
-uv add debug-toolbar[mcp]
+uv add litestar-debug-toolbar[mcp]
 # or
-pip install debug-toolbar[mcp]
+pip install litestar-debug-toolbar[mcp]
 ```
 
 ## Quick Start

@@ -8,37 +8,37 @@ Install with your preferred package manager:
 :::{tab-item} pip
 ```bash
 # For Litestar
-pip install debug-toolbar[litestar]
+pip install litestar-debug-toolbar[litestar]
 
 # For Starlette
-pip install debug-toolbar[starlette]
+pip install litestar-debug-toolbar[starlette]
 
 # For FastAPI
-pip install debug-toolbar[fastapi]
+pip install litestar-debug-toolbar[fastapi]
 ```
 :::
 :::{tab-item} uv
 ```bash
 # For Litestar
-uv add debug-toolbar[litestar]
+uv add litestar-debug-toolbar[litestar]
 
 # For Starlette
-uv add debug-toolbar[starlette]
+uv add litestar-debug-toolbar[starlette]
 
 # For FastAPI
-uv add debug-toolbar[fastapi]
+uv add litestar-debug-toolbar[fastapi]
 ```
 :::
 :::{tab-item} poetry
 ```bash
 # For Litestar
-poetry add debug-toolbar[litestar]
+poetry add litestar-debug-toolbar[litestar]
 
 # For Starlette
-poetry add debug-toolbar[starlette]
+poetry add litestar-debug-toolbar[starlette]
 
 # For FastAPI
-poetry add debug-toolbar[fastapi]
+poetry add litestar-debug-toolbar[fastapi]
 ```
 :::
 ::::

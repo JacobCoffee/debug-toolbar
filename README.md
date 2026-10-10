@@ -11,11 +11,11 @@
   <a href="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/publish.yml">
     <img src="https://github.com/JacobCoffee/debug-toolbar/actions/workflows/publish.yml/badge.svg" alt="Latest Release">
   </a>
-  <a href="https://pypi.org/project/debug-toolbar/">
-    <img src="https://img.shields.io/pypi/v/debug-toolbar.svg" alt="PyPI Version">
+  <a href="https://pypi.org/project/litestar-debug-toolbar/">
+    <img src="https://img.shields.io/pypi/v/litestar-debug-toolbar.svg" alt="PyPI Version">
   </a>
-  <a href="https://pypi.org/project/debug-toolbar/">
-    <img src="https://img.shields.io/pypi/pyversions/debug-toolbar.svg" alt="Python Versions">
+  <a href="https://pypi.org/project/litestar-debug-toolbar/">
+    <img src="https://img.shields.io/pypi/pyversions/litestar-debug-toolbar.svg" alt="Python Versions">
   </a>
   <a href="https://github.com/JacobCoffee/debug-toolbar/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/JacobCoffee/debug-toolbar.svg" alt="License">
@@ -102,22 +102,22 @@
 
 ```bash
 # Core package only
-pip install debug-toolbar
+pip install litestar-debug-toolbar
 
 # With Litestar integration
-pip install debug-toolbar[litestar]
+pip install litestar-debug-toolbar[litestar]
 
 # With Advanced-Alchemy SQLAlchemy panel
-pip install debug-toolbar[advanced-alchemy]
+pip install litestar-debug-toolbar[advanced-alchemy]
 
 # All extras
-pip install debug-toolbar[all]
+pip install litestar-debug-toolbar[all]
 ```
 
 Or with [uv](https://github.com/astral-sh/uv):
 
 ```bash
-uv add debug-toolbar[litestar]
+uv add litestar-debug-toolbar[litestar]
 ```
 
 ## Quick Start

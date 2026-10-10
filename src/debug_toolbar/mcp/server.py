@@ -66,7 +66,7 @@ def create_mcp_server(
         ```
     """
     if not MCP_AVAILABLE:
-        msg = "MCP support requires the 'mcp' package. Install with: pip install debug-toolbar[mcp]"
+        msg = "MCP support requires the 'mcp' package. Install with: pip install litestar-debug-toolbar[mcp]"
         raise ImportError(msg)
 
     @asynccontextmanager
