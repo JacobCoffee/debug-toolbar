@@ -74,7 +74,7 @@ must use the same storage file via --storage-file or FileToolbarStorage.
 
     if not is_available():
         print(  # noqa: T201
-            "Error: MCP support requires the 'mcp' package.\nInstall with: pip install debug-toolbar[mcp]",
+            "Error: MCP support requires the 'mcp' package.\nInstall with: pip install litestar-debug-toolbar[mcp]",
             file=sys.stderr,
         )
         return 1
