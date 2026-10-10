@@ -100,6 +100,8 @@
 
 ## Installation
 
+> **Litestar version:** the `litestar` and `advanced-alchemy` extras require **Litestar 3**. See [Upgrading to 2.0](#upgrading-to-20) if you're coming from `litestar-debug-toolbar` 1.x on Litestar 2.
+
 ```bash
 # Core package only
 pip install litestar-debug-toolbar
@@ -266,6 +268,15 @@ debug_toolbar/
 └── extras/         # Optional integrations
     └── advanced_alchemy/  # SQLAlchemy panel with N+1 detection
 ```
+
+## Upgrading to 2.0
+
+Version 2.0 adds support for **Litestar 3**. Here's what changed for users:
+
+- The `litestar` and `advanced-alchemy` extras now need **Litestar 3** and a matching Advanced-Alchemy release; Litestar 2 is no longer supported.
+- The minimum Python version moved from 3.10 to **3.11**, matching Litestar 3's requirement.
+- If you don't use the `litestar` or `advanced-alchemy` extras (e.g. you only use the Starlette or FastAPI integration), nothing changes for you.
+- To upgrade: update your app to Litestar 3 first (see the [Litestar 3 migration guide](https://docs.litestar.dev/latest/release-notes/whats-new-3.html)), then install `litestar-debug-toolbar>=2.0.0`.
 
 ## Versioning
 

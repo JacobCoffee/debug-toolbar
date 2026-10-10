@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.10"
+# requires-python = ">=3.11"
 # dependencies = [
 #   "debug-toolbar[litestar]",
 #   "jinja2>=3.1.0",

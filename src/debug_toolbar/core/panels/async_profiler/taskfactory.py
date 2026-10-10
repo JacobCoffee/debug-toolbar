@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import sys
 import time
 import traceback
 from collections.abc import Callable, Coroutine
@@ -138,10 +137,8 @@ class TaskFactoryBackend(AsyncProfilerBackend):
                 task = self._original_factory(loop, coro)
                 if name is not None:
                     task.set_name(name)
-        elif sys.version_info >= (3, 11):
-            task = asyncio.Task(coro, loop=loop, name=name, context=context, **kwargs)
         else:
-            task = asyncio.Task(coro, loop=loop, name=name)  # type: ignore[call-arg]
+            task = asyncio.Task(coro, loop=loop, name=name, context=context, **kwargs)
         creation_time = loop.time() - self._start_time
 
         coro_name = getattr(coro, "__qualname__", str(coro))
