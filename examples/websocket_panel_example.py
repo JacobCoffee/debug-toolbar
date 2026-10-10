@@ -3,7 +3,7 @@
 # dependencies = [
 #   "debug-toolbar[litestar]",
 #   "jinja2>=3.1.0",
-#   "uvicorn>=0.30.0",
+#   "uvicorn[standard]>=0.30.0",
 # ]
 # ///
 """WebSocket Panel Example for Debug Toolbar.
