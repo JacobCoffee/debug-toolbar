@@ -8,76 +8,76 @@ An async-native debug toolbar for Python ASGI frameworks with support for Litest
 ````{tab-item} uv
 ```bash
 # With Litestar integration
-uv add debug-toolbar[litestar]
+uv add litestar-debug-toolbar[litestar]
 
 # With Starlette integration
-uv add debug-toolbar[starlette]
+uv add litestar-debug-toolbar[starlette]
 
 # With FastAPI integration
-uv add debug-toolbar[fastapi]
+uv add litestar-debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
-uv add debug-toolbar[advanced-alchemy]
+uv add litestar-debug-toolbar[advanced-alchemy]
 
 # Everything
-uv add debug-toolbar[all]
+uv add litestar-debug-toolbar[all]
 ```
 ````
 
 ````{tab-item} pip
 ```bash
 # With Litestar integration
-pip install debug-toolbar[litestar]
+pip install litestar-debug-toolbar[litestar]
 
 # With Starlette integration
-pip install debug-toolbar[starlette]
+pip install litestar-debug-toolbar[starlette]
 
 # With FastAPI integration
-pip install debug-toolbar[fastapi]
+pip install litestar-debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
-pip install debug-toolbar[advanced-alchemy]
+pip install litestar-debug-toolbar[advanced-alchemy]
 
 # Everything
-pip install debug-toolbar[all]
+pip install litestar-debug-toolbar[all]
 ```
 ````
 
 ````{tab-item} pdm
 ```bash
 # With Litestar integration
-pdm add debug-toolbar[litestar]
+pdm add litestar-debug-toolbar[litestar]
 
 # With Starlette integration
-pdm add debug-toolbar[starlette]
+pdm add litestar-debug-toolbar[starlette]
 
 # With FastAPI integration
-pdm add debug-toolbar[fastapi]
+pdm add litestar-debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
-pdm add debug-toolbar[advanced-alchemy]
+pdm add litestar-debug-toolbar[advanced-alchemy]
 
 # Everything
-pdm add debug-toolbar[all]
+pdm add litestar-debug-toolbar[all]
 ```
 ````
 
 ````{tab-item} poetry
 ```bash
 # With Litestar integration
-poetry add debug-toolbar[litestar]
+poetry add litestar-debug-toolbar[litestar]
 
 # With Starlette integration
-poetry add debug-toolbar[starlette]
+poetry add litestar-debug-toolbar[starlette]
 
 # With FastAPI integration
-poetry add debug-toolbar[fastapi]
+poetry add litestar-debug-toolbar[fastapi]
 
 # With Advanced-Alchemy SQLAlchemy panel
-poetry add debug-toolbar[advanced-alchemy]
+poetry add litestar-debug-toolbar[advanced-alchemy]
 
 # Everything
-poetry add debug-toolbar[all]
+poetry add litestar-debug-toolbar[all]
 ```
 ````
 `````

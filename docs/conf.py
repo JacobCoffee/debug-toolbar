@@ -35,7 +35,7 @@ html_theme_options = {
     "github_url": "https://github.com/JacobCoffee/debug-toolbar",
     "nav_links": [
         {"title": "Litestar", "url": "https://litestar.dev"},
-        {"title": "PyPI", "url": "https://pypi.org/project/debug-toolbar"},
+        {"title": "PyPI", "url": "https://pypi.org/project/litestar-debug-toolbar"},
     ],
 }
 

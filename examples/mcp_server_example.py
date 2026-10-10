@@ -536,7 +536,7 @@ def run_mcp_server(transport: str = "stdio") -> None:
 
     if not is_available():
         print("Error: MCP support requires the 'mcp' package.", file=sys.stderr)  # noqa: T201
-        print("Install with: pip install debug-toolbar[mcp]", file=sys.stderr)  # noqa: T201
+        print("Install with: pip install litestar-debug-toolbar[mcp]", file=sys.stderr)  # noqa: T201
         sys.exit(1)
 
     storage = FileToolbarStorage(STORAGE_FILE, max_size=100)
