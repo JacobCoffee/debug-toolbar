@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from html import escape
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
@@ -20,7 +21,7 @@ def _render_request_row(request_id: UUID, data: dict[str, Any]) -> str:
     metadata = data.get("metadata", {})
     timing = data.get("timing_data", {})
     method = metadata.get("method", "GET")
-    path = metadata.get("path", "/")
+    path = escape(metadata.get("path", "/"))
     status = metadata.get("status_code", HTTP_STATUS_OK_MIN)
     total_time = timing.get("total_time", 0) * 1000
 
@@ -95,16 +96,16 @@ def _render_detail_html(request_id: UUID, data: dict[str, Any]) -> str:
     """Render the request detail HTML page."""
     metadata = data.get("metadata", {})
     timing = data.get("timing_data", {})
-    panels_data = data.get("panels", {})
+    panels_data = data.get("panel_data", {})
 
     method = metadata.get("method", "GET")
-    path = metadata.get("path", "/")
+    path = escape(metadata.get("path", "/"))
     status = metadata.get("status_code", HTTP_STATUS_OK_MIN)
     total_time = timing.get("total_time", 0) * 1000
 
     panels_html = []
     for panel_id, panel_data in panels_data.items():
-        panel_content = "<pre>" + str(panel_data) + "</pre>"
+        panel_content = "<pre>" + escape(str(panel_data)) + "</pre>"
         panels_html.append(f"""
         <div class="panel-section">
             <h3>{panel_id}</h3>
