@@ -527,7 +527,7 @@ wheels = [
 
 [[package]]
 name = "debug-toolbar"
-version = "0.4.2"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "jinja2" },
