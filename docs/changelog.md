@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [1.0.0](https://github.com/JacobCoffee/debug-toolbar/compare/v0.4.2..v1.0.0) - 2026-10-10
+
+### Bug Fixes
+
+- **(ci)** publish litestar-debug-toolbar sdist with correct metadata (#50) - ([082c5c5](https://github.com/JacobCoffee/debug-toolbar/commit/082c5c5db732010623e0f3ebb296ed6a9ff2c6c6)) - Jacob Coffee
+- return original compressed body when injected content is not UTF-8 (#31) - ([3ce3605](https://github.com/JacobCoffee/debug-toolbar/commit/3ce3605c5119bb6fe05d13a9abb7785d1828a373)) - Copilot
+- problems found in the 1.0 UI check (#56) - ([61fc2af](https://github.com/JacobCoffee/debug-toolbar/commit/61fc2af6d8551df413b7a64bf0da53b91836eed8)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v0.4.2 - ([df3efbe](https://github.com/JacobCoffee/debug-toolbar/commit/df3efbe31a7ac7f89407fe283ce8e1539bdaf7b6)) - github-actions[bot]
+- point install instructions and PyPI links to litestar-debug-toolbar (#51) - ([57c56ce](https://github.com/JacobCoffee/debug-toolbar/commit/57c56ce378e89d5571e8135dfb578a064fe2daac)) - Jacob Coffee
+
+### Features
+
+- inject toolbar into deflate and stdlib zstd encoded responses (#29) - ([c82db71](https://github.com/JacobCoffee/debug-toolbar/commit/c82db716cc36792950e06bc6777bb603376c9b5f)) - Copilot
+- add copy buttons to the SQL panel (#53) - ([1ecaa22](https://github.com/JacobCoffee/debug-toolbar/commit/1ecaa22f59b6288c28c70e2f076df3e51ed2c489)) - Jacob Coffee
+- add static files panel (#54) - ([b8d34eb](https://github.com/JacobCoffee/debug-toolbar/commit/b8d34ebd623c80b8cb06aaca538e9e43f86b7de4)) - Jacob Coffee
+
+### Miscellaneous Chores
+
+- widen requires-python to support Python 3.14+ (#48) - ([9f925d2](https://github.com/JacobCoffee/debug-toolbar/commit/9f925d2df2bffef6deeb6effc6800ff50652760e)) - Hasan Sezer Taşan
+- release 1.0.0 (#55) - ([8346ff9](https://github.com/JacobCoffee/debug-toolbar/commit/8346ff9f37401a8fb927307f2b90329fc7d5d0e7)) - Jacob Coffee
+
+### Build
+
+- **(deps)** bump the actions group across 1 directory with 12 updates (#47) - ([da64fa4](https://github.com/JacobCoffee/debug-toolbar/commit/da64fa4952514288f6d91b7610f16bc9608d9c7f)) - dependabot[bot]
+
+### Ci
+
+- use git-cliff for release notes in publish workflow - ([13fcbfd](https://github.com/JacobCoffee/debug-toolbar/commit/13fcbfd88d7919c3375baa6388182954e526c08a)) - Jacob Coffee
+- stop main pushes from cancelling each other (#52) - ([21c59fc](https://github.com/JacobCoffee/debug-toolbar/commit/21c59fcb622b509619c63f22df61f6503fd13a71)) - Jacob Coffee
+
+---
 ## [0.4.2](https://github.com/JacobCoffee/debug-toolbar/compare/v0.4.1..v0.4.2) - 2026-01-07
 
 ### Bug Fixes
