@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import gzip
+import sys
+import zlib
+from typing import TYPE_CHECKING
 
 import pytest
 from litestar.status_codes import HTTP_200_OK
@@ -10,6 +13,9 @@ from litestar.testing import TestClient
 
 from debug_toolbar.litestar import DebugToolbarPlugin, LitestarDebugToolbarConfig
 from litestar import Litestar, MediaType, Response, get
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @get("/", media_type=MediaType.HTML)
@@ -456,3 +462,36 @@ class TestGzipCompression:
             assert response.status_code == 200
             assert b"debug-toolbar" in response.content
             assert b"</body>" in response.content
+
+
+def _zstd_compress(data: bytes) -> bytes:
+    if sys.version_info >= (3, 14):
+        from compression import zstd
+
+        return zstd.compress(data)
+    zstandard = pytest.importorskip("zstandard")
+    return zstandard.ZstdCompressor().compress(data)
+
+
+class TestOtherEncodings:
+    """Test toolbar injection for deflate and zstd encoded responses."""
+
+    @pytest.mark.parametrize(("encoding", "compress"), [("deflate", zlib.compress), ("zstd", _zstd_compress)])
+    def test_toolbar_injected(self, encoding: str, compress: Callable[[bytes], bytes]) -> None:
+        body = compress(b"<html><body><h1>Test</h1></body></html>")
+
+        @get("/encoded", media_type=MediaType.HTML)
+        async def encoded_handler() -> Response:
+            return Response(content=body, media_type=MediaType.HTML, headers={"content-encoding": encoding})
+
+        app = Litestar(
+            route_handlers=[encoded_handler],
+            plugins=[DebugToolbarPlugin(LitestarDebugToolbarConfig(enabled=True))],
+            debug=True,
+        )
+        with TestClient(app) as client:
+            response = client.get("/encoded")
+            assert response.status_code == 200
+            assert "content-encoding" not in response.headers
+            assert b"debug-toolbar" in response.content
+            assert response.content.index(b"debug-toolbar") < response.content.index(b"</body>")
