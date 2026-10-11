@@ -223,7 +223,7 @@ class WebSocketPanel(Panel):
         for queue in subscribers:
             try:
                 queue.put_nowait(message)
-            except asyncio.QueueFull:  # noqa: PERF203 - queue cleanup in loop is fine
+            except asyncio.QueueFull:
                 dead_queues.append(queue)
 
         if dead_queues:

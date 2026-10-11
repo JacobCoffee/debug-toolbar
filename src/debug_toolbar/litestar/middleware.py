@@ -12,12 +12,15 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, cast
 from uuid import uuid4
 
+from litestar.enums import ScopeType
+from litestar.middleware.base import ASGIMiddleware
+
 from debug_toolbar.core import DebugToolbar, RequestContext, set_request_context
 from debug_toolbar.core.panels.websocket import WebSocketConnection, WebSocketMessage, WebSocketPanel
 from debug_toolbar.litestar.config import LitestarDebugToolbarConfig
 from debug_toolbar.litestar.panels.events import collect_events_metadata
+from debug_toolbar.litestar.panels.middleware import collect_middleware_metadata
 from debug_toolbar.litestar.panels.static_files import collect_static_files_metadata
-from litestar.middleware import AbstractMiddleware
 
 if TYPE_CHECKING:
     from litestar.types import (
@@ -48,7 +51,7 @@ class ResponseState:
     original_headers: list[tuple[bytes, bytes]] = field(default_factory=list)
 
 
-class DebugToolbarMiddleware(AbstractMiddleware):
+class DebugToolbarMiddleware(ASGIMiddleware):
     """Litestar middleware for the debug toolbar.
 
     This middleware:
@@ -58,39 +61,36 @@ class DebugToolbarMiddleware(AbstractMiddleware):
     - Adds Server-Timing headers
     """
 
-    scopes = {"http", "websocket"}
-    exclude = ["_debug_toolbar"]
+    scopes = (ScopeType.HTTP, ScopeType.WEBSOCKET)
+    exclude_path_pattern = "_debug_toolbar"
 
     def __init__(
         self,
-        app: ASGIApp,
         config: LitestarDebugToolbarConfig | None = None,
         toolbar: DebugToolbar | None = None,
     ) -> None:
         """Initialize the middleware.
 
         Args:
-            app: The next ASGI application.
             config: Toolbar configuration. Uses defaults if not provided.
             toolbar: Optional shared toolbar instance. Creates new if not provided.
         """
-        super().__init__(app)
         self.config = config or LitestarDebugToolbarConfig()
         self.toolbar = toolbar or DebugToolbar(self.config)
 
-    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+    async def handle(self, scope: Scope, receive: Receive, send: Send, next_app: ASGIApp) -> None:
         """Process an ASGI request."""
         path = scope.get("path", "/")
 
         if scope["type"] == "websocket":
             if any(path.startswith(excluded) for excluded in self.config.exclude_paths):
-                await self.app(scope, receive, send)
+                await next_app(scope, receive, send)
                 return
-            await self._handle_websocket(scope, receive, send)
+            await self._handle_websocket(scope, receive, send, next_app)
             return
 
         if scope["type"] != "http":
-            await self.app(scope, receive, send)
+            await next_app(scope, receive, send)
             return
 
         from litestar import Request
@@ -98,31 +98,32 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         request = Request(scope)
 
         if not self.config.should_show_toolbar(request):
-            await self.app(scope, receive, send)
+            await next_app(scope, receive, send)
             return
 
         context = await self.toolbar.process_request()
         scope["_debug_toolbar_context"] = context  # type: ignore[typeddict-unknown-key]
         self._populate_request_metadata(request, context)
         self._populate_events_metadata(request, context)
+        self._populate_middleware_metadata(scope, context)
 
         state = ResponseState()
-        send_wrapper = self._create_send_wrapper(send, context, state)
+        send_wrapper = self._create_send_wrapper(scope, send, context, state)
 
         try:
-            await self.app(scope, receive, send_wrapper)
+            await next_app(scope, receive, send_wrapper)
         except Exception:
             await self._handle_exception(send, state)
             raise
         finally:
             set_request_context(None)
 
-    def _create_send_wrapper(self, send: Send, context: RequestContext, state: ResponseState) -> Send:
+    def _create_send_wrapper(self, scope: Scope, send: Send, context: RequestContext, state: ResponseState) -> Send:
         """Create a send wrapper that intercepts and modifies responses."""
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
-                await self._handle_response_start(send, message, context, state)
+                await self._handle_response_start(scope, send, message, context, state)
             elif message["type"] == "http.response.body":
                 await self._handle_response_body(send, message, context, state)
             else:
@@ -132,6 +133,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
 
     async def _handle_response_start(
         self,
+        scope: Scope,
         send: Send,
         message: Message,
         context: RequestContext,
@@ -151,6 +153,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         context.metadata["status_code"] = state.status_code
         context.metadata["response_headers"] = state.headers
         context.metadata["response_content_type"] = state.headers.get("content-type", "")
+        self._populate_response_cache_metadata(scope, context)
 
         state.is_html = "text/html" in state.headers.get("content-type", "")
         if not state.is_html:
@@ -253,16 +256,17 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         except Exception:
             logger.debug("Failed to send buffered response during exception handling", exc_info=True)
 
-    async def _handle_websocket(self, scope: Scope, receive: Receive, send: Send) -> None:
+    async def _handle_websocket(self, scope: Scope, receive: Receive, send: Send, next_app: ASGIApp) -> None:
         """Handle WebSocket connection tracking.
 
         Args:
             scope: ASGI scope for the WebSocket connection.
             receive: ASGI receive callable.
             send: ASGI send callable.
+            next_app: The next ASGI application in the middleware stack.
         """
         if not self.config.websocket_tracking_enabled:
-            await self.app(scope, receive, send)
+            await next_app(scope, receive, send)
             return
 
         connection = WebSocketConnection(
@@ -288,7 +292,7 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         receive_wrapper = self._create_websocket_receive_wrapper(receive, connection)
 
         try:
-            await self.app(scope, receive_wrapper, send_wrapper)
+            await next_app(scope, receive_wrapper, send_wrapper)
         finally:
             if connection.state not in ("closing", "closed"):
                 connection.state = "closed"
@@ -494,6 +498,67 @@ class DebugToolbarMiddleware(AbstractMiddleware):
         except Exception:
             context.metadata["routes"] = []
             context.metadata["matched_route"] = ""
+
+    def _populate_middleware_metadata(self, scope: Scope, context: RequestContext) -> None:
+        """Populate the resolved middleware stack and per-request bypass decisions.
+
+        Litestar 3 only: relies on :class:`~litestar.middleware.base.ASGIMiddleware`.
+
+        Args:
+            scope: The ASGI connection scope.
+            context: The request context to populate.
+        """
+        try:
+            collect_middleware_metadata(scope, context)
+        except Exception:
+            context.metadata["middleware"] = []
+
+    def _populate_response_cache_metadata(self, scope: Scope, context: RequestContext) -> None:
+        """Populate response-cache metadata for routes configured with ``cache=...``.
+
+        Litestar 3 only: reads the ``is_cached``/``do_cache`` flags Litestar's internal
+        ``ResponseCacheMiddleware`` sets on the connection's :class:`ScopeState`.
+
+        Args:
+            scope: The ASGI connection scope.
+            context: The request context to populate.
+        """
+        route_handler = scope.get("route_handler")
+        cache_setting = getattr(route_handler, "cache", False) if route_handler is not None else False
+        if not cache_setting:
+            return
+
+        try:
+            from litestar.config.response_cache import CACHE_FOREVER
+            from litestar.utils.empty import value_or_default
+            from litestar.utils.scope.state import ScopeState
+
+            from litestar import Request
+
+            connection_state = ScopeState.from_scope(scope)
+            is_cached = bool(value_or_default(connection_state.is_cached, False))  # noqa: FBT003
+            do_cache = bool(value_or_default(connection_state.do_cache, False))  # noqa: FBT003
+
+            app = scope["litestar_app"]
+            cache_config = app.response_cache_config
+            key_builder = route_handler.cache_key_builder or cache_config.key_builder
+            cache_key = key_builder(Request(scope))
+
+            expires_in: int | None = cache_config.default_expiration
+            if cache_setting is CACHE_FOREVER:
+                expires_in = None
+            elif cache_setting is not True and isinstance(cache_setting, int):
+                expires_in = cache_setting
+
+            context.metadata["response_cache"] = {
+                "store": cache_config.store,
+                "cache_key": cache_key,
+                "expires_in": expires_in,
+                "served_from_cache": is_cached,
+                "stored_to_cache": do_cache and not is_cached,
+            }
+        except Exception:
+            logger.debug("Failed to collect response cache metadata", exc_info=True)
 
     def _inject_toolbar(  # noqa: C901, PLR0912
         self, body: bytes, context: RequestContext, content_encoding: str = ""

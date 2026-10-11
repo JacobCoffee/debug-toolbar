@@ -2,6 +2,11 @@
 
 ## Installation
 
+```{note}
+The `litestar` extra requires **Litestar 3**. Coming from 1.x on Litestar 2? See
+[Upgrading to 2.0](https://github.com/JacobCoffee/debug-toolbar#upgrading-to-20) in the README.
+```
+
 Install with your preferred package manager:
 
 ::::{tab-set}

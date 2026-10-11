@@ -14,17 +14,17 @@ def _static_directories(handler: Any) -> list[str] | None:
     """Return the configured directories for a static file handler, or None.
 
     Litestar's ``create_static_files_router`` builds its handlers as closures
-    over a ``StaticFiles`` instance, so the only way to recover the configured
-    directories is to inspect that closure.
+    over the resolved ``directories``, so the only way to recover them is to
+    inspect that closure.
     """
     fn = getattr(handler, "fn", None)
     if fn is None or not getattr(fn, "__closure__", None):
         return None
 
     for name, cell in zip(fn.__code__.co_freevars, fn.__closure__, strict=True):
-        if name != "static_files":
+        if name != "resolved_directories":
             continue
-        directories = getattr(cell.cell_contents, "directories", None)
+        directories = cell.cell_contents
         if not directories:
             return None
         return [str(directory) for directory in directories]

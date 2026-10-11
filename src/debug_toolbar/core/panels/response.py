@@ -30,13 +30,19 @@ class ResponsePanel(Panel):
         """Generate response statistics from context metadata."""
         metadata = context.metadata
 
-        return {
+        stats = {
             "status_code": metadata.get("status_code", 0),
             "reason_phrase": metadata.get("reason_phrase", ""),
             "headers": metadata.get("response_headers", {}),
             "content_type": metadata.get("response_content_type", ""),
             "content_length": metadata.get("response_content_length", 0),
         }
+
+        response_cache = metadata.get("response_cache")
+        if response_cache is not None:
+            stats["response_cache"] = response_cache
+
+        return stats
 
     def get_nav_subtitle(self) -> str:
         """Get the navigation subtitle."""

@@ -50,7 +50,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -80,12 +79,12 @@ keywords = [
 license = {text = "MIT"}
 name = "debug-toolbar"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 version = "1.0.1"
 
 [project.optional-dependencies]
 advanced-alchemy = [
-    "advanced-alchemy>=0.10.0",
+    "advanced-alchemy>=1.11.0",
     "aiosqlite>=0.19.0",
     "sqlalchemy>=2.0.0",
 ]
@@ -96,7 +95,7 @@ fastapi = [
     "fastapi>=0.100.0",
 ]
 litestar = [
-    "litestar>=2.0.0",
+    "litestar[cli]>=3.0.0",
 ]
 mcp = [
     "mcp>=1.0.0",
@@ -262,7 +261,7 @@ exclude = ["examples/", "docs/"]
 fix = true
 line-length = 120
 src = ["src/debug_toolbar", "tests"]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -357,6 +356,14 @@ exclude = [
 
 [tool.uv]
 default-groups = ["dev"]
+
+# Development/CI only: track upstream branches ahead of releases that support Litestar 3.
+# `litestar` needs Litestar's unreleased 3.0; `advanced-alchemy` needs its unreleased 1.11.0,
+# which adds support for Litestar 3's new dependency-injection markers.
+# Remove both once litestar>=3.0.0 and advanced-alchemy>=1.11.0 are published on PyPI.
+[tool.uv.sources]
+advanced-alchemy = { git = "https://github.com/litestar-org/advanced-alchemy", branch = "main" }
+litestar = { git = "https://github.com/litestar-org/litestar", branch = "main" }
 
 [tool.uv.build-backend]
 module-name = "debug_toolbar"
