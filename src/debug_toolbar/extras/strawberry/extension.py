@@ -23,11 +23,16 @@ logger = logging.getLogger(__name__)
 
 try:
     from strawberry.extensions import SchemaExtension as _SchemaExtension
+    from strawberry.resolvers import is_default_resolver
 
     STRAWBERRY_AVAILABLE = True
 except ImportError:
     STRAWBERRY_AVAILABLE = False
     _SchemaExtension = object  # type: ignore[assignment, misc]
+
+    def is_default_resolver(_func: Callable[..., Any]) -> bool:  # type: ignore[misc]
+        """Fallback when Strawberry is unavailable."""
+        return False
 
 
 class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
@@ -206,6 +211,7 @@ class DebugToolbarExtension(_SchemaExtension):  # type: ignore[misc]
             parent_type=parent_type_name,
             return_type=return_type_str,
             arguments=dict(kwargs),
+            is_default_resolver=is_default_resolver(_next),
         )
 
         if self._capture_stacks:

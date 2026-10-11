@@ -260,6 +260,64 @@ class TestN1Analyzer:
 
         assert N1Analyzer(threshold=3).analyze([operation]) == []
 
+    def test_ignores_default_resolvers(self) -> None:
+        """Should not flag plain attribute reads with no custom resolver."""
+        resolvers = [
+            TrackedResolver(
+                resolver_id=f"r{i}",
+                field_name="id",
+                field_path=f"Query.posts.{i}.id",
+                resolver_function="Post.id",
+                parent_type="Post",
+                return_type="String",
+                duration_ms=0.01,
+                is_default_resolver=True,
+            )
+            for i in range(5)
+        ]
+        operation = TrackedOperation(
+            operation_id="op1",
+            query="query { posts { id } }",
+            variables={},
+            operation_name=None,
+            operation_type="query",
+            start_time=0.0,
+            resolvers=resolvers,
+        )
+
+        assert N1Analyzer(threshold=3).analyze([operation]) == []
+
+    def test_flags_custom_resolver_called_per_item(self) -> None:
+        """Should still flag a custom (non-default) resolver run once per list item."""
+        resolvers = [
+            TrackedResolver(
+                resolver_id=f"r{i}",
+                field_name="author",
+                field_path=f"Query.posts.{i}.author",
+                resolver_function="Post.author",
+                parent_type="Post",
+                return_type="User",
+                duration_ms=10.0,
+                is_default_resolver=False,
+            )
+            for i in range(3)
+        ]
+        operation = TrackedOperation(
+            operation_id="op1",
+            query="query { posts { author { name } } }",
+            variables={},
+            operation_name=None,
+            operation_type="query",
+            start_time=0.0,
+            resolvers=resolvers,
+        )
+
+        patterns = N1Analyzer(threshold=3).analyze([operation])
+
+        assert len(patterns) == 1
+        assert patterns[0]["field_name"] == "author"
+        assert patterns[0]["count"] == 3
+
 
 class TestDuplicateDetector:
     """Tests for DuplicateDetector."""
