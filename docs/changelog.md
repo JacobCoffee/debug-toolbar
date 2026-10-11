@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [1.1.0](https://github.com/JacobCoffee/debug-toolbar/compare/v1.0.1..v1.1.0) - 2026-10-11
+
+### Bug Fixes
+
+- **(examples)** show the debug toolbar in the asgi_basic example (#61) - ([af3c25f](https://github.com/JacobCoffee/debug-toolbar/commit/af3c25f836769bba5e38cdd8833e4d677c8333ea)) - Jacob Coffee
+- **(mcp)** support mcp SDK v2 alongside v1 (#68) - ([1f491ff](https://github.com/JacobCoffee/debug-toolbar/commit/1f491ff4e28fe76268276caf87a9c3b750544181)) - Jacob Coffee
+- stop flagging default-resolved fields as GraphQL N+1 (#63) - ([c32b702](https://github.com/JacobCoffee/debug-toolbar/commit/c32b7020f91d337f66227b529b7946321ba2e1c9)) - Jacob Coffee
+- update collapse button aria-label and aria-expanded on toggle (#62) - ([0f0a657](https://github.com/JacobCoffee/debug-toolbar/commit/0f0a6579d5b2212fbe424d5d7edcfc90518058fa)) - Jacob Coffee
+- populate FastAPI dependency injection panel with real resolutions (#64) - ([22c491a](https://github.com/JacobCoffee/debug-toolbar/commit/22c491ac56e52bd5a745dba9f4bf6ae1150ba205)) - Jacob Coffee
+- async profiler task names and blocking call detection (#67) - ([b71a105](https://github.com/JacobCoffee/debug-toolbar/commit/b71a1059bbf5f7c75f91ab327b9cb0d6b45f1b23)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v1.0.1 - ([d957b71](https://github.com/JacobCoffee/debug-toolbar/commit/d957b7174474f9ad61eb26b981229e7d41873832)) - github-actions[bot]
+
+### Features
+
+- add Tachyon sampling profiler backend (Python 3.15+) (#60) - ([e53cddb](https://github.com/JacobCoffee/debug-toolbar/commit/e53cddb42c410238bb0fe5cf4041338e2642938c)) - Jacob Coffee
+
+### Miscellaneous Chores
+
+- release 1.1.0 (#69) - ([da8d2e9](https://github.com/JacobCoffee/debug-toolbar/commit/da8d2e9513e0d35fc7d9e5605e0579fad46d9ca0)) - Jacob Coffee
+
+### Tests
+
+- add tests for example apps (#65) - ([1560656](https://github.com/JacobCoffee/debug-toolbar/commit/1560656ada4830e96f94aab61dd654ecdb3139c3)) - Jacob Coffee
+
+### Ci
+
+- run CI when examples change (#66) - ([2801623](https://github.com/JacobCoffee/debug-toolbar/commit/280162369994350bc21ae8af576f7c99afd34fa5)) - Jacob Coffee
+
+---
 ## [1.0.1](https://github.com/JacobCoffee/debug-toolbar/compare/v1.0.0..v1.0.1) - 2026-10-11
 
 ### Bug Fixes
