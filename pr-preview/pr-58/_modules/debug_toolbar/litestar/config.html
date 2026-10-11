@@ -199,43 +199,46 @@ data-aria-dark="Switch to auto color mode">
 </span><span data-line="50">        <span class="k">if</span> <span class="s2">&quot;debug_toolbar.litestar.panels.static_files.StaticFilesPanel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_panels</span><span class="p">:</span>
 </span><span data-line="51">            <span class="n">default_panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;debug_toolbar.litestar.panels.static_files.StaticFilesPanel&quot;</span><span class="p">)</span>
 </span><span data-line="52">
-</span><span data-line="53">        <span class="bp">self</span><span class="o">.</span><span class="n">panels</span> <span class="o">=</span> <span class="n">default_panels</span>
-</span><span data-line="54">
+</span><span data-line="53">        <span class="k">if</span> <span class="s2">&quot;debug_toolbar.litestar.panels.middleware.MiddlewarePanel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_panels</span><span class="p">:</span>
+</span><span data-line="54">            <span class="n">default_panels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;debug_toolbar.litestar.panels.middleware.MiddlewarePanel&quot;</span><span class="p">)</span>
+</span><span data-line="55">
+</span><span data-line="56">        <span class="bp">self</span><span class="o">.</span><span class="n">panels</span> <span class="o">=</span> <span class="n">default_panels</span>
+</span><span data-line="57">
 <div class="viewcode-block" id="LitestarDebugToolbarConfig.should_show_toolbar">
 <a class="viewcode-back" href="../../../api/_autosummary/debug_toolbar.litestar.config.html#debug_toolbar.litestar.config.LitestarDebugToolbarConfig.should_show_toolbar">[docs]</a>
-</span><span data-line="55">    <span class="k">def</span><span class="w"> </span><span class="nf">should_show_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span data-line="56"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if the toolbar should be shown for this request.</span>
-</span><span data-line="57">
-</span><span data-line="58"><span class="sd">        Args:</span>
-</span><span data-line="59"><span class="sd">            request: The Litestar request object.</span>
+</span><span data-line="58">    <span class="k">def</span><span class="w"> </span><span class="nf">should_show_toolbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span data-line="59"><span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if the toolbar should be shown for this request.</span>
 </span><span data-line="60">
-</span><span data-line="61"><span class="sd">        Returns:</span>
-</span><span data-line="62"><span class="sd">            True if the toolbar should be shown.</span>
-</span><span data-line="63"><span class="sd">        &quot;&quot;&quot;</span>
-</span><span data-line="64">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
-</span><span data-line="65">            <span class="k">return</span> <span class="kc">False</span>
-</span><span data-line="66">
-</span><span data-line="67">        <span class="n">path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span>
-</span><span data-line="68">
-</span><span data-line="69">        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">excluded</span><span class="p">)</span> <span class="k">for</span> <span class="n">excluded</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_paths</span><span class="p">):</span>
-</span><span data-line="70">            <span class="k">return</span> <span class="kc">False</span>
+</span><span data-line="61"><span class="sd">        Args:</span>
+</span><span data-line="62"><span class="sd">            request: The Litestar request object.</span>
+</span><span data-line="63">
+</span><span data-line="64"><span class="sd">        Returns:</span>
+</span><span data-line="65"><span class="sd">            True if the toolbar should be shown.</span>
+</span><span data-line="66"><span class="sd">        &quot;&quot;&quot;</span>
+</span><span data-line="67">        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+</span><span data-line="68">            <span class="k">return</span> <span class="kc">False</span>
+</span><span data-line="69">
+</span><span data-line="70">        <span class="n">path</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span>
 </span><span data-line="71">
-</span><span data-line="72">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">:</span>
-</span><span data-line="73">            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+</span><span data-line="72">        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">excluded</span><span class="p">)</span> <span class="k">for</span> <span class="n">excluded</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_paths</span><span class="p">):</span>
+</span><span data-line="73">            <span class="k">return</span> <span class="kc">False</span>
 </span><span data-line="74">
-</span><span data-line="75">            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">:</span>
-</span><span data-line="76">                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-</span><span data-line="77">                    <span class="k">return</span> <span class="kc">False</span>
-</span><span data-line="78">
-</span><span data-line="79">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_hosts</span><span class="p">:</span>
-</span><span data-line="80">            <span class="n">host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-</span><span data-line="81">            <span class="k">if</span> <span class="n">host</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_hosts</span><span class="p">:</span>
-</span><span data-line="82">                <span class="k">return</span> <span class="kc">False</span>
-</span><span data-line="83">
-</span><span data-line="84">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_toolbar_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span data-line="85">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_toolbar_callback</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span data-line="75">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">:</span>
+</span><span data-line="76">            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+</span><span data-line="77">
+</span><span data-line="78">            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude_patterns</span><span class="p">:</span>
+</span><span data-line="79">                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+</span><span data-line="80">                    <span class="k">return</span> <span class="kc">False</span>
+</span><span data-line="81">
+</span><span data-line="82">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_hosts</span><span class="p">:</span>
+</span><span data-line="83">            <span class="n">host</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span data-line="84">            <span class="k">if</span> <span class="n">host</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_hosts</span><span class="p">:</span>
+</span><span data-line="85">                <span class="k">return</span> <span class="kc">False</span>
 </span><span data-line="86">
-</span><span data-line="87">        <span class="k">return</span> <span class="kc">True</span></div>
+</span><span data-line="87">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_toolbar_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span data-line="88">            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_toolbar_callback</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span data-line="89">
+</span><span data-line="90">        <span class="k">return</span> <span class="kc">True</span></div>
 </div>
 
 </span></pre></div>
