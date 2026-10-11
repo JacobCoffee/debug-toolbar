@@ -31,6 +31,9 @@ class N1Analyzer:
     def analyze(self, operations: list[TrackedOperation]) -> list[dict[str, Any]]:
         """Analyze operations for N+1 patterns.
 
+        Default-resolved fields (plain attribute reads with no custom
+        resolver) are excluded since they never perform per-item I/O.
+
         Args:
             operations: List of tracked operations.
 
@@ -52,6 +55,8 @@ class N1Analyzer:
         for operation in operations:
             for resolver in operation.resolvers:
                 if resolver.parent_type.startswith("__"):
+                    continue
+                if resolver.is_default_resolver:
                     continue
                 arg_sig = self._get_argument_signature(resolver.arguments)
                 signature = f"{resolver.parent_type}.{resolver.field_name}({arg_sig})"
