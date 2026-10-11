@@ -64,6 +64,39 @@ class TestProfilingPanelInit:
         assert panel._profiling_overhead == 0.0
 
 
+class TestProfilingPanelWithRealConfig:
+    """Profiling options documented in the configuration guide must be accepted by every config class."""
+
+    @pytest.mark.parametrize(
+        "config_path",
+        [
+            "debug_toolbar.core.config:DebugToolbarConfig",
+            "debug_toolbar.litestar.config:LitestarDebugToolbarConfig",
+            "debug_toolbar.starlette.config:StarletteDebugToolbarConfig",
+            "debug_toolbar.fastapi.config:FastAPIDebugToolbarConfig",
+        ],
+    )
+    def test_panel_uses_profiler_options_from_config(self, config_path: str) -> None:
+        module_name, class_name = config_path.split(":")
+        config_class = getattr(pytest.importorskip(module_name), class_name)
+        config = config_class(
+            profiler_backend="cprofile",
+            profiler_top_functions=7,
+            profiler_sort_by="tottime",
+            profiler_tachyon_interval_usec=500,
+            enable_flamegraph=False,
+        )
+        toolbar = MagicMock()
+        toolbar.config = config
+
+        panel = ProfilingPanel(toolbar)
+
+        assert panel._backend == "cprofile"
+        assert panel._top_functions == 7
+        assert panel._sort_by == "tottime"
+        assert panel._enable_flamegraph is False
+
+
 class TestProfilingPanelBackendSelection:
     """Tests for backend selection logic."""
 

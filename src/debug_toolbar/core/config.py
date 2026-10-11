@@ -31,6 +31,11 @@ class DebugToolbarConfig:
         panel_display_depth: Max depth for nested data rendering. Defaults to 10.
         panel_display_max_items: Max items to show in arrays/objects. Defaults to 100.
         panel_display_max_string: Max string length before truncation. Defaults to 1000.
+        profiler_backend: Profiling backend: "cprofile", "pyinstrument", or "tachyon". Defaults to "cprofile".
+        profiler_top_functions: Max functions shown in the profiling panel. Defaults to 50.
+        profiler_sort_by: Sort order for profiling results. Defaults to "cumulative".
+        profiler_tachyon_interval_usec: Tachyon sampling interval in microseconds. Defaults to 1000.
+        enable_flamegraph: Whether to generate flame graph data. Defaults to True.
         async_profiler_backend: Async profiler backend. "auto" selects best available.
         async_blocking_threshold_ms: Threshold for blocking call detection. Defaults to 100.
         async_enable_blocking_detection: Whether to detect blocking calls. Defaults to True.
@@ -68,6 +73,12 @@ class DebugToolbarConfig:
     panel_display_depth: int = 10
     panel_display_max_items: int = 100
     panel_display_max_string: int = 1000
+
+    profiler_backend: Literal["cprofile", "pyinstrument", "tachyon"] = "cprofile"
+    profiler_top_functions: int = 50
+    profiler_sort_by: str = "cumulative"
+    profiler_tachyon_interval_usec: int = 1000
+    enable_flamegraph: bool = True
 
     async_profiler_backend: Literal["taskfactory", "yappi", "auto"] = "auto"
     async_blocking_threshold_ms: float = 100.0
