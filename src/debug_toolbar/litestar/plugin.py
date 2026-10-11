@@ -74,17 +74,12 @@ class DebugToolbarPlugin(InitPluginProtocol):
             return app_config
 
         from debug_toolbar.litestar.routes import create_debug_toolbar_router
-        from litestar.middleware import DefineMiddleware
 
         self._auto_add_websocket_panel(app_config)
 
         self._toolbar = DebugToolbar(self._config)
 
-        middleware = DefineMiddleware(
-            DebugToolbarMiddleware,
-            config=self._config,
-            toolbar=self._toolbar,
-        )
+        middleware = DebugToolbarMiddleware(config=self._config, toolbar=self._toolbar)
 
         if app_config.middleware is None:
             app_config.middleware = [middleware]
