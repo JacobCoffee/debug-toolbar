@@ -1,0 +1,60 @@
+name: Examples (latest dependencies)
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'tests/examples/**'
+      - '.github/workflows/examples-latest.yml'
+
+concurrency:
+  group: examples-latest-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  examples-latest:
+    name: Examples - Python ${{ matrix.python-version }} (latest deps)
+    runs-on: ubuntu-latest
+    env:
+      UV_PYTHON: ${{ matrix.python-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.15"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v6
+        with:
+          enable-cache: true
+          version: "0.9.12"
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies with latest allowed versions
+        run: uv sync --all-extras --upgrade
+
+      - name: Print resolved versions of key frameworks
+        run: |
+          uv pip list | grep -Ei '^(litestar|starlette|fastapi|strawberry-graphql|advanced-alchemy|sqlalchemy|aiosqlite|mcp|uvicorn|jinja2|httpx) '
+
+      - name: Run example tests
+        run: uv run pytest tests/examples -v
+        shell: bash
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
