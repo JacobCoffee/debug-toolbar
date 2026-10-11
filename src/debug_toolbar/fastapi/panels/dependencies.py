@@ -42,7 +42,8 @@ class DependencyInjectionPanel(Panel):
         dependency_tree = dependencies_data.get("tree", {})
         cache_stats = dependencies_data.get("cache_stats", {})
 
-        total_time_ms = sum(d.get("duration_ms") or 0 for d in resolved)
+        durations = [d["duration_ms"] for d in resolved if d.get("duration_ms") is not None]
+        total_time_ms = sum(durations) if durations else None
         cached_count = sum(1 for d in resolved if d.get("cached", False))
         total_count = len(resolved)
 

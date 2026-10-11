@@ -2750,7 +2750,7 @@ class DebugToolbar {
         const maxStringLen = 1000;
 
         if (value === null || value === undefined) {
-            return '<span class="null">\u2014</span>';
+            return '<span class="null">null</span>';
         }
         if (typeof value === 'boolean') {
             return '<span class="bool">' + value + '</span>';

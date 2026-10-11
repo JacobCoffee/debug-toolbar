@@ -132,9 +132,7 @@ def record_dependency_resolution(
         name: Name of the dependency function/class.
         dependency_type: Type of dependency (function, class, generator).
         cached: Whether the result came from cache.
-        duration_ms: Resolution time in milliseconds, or ``None`` if it could not
-            be measured (e.g. coroutine-function dependencies, which FastAPI
-            invokes with no interceptable call site).
+        duration_ms: Resolution time in milliseconds, or ``None`` if unknown.
         module: Module where the dependency is defined.
         cache_key: Cache key used by FastAPI.
         params: Parameters passed to the dependency.
