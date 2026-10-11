@@ -17,9 +17,10 @@ Run with: uv run examples/asgi_basic/app.py
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from debug_toolbar import DebugToolbar, DebugToolbarConfig, set_request_context
+from debug_toolbar.core.assets import get_toolbar_css, get_toolbar_js
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -49,33 +50,119 @@ async def debug_toolbar_middleware(inner_app: Callable, scope: dict, receive: Ca
     context.metadata["path"] = path
     context.metadata["query_string"] = scope.get("query_string", b"").decode()
 
-    response_started = False
     status_code = 200
     response_headers: list[tuple[bytes, bytes]] = []
+    is_html = False
+    body_chunks: list[bytes] = []
 
     async def send_wrapper(message: dict) -> None:
-        nonlocal response_started, status_code, response_headers
+        nonlocal status_code, response_headers, is_html
 
         if message["type"] == "http.response.start":
-            response_started = True
             status_code = message.get("status", 200)
             response_headers = list(message.get("headers", []))
+            content_type = next((v for k, v in response_headers if k == b"content-type"), b"")
+            is_html = b"text/html" in content_type
+            if not is_html:
+                await _send_response_start(send, context, status_code, response_headers)
+            return
 
+        if not is_html:
+            await send(message)
+            return
+
+        body_chunks.append(message.get("body", b""))
+        if not message.get("more_body", False):
+            full_body = b"".join(body_chunks)
             context.metadata["status_code"] = status_code
             await toolbar.process_response(context)
-
-            server_timing = toolbar.get_server_timing_header(context)
-            if server_timing:
-                response_headers.append((b"server-timing", server_timing.encode()))
-
-            message = {**message, "headers": response_headers}
-
-        await send(message)
+            modified_body = _inject_toolbar(full_body, context)
+            new_headers = [(k, v) for k, v in response_headers if k.lower() != b"content-length"]
+            new_headers.append((b"content-length", str(len(modified_body)).encode()))
+            await _send_response_start(send, context, status_code, new_headers, already_processed=True)
+            await send({"type": "http.response.body", "body": modified_body, "more_body": False})
 
     try:
         await inner_app(scope, receive, send_wrapper)
     finally:
         set_request_context(None)
+
+
+async def _send_response_start(
+    send: Callable,
+    context: Any,
+    status_code: int,
+    headers: list[tuple[bytes, bytes]],
+    *,
+    already_processed: bool = False,
+) -> None:
+    """Send the http.response.start message, adding the server-timing header."""
+    if not already_processed:
+        context.metadata["status_code"] = status_code
+        await toolbar.process_response(context)
+
+    server_timing = toolbar.get_server_timing_header(context)
+    if server_timing:
+        headers = [*headers, (b"server-timing", server_timing.encode())]
+
+    await send({"type": "http.response.start", "status": status_code, "headers": headers})
+
+
+def _inject_toolbar(body: bytes, context: Any) -> bytes:
+    """Inject the toolbar HTML into an HTML response body."""
+    try:
+        html = body.decode("utf-8")
+    except UnicodeDecodeError:
+        return body
+
+    toolbar_data = toolbar.get_toolbar_data(context)
+    toolbar_html = _render_toolbar(toolbar_data)
+
+    insert_before = config.insert_before
+    if insert_before in html:
+        html = html.replace(insert_before, toolbar_html + insert_before, 1)
+    else:
+        html += toolbar_html
+
+    return html.encode("utf-8")
+
+
+def _render_toolbar(data: dict[str, Any]) -> str:
+    """Render the toolbar HTML."""
+    panels_html = []
+    for panel in data.get("panels", []):
+        subtitle = panel.get("nav_subtitle", "")
+        subtitle_html = f'<span class="panel-subtitle">{subtitle}</span>' if subtitle else ""
+        panels_html.append(f"""
+            <button class="toolbar-panel-btn" data-panel-id="{panel["panel_id"]}">
+                <span class="panel-title">{panel["nav_title"]}</span>
+                {subtitle_html}
+            </button>
+        """)
+
+    timing = data.get("timing", {})
+    total_time = timing.get("total_time", 0) * 1000
+    request_id = data.get("request_id", "N/A")
+
+    return f"""
+    <link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">
+    <div id="debug-toolbar" data-request-id="{request_id}">
+        <div class="toolbar-bar">
+            <span class="toolbar-brand" title="Click to toggle">Debug Toolbar</span>
+            <span class="toolbar-time">{total_time:.2f}ms</span>
+            <div class="toolbar-panels">
+                {"".join(panels_html)}
+            </div>
+            <span class="toolbar-request-id">
+                <a href="/_debug_toolbar/{request_id}" class="toolbar-history-link"
+                   title="View request details">{request_id[:8]}</a>
+            </span>
+            <a href="/_debug_toolbar/" class="toolbar-history-link" title="View request history">History</a>
+        </div>
+        <div class="toolbar-details"></div>
+    </div>
+    <script src="/_debug_toolbar/static/toolbar.js"></script>
+    """
 
 
 async def handle_debug_toolbar_request(
@@ -86,7 +173,27 @@ async def handle_debug_toolbar_request(
     """Handle debug toolbar API requests."""
     path = scope.get("path", "")
 
-    if path == "/_debug_toolbar/requests":
+    if path == "/_debug_toolbar/static/toolbar.css":
+        body = get_toolbar_css().encode()
+        await send({
+            "type": "http.response.start",
+            "status": 200,
+            "headers": [(b"content-type", b"text/css")],
+        })
+        await send({"type": "http.response.body", "body": body})
+        return
+
+    if path == "/_debug_toolbar/static/toolbar.js":
+        body = get_toolbar_js().encode()
+        await send({
+            "type": "http.response.start",
+            "status": 200,
+            "headers": [(b"content-type", b"application/javascript")],
+        })
+        await send({"type": "http.response.body", "body": body})
+        return
+
+    if path == "/_debug_toolbar/api/requests":
         requests_list = []
         for rid, data in toolbar.storage.get_all():
             metadata = data.get("metadata", {})
@@ -104,7 +211,7 @@ async def handle_debug_toolbar_request(
         await send({"type": "http.response.body", "body": body})
         return
 
-    if path.startswith("/_debug_toolbar/request/"):
+    if path.startswith("/_debug_toolbar/api/requests/"):
         from uuid import UUID
 
         request_id_str = path.split("/")[-1]
@@ -150,7 +257,7 @@ async def application(scope: dict, receive: Callable, send: Callable) -> None:  
         <li><a href="/">Home</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/api/data">API Data</a></li>
-        <li><a href="/_debug_toolbar/requests">Debug Toolbar Requests</a></li>
+        <li><a href="/_debug_toolbar/api/requests">Debug Toolbar Requests</a></li>
     </ul>
 </body>
 </html>"""
