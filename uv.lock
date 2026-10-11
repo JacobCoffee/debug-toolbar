@@ -635,7 +635,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.0" },
     { name = "litestar", marker = "extra == 'litestar'", specifier = ">=2.0.0" },
     { name = "markupsafe", specifier = ">=2.1.0" },
-    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.0.0" },
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.21.1" },
     { name = "sqlalchemy", marker = "extra == 'advanced-alchemy'", specifier = ">=2.0.0" },
     { name = "starlette", marker = "extra == 'starlette'", specifier = ">=0.27.0" },
     { name = "strawberry-graphql", marker = "extra == 'strawberry'", specifier = ">=0.240.0" },

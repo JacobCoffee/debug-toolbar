@@ -99,7 +99,7 @@ litestar = [
     "litestar>=2.0.0",
 ]
 mcp = [
-    "mcp>=1.0.0",
+    "mcp>=1.21.1",
 ]
 starlette = [
     "starlette>=0.27.0",

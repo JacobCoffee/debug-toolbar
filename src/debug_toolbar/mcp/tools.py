@@ -6,13 +6,19 @@ from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
 if TYPE_CHECKING:
-    from debug_toolbar.mcp.server import MCPContext
-
-try:
     from mcp.server.fastmcp import Context, FastMCP
-except ImportError:
-    Context = Any  # type: ignore[assignment, misc]
-    FastMCP = Any  # type: ignore[assignment, misc]
+
+    from debug_toolbar.mcp.server import MCPContext
+else:
+    try:
+        from mcp.server.fastmcp import Context, FastMCP
+    except ImportError:
+        try:
+            from mcp.server.mcpserver import Context
+            from mcp.server.mcpserver import MCPServer as FastMCP
+        except ImportError:
+            Context = Any  # type: ignore[assignment, misc]
+            FastMCP = Any  # type: ignore[assignment, misc]
 
 SLOW_QUERY_THRESHOLD_MS = 100
 SLOW_RESOLVER_THRESHOLD_MS = 50
