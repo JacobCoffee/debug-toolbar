@@ -1,12 +1,9 @@
 """Tests for the raw-ASGI ``examples/asgi_basic`` example.
 
 This example hand-rolls its own debug-toolbar middleware directly against the
-``DebugToolbar`` core API, predating the framework integrations' HTML
-injection and static-asset routes. On this branch (ahead of PR #61) it does
-not inject the toolbar markup into HTML responses and does not serve
-``/_debug_toolbar/static/*`` assets at all -- only the two hand-rolled JSON
-endpoints (``/_debug_toolbar/requests`` and ``/_debug_toolbar/request/<id>``)
-exist. These tests assert the behavior that is actually present today.
+``DebugToolbar`` core API. It injects the toolbar markup into HTML responses,
+serves ``/_debug_toolbar/static/*`` assets, and exposes JSON endpoints at
+``/_debug_toolbar/api/requests`` and ``/_debug_toolbar/api/requests/<id>``.
 """
 
 from __future__ import annotations
@@ -32,30 +29,26 @@ def _client(asgi_basic: ModuleType) -> httpx.AsyncClient:
     return httpx.AsyncClient(transport=transport, base_url="http://testserver")
 
 
-async def test_home_page_returns_html(asgi_basic: ModuleType) -> None:
+async def test_home_page_injects_toolbar_markup(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
         response = await client.get("/")
 
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "ASGI Debug Toolbar Example" in response.text
+    assert 'id="debug-toolbar"' in response.text
+    assert '<link rel="stylesheet" href="/_debug_toolbar/static/toolbar.css">' in response.text
+    assert '<script src="/_debug_toolbar/static/toolbar.js"></script>' in response.text
 
 
-async def test_home_page_does_not_inject_toolbar_markup(asgi_basic: ModuleType) -> None:
-    """The hand-rolled middleware never rewrites the response body (PR #61)."""
-    async with _client(asgi_basic) as client:
-        response = await client.get("/")
-
-    assert 'id="debug-toolbar"' not in response.text
-
-
-async def test_about_page_returns_html(asgi_basic: ModuleType) -> None:
+async def test_about_page_injects_toolbar_markup(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
         response = await client.get("/about")
 
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "About" in response.text
+    assert 'id="debug-toolbar"' in response.text
 
 
 async def test_api_data_returns_json_without_toolbar_markup(asgi_basic: ModuleType) -> None:
@@ -65,13 +58,13 @@ async def test_api_data_returns_json_without_toolbar_markup(asgi_basic: ModuleTy
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/json")
     data = response.json()
-    assert data["items"] == [1, 2, 3]
+    assert data["message"] == "Hello from the API"
     assert 'id="debug-toolbar"' not in response.text
 
 
 async def test_unknown_path_returns_404(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
-        response = await client.get("/nope")
+        response = await client.get("/no-such-page")
 
     assert response.status_code == 404
 
@@ -83,25 +76,43 @@ async def test_server_timing_header_present_after_request(asgi_basic: ModuleType
     assert "server-timing" in response.headers
 
 
-async def test_debug_toolbar_requests_lists_recorded_request(asgi_basic: ModuleType) -> None:
+async def test_static_css_asset(asgi_basic: ModuleType) -> None:
+    async with _client(asgi_basic) as client:
+        response = await client.get("/_debug_toolbar/static/toolbar.css")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/css")
+    assert response.text
+
+
+async def test_static_js_asset(asgi_basic: ModuleType) -> None:
+    async with _client(asgi_basic) as client:
+        response = await client.get("/_debug_toolbar/static/toolbar.js")
+
+    assert response.status_code == 200
+    assert "javascript" in response.headers["content-type"]
+    assert response.text
+
+
+async def test_debug_toolbar_api_requests_lists_recorded_request(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
         await client.get("/")
-        response = await client.get("/_debug_toolbar/requests")
+        response = await client.get("/_debug_toolbar/api/requests")
 
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/json")
     requests_list = response.json()
-    assert len(requests_list) == 1
-    assert requests_list[0]["method"] == "GET"
+    assert len(requests_list) >= 1
+    assert "request_id" in requests_list[0]
     assert requests_list[0]["path"] == "/"
 
 
-async def test_debug_toolbar_request_detail_contains_panel_data(asgi_basic: ModuleType) -> None:
+async def test_debug_toolbar_api_request_detail_contains_panel_data(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
         await client.get("/")
-        requests_response = await client.get("/_debug_toolbar/requests")
+        requests_response = await client.get("/_debug_toolbar/api/requests")
         request_id = requests_response.json()[0]["request_id"]
-        detail_response = await client.get(f"/_debug_toolbar/request/{request_id}")
+        detail_response = await client.get(f"/_debug_toolbar/api/requests/{request_id}")
 
     assert detail_response.status_code == 200
     assert detail_response.headers["content-type"].startswith("application/json")
@@ -119,18 +130,8 @@ async def test_debug_toolbar_request_detail_contains_panel_data(asgi_basic: Modu
     assert request_stats["path"] == "/"
 
 
-async def test_debug_toolbar_request_detail_unknown_id_returns_404(asgi_basic: ModuleType) -> None:
+async def test_debug_toolbar_api_request_detail_unknown_id_returns_404(asgi_basic: ModuleType) -> None:
     async with _client(asgi_basic) as client:
-        response = await client.get(f"/_debug_toolbar/request/{uuid4()}")
+        response = await client.get(f"/_debug_toolbar/api/requests/{uuid4()}")
 
     assert response.status_code == 404
-
-
-async def test_static_assets_are_not_served_yet(asgi_basic: ModuleType) -> None:
-    """No ``/_debug_toolbar/static/*`` route exists in this example (PR #61)."""
-    async with _client(asgi_basic) as client:
-        css_response = await client.get("/_debug_toolbar/static/toolbar.css")
-        js_response = await client.get("/_debug_toolbar/static/toolbar.js")
-
-    assert css_response.status_code == 404
-    assert js_response.status_code == 404
