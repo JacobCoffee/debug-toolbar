@@ -4,15 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 import traceback
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from debug_toolbar.core.panels.async_profiler.models import BlockingCall, LagSample
-
-if TYPE_CHECKING:
-    ExceptionHandler = Callable[[asyncio.AbstractEventLoop, dict[str, Any]], object]
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +19,12 @@ DEFAULT_SAMPLE_INTERVAL_MS = 10.0
 DEFAULT_MAX_STACK_DEPTH = 10
 STACK_SKIP_FRAMES = 3
 MS_TO_SECONDS = 1000.0
+ASYNCIO_LOGGER_NAME = "asyncio"
+SLOW_CALLBACK_LOG_ARGS = 2
+
+_SLOW_CALLBACK_LOCATION_RE = re.compile(
+    r"(?P<func>[\w.]+)\(\).*?(?:running at|created at|defined at) (?P<file>[^\s:]+):(?P<line>\d+)"
+)
 
 
 def _get_stack_frames(
@@ -58,10 +61,11 @@ class BlockingCallDetector:
 
     __slots__ = (
         "_blocking_calls",
+        "_log_handler",
         "_loop",
         "_original_debug",
         "_original_duration",
-        "_original_handler",
+        "_original_logger_level",
         "_threshold_ms",
     )
 
@@ -76,7 +80,8 @@ class BlockingCallDetector:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._original_debug: bool = False
         self._original_duration: float = 0.1
-        self._original_handler: ExceptionHandler | None = None
+        self._original_logger_level: int = logging.NOTSET
+        self._log_handler: _SlowCallbackLogHandler | None = None
 
     def install(self, loop: asyncio.AbstractEventLoop) -> None:
         """Install blocking call detection on the event loop.
@@ -89,43 +94,15 @@ class BlockingCallDetector:
 
         self._original_debug = loop.get_debug()
         self._original_duration = loop.slow_callback_duration
-        self._original_handler = loop.get_exception_handler()
 
         loop.set_debug(True)
         loop.slow_callback_duration = self._threshold_ms / MS_TO_SECONDS
-        loop.set_exception_handler(self._exception_handler)
 
-    def _exception_handler(self, loop: asyncio.AbstractEventLoop, context: dict[str, Any]) -> None:
-        """Custom exception handler that captures slow callback warnings.
-
-        Args:
-            loop: The event loop.
-            context: Exception context dictionary.
-        """
-        message = context.get("message", "")
-        if "Executing" in message and "took" in message and "seconds" in message:
-            import re
-
-            match = re.search(r"took ([\d.]+) seconds", message)
-            if match:
-                duration_s = float(match.group(1))
-                duration_ms = duration_s * MS_TO_SECONDS
-                source = context.get("source_traceback", [])
-                if source:
-                    frame = source[-1] if source else None
-                    self.record_blocking_call(
-                        duration_ms=duration_ms,
-                        function_name=frame.name if frame else "unknown",
-                        file=frame.filename if frame else "unknown",
-                        line=frame.lineno if frame else 0,
-                    )
-                else:
-                    self.record_blocking_call(duration_ms=duration_ms)
-
-        if self._original_handler:
-            self._original_handler(loop, context)
-        else:
-            loop.default_exception_handler(context)
+        asyncio_logger = logging.getLogger(ASYNCIO_LOGGER_NAME)
+        self._original_logger_level = asyncio_logger.level
+        asyncio_logger.setLevel(logging.WARNING)
+        self._log_handler = _SlowCallbackLogHandler(self)
+        asyncio_logger.addHandler(self._log_handler)
 
     def uninstall(self) -> None:
         """Uninstall blocking call detection and restore original settings."""
@@ -134,7 +111,12 @@ class BlockingCallDetector:
 
         self._loop.set_debug(self._original_debug)
         self._loop.slow_callback_duration = self._original_duration
-        self._loop.set_exception_handler(self._original_handler)
+
+        asyncio_logger = logging.getLogger(ASYNCIO_LOGGER_NAME)
+        if self._log_handler is not None:
+            asyncio_logger.removeHandler(self._log_handler)
+            self._log_handler = None
+        asyncio_logger.setLevel(self._original_logger_level)
 
     def record_blocking_call(
         self,
@@ -188,6 +170,58 @@ class BlockingCallDetector:
             "blocking_calls": calls,
             "total_blocking_time_ms": sum(c.duration_ms for c in self._blocking_calls),
         }
+
+
+class _SlowCallbackLogHandler(logging.Handler):
+    """Logging handler that turns asyncio's slow-callback warnings into blocking call records.
+
+    CPython's event loop reports slow callbacks (when running in debug mode past
+    ``slow_callback_duration``) by calling ``logging.getLogger("asyncio").warning(...)``
+    directly from ``BaseEventLoop._run_once``, not via ``call_exception_handler``. This
+    handler is attached directly to the ``asyncio`` logger to observe those records.
+    """
+
+    __slots__ = ("_detector",)
+
+    def __init__(self, detector: BlockingCallDetector) -> None:
+        super().__init__(level=logging.WARNING)
+        self._detector = detector
+
+    def emit(self, record: logging.LogRecord) -> None:
+        """Parse a slow-callback warning record and record it as a blocking call.
+
+        Args:
+            record: The log record emitted by the asyncio logger.
+        """
+        if record.name != ASYNCIO_LOGGER_NAME or not isinstance(record.msg, str):
+            return
+        if not record.msg.startswith("Executing") or "took" not in record.msg:
+            return
+
+        args = record.args
+        if not isinstance(args, tuple) or len(args) < SLOW_CALLBACK_LOG_ARGS:
+            return
+
+        duration_arg = args[1]
+        if not isinstance(duration_arg, (int, float)):
+            return
+        duration_ms = float(duration_arg) * MS_TO_SECONDS
+
+        handle_repr = str(args[0])
+        match = _SLOW_CALLBACK_LOCATION_RE.search(handle_repr)
+        if match:
+            function_name = match.group("func")
+            file = match.group("file")
+            line = int(match.group("line"))
+        else:
+            function_name, file, line = "unknown", "unknown", 0
+
+        self._detector.record_blocking_call(
+            duration_ms=duration_ms,
+            function_name=function_name,
+            file=file,
+            line=line,
+        )
 
 
 class EventLoopLagMonitor:
