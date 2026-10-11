@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -166,21 +166,22 @@ class TestDebugToolbarMiddleware:
 
         await middleware(scope, receive, send)
 
-    def test_populate_dependency_metadata(self) -> None:
-        """Should populate dependency metadata into context."""
+    def test_record_dependency_resolution_syncs_live_context(self) -> None:
+        """record_dependency_resolution must sync into the active request context immediately."""
+        from debug_toolbar.core import RequestContext, set_request_context
         from debug_toolbar.fastapi.middleware import _dependency_cache_stats, _dependency_tracking
 
-        _dependency_tracking.set([{"name": "get_db", "type": "function", "cached": False, "duration_ms": 1.0}])
-        _dependency_cache_stats.set({"hits": 0, "misses": 1, "total": 1})
+        _dependency_tracking.set([])
+        _dependency_cache_stats.set({"hits": 0, "misses": 0, "total": 0})
 
-        app = AsyncMock()
-        middleware = DebugToolbarMiddleware(app)
-
-        context = MagicMock()
-        context.metadata = {}
-
-        middleware._populate_dependency_metadata(context)
+        context = RequestContext()
+        set_request_context(context)
+        try:
+            record_dependency_resolution("get_db", "function", cached=False, duration_ms=1.0)
+        finally:
+            set_request_context(None)
 
         assert "dependencies" in context.metadata
         assert len(context.metadata["dependencies"]["resolved"]) == 1
+        assert context.metadata["dependencies"]["resolved"][0]["name"] == "get_db"
         assert context.metadata["dependencies"]["cache_stats"]["total"] == 1
