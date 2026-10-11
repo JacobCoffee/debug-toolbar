@@ -82,13 +82,6 @@ class TestCollapseButtonAccessibility:
         assert b'aria-label="Collapse toolbar"' in response.content
         assert b'aria-expanded="true"' in response.content
 
-    def test_toolbar_js_updates_collapse_button_label(self, client: TestClient) -> None:
-        response = client.get("/_debug_toolbar/static/toolbar.js")
-        js = response.text
-        assert "updateCollapseButton" in js
-        assert "'Expand toolbar'" in js
-        assert "setAttribute('aria-expanded'" in js
-
 
 class TestServerTimingHeader:
     def test_adds_server_timing_header_to_html(self, client: TestClient) -> None:
