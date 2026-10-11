@@ -9,6 +9,8 @@ on:
     paths:
       - 'examples/**'
       - 'tests/examples/**'
+      - 'src/**'
+      - 'pyproject.toml'
       - '.github/workflows/examples-latest.yml'
 
 concurrency:
