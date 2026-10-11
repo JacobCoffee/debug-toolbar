@@ -23,6 +23,48 @@ _dependency_tracking: ContextVar[list[dict[str, Any]] | None] = ContextVar("depe
 _dependency_cache_stats: ContextVar[dict[str, int] | None] = ContextVar("dependency_cache_stats", default=None)
 
 
+def _install_dependency_instrumentation() -> None:
+    """Monkeypatch FastAPI's dependency solver to record each resolved dependency.
+
+    FastAPI resolves ``Depends()`` callables internally with no public hook for
+    observing resolutions, so this wraps ``solve_dependencies`` (both where it is
+    defined and where ``fastapi.routing`` imported it) to capture each dependency
+    resolution into the request-scoped tracking contextvars.
+    """
+    import time as time_module
+
+    from fastapi.dependencies import utils as fastapi_dependency_utils
+
+    from fastapi import routing as fastapi_routing
+
+    if fastapi_dependency_utils.solve_dependencies.__name__ == "instrumented_solve_dependencies":
+        return
+
+    original_solve_dependencies = fastapi_dependency_utils.solve_dependencies
+
+    async def instrumented_solve_dependencies(*, request: Any, dependant: Any, **kwargs: Any) -> Any:
+        depth_key = "_debug_toolbar_dependency_depth"
+        depth = request.scope.get(depth_key, 0) + 1
+        request.scope[depth_key] = depth
+        dependency_cache = kwargs.get("dependency_cache") or {}
+        already_cached = dependant.cache_key in dependency_cache
+        start = time_module.perf_counter()
+        try:
+            result = await original_solve_dependencies(request=request, dependant=dependant, **kwargs)
+        finally:
+            request.scope[depth_key] = depth - 1
+
+        # depth == 1 is the route handler's own top-level dependant, not a Depends().
+        if depth > 1 and dependant.call is not None and _dependency_tracking.get() is not None:
+            duration_ms = (time_module.perf_counter() - start) * 1000
+            track_dependency(dependant.call, cached=already_cached, duration_ms=duration_ms)
+
+        return result
+
+    fastapi_dependency_utils.solve_dependencies = instrumented_solve_dependencies  # type: ignore[invalid-assignment]
+    fastapi_routing.solve_dependencies = instrumented_solve_dependencies  # type: ignore[invalid-assignment]
+
+
 def get_dependency_tracking() -> list[dict[str, Any]]:
     """Get the current dependency tracking list."""
     tracking = _dependency_tracking.get()
@@ -83,6 +125,13 @@ def record_dependency_resolution(
     else:
         stats["misses"] += 1
 
+    context = get_request_context()
+    if context is not None:
+        context.metadata.setdefault(
+            "dependencies",
+            {"resolved": tracking, "tree": {}, "cache_stats": stats},
+        )
+
 
 class DebugToolbarMiddleware(StarletteMiddleware):
     """FastAPI-specific middleware for the debug toolbar.
@@ -107,6 +156,9 @@ class DebugToolbarMiddleware(StarletteMiddleware):
         super().__init__(app, config, toolbar)
         self.fastapi_config = config
 
+        if config.track_dependency_injection:
+            _install_dependency_instrumentation()
+
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Process an ASGI request with dependency tracking."""
         if scope["type"] != "http":
@@ -117,24 +169,7 @@ class DebugToolbarMiddleware(StarletteMiddleware):
             _dependency_tracking.set([])
             _dependency_cache_stats.set({"hits": 0, "misses": 0, "total": 0})
 
-        try:
-            await super().__call__(scope, receive, send)
-        finally:
-            if self.fastapi_config.track_dependency_injection:
-                context = get_request_context()
-                if context is not None:
-                    self._populate_dependency_metadata(context)
-
-    def _populate_dependency_metadata(self, context: Any) -> None:
-        """Populate dependency tracking data into the context."""
-        tracking = _dependency_tracking.get()
-        stats = _dependency_cache_stats.get()
-
-        context.metadata["dependencies"] = {
-            "resolved": tracking,
-            "tree": {},
-            "cache_stats": stats,
-        }
+        await super().__call__(scope, receive, send)
 
 
 def track_dependency(
