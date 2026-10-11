@@ -124,12 +124,21 @@ def test_request_detail_contains_multiple_panels(fastapi_basic: ModuleType) -> N
     assert request_stats["path"] == "/"
 
 
-def test_dependency_injection_panel_is_present(fastapi_basic: ModuleType) -> None:
-    """Only asserts the panel key exists; its stats are covered by an in-flight fix."""
+def test_dependency_injection_panel_reports_real_resolutions(fastapi_basic: ModuleType) -> None:
     with TestClient(fastapi_basic.app) as client:
         client.get("/users/123")
         requests_response = client.get("/_debug_toolbar/api/requests")
         request_id = requests_response.json()[0]["request_id"]
         detail_response = client.get(f"/_debug_toolbar/api/requests/{request_id}")
 
-    assert "DependencyInjectionPanel" in detail_response.json()["panel_data"]
+    panel_stats = detail_response.json()["panel_data"]["DependencyInjectionPanel"]
+    resolved = panel_stats["resolved_dependencies"]
+    assert resolved != []
+
+    names = {dep["name"] for dep in resolved}
+    assert "get_db" in names
+    assert "get_current_user" in names
+    assert "get_token" in names
+
+    assert panel_stats["total_count"] == len(resolved)
+    assert panel_stats["cached_count"] + panel_stats["fresh_count"] == panel_stats["total_count"]

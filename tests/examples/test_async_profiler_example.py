@@ -34,7 +34,8 @@ async def test_main_reports_real_task_tracking(
     assert int(completed_match.group(1)) == 5
 
     assert "Tasks tracked:" in output
-    assert "(fast_task)" in output
+    for i in range(5):
+        assert f"fast_task_{i} (fast_task)" in output
 
     assert "Total tasks: 4" in output
     duration_lines = re.findall(r" - (fast_\d+|slow_\d+): ([\d.]+)ms", output)
@@ -49,6 +50,15 @@ async def test_main_reports_real_task_tracking(
     max_concurrent_match = re.search(r"Max concurrent tasks: (\d+)", output)
     assert max_concurrent_match is not None
     assert int(max_concurrent_match.group(1)) >= 1
+
+    blocking_match = re.search(r"Blocking calls detected: (\d+)", output)
+    assert blocking_match is not None
+    assert int(blocking_match.group(1)) == 1
+    assert "Has warnings: True" in output
+    assert "blocking_task:" in output
+    blocking_duration_match = re.search(r" - blocking_task: ([\d.]+)ms", output)
+    assert blocking_duration_match is not None
+    assert float(blocking_duration_match.group(1)) >= 100
 
     lag_match = re.search(r"Max event loop lag: ([\d.]+)ms", output)
     assert lag_match is not None
