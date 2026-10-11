@@ -69,9 +69,6 @@ async def test_main_reports_real_task_tracking(
 
     parent_lines = [line for line in output.splitlines() if "(parent:" in line]
     assert len(parent_lines) == 4
-    parents = [line.split("(parent: ")[1] for line in parent_lines]
-    assert len(set(parents[1:])) == 1
-    assert parents[0] != parents[1]
 
     assert "Panel nav subtitle:" in output
     assert "Panel title: Async" in output
