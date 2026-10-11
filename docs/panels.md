@@ -14,7 +14,7 @@ The debug toolbar ships with a comprehensive set of panels for debugging and pro
 | Headers | Optional | No | Categorized headers with security analysis |
 | Settings | Optional | No | Application configuration viewer |
 | Templates | Optional | No | Jinja2/Mako render tracking |
-| Profiling | Optional | No | cProfile/pyinstrument with flame graphs |
+| Profiling | Optional | No | cProfile/pyinstrument/Tachyon with flame graphs |
 | Alerts | Optional | No | Proactive issue detection |
 | Memory | Optional | No | Memory profiling (tracemalloc/memray) |
 | Cache | Optional | No | Redis/memcached tracking |
@@ -155,6 +155,7 @@ Request profiling with flame graph visualization:
 
 - cProfile-based request profiling
 - Optional pyinstrument support
+- Optional Tachyon support (Python 3.15+, low-overhead statistical sampling)
 - Interactive flame graph generation (speedscope format)
 - Function call statistics
 - Cumulative and per-call timing

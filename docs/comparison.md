@@ -48,6 +48,7 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 |-------|:----:|:------:|:-----:|:-------:|:---------:|
 | **cProfile** | **Yes** | Yes | Yes | No | No |
 | **pyinstrument** | **Yes** | No | No | **Yes** | No |
+| **Tachyon (Python 3.15+)** | **Yes** | No | No | No | No |
 | **Flame Graphs** | **Yes** | Plugin | No | No | No |
 | **CPU Time (user/sys)** | **Yes** | Yes | Yes | No | No |
 | **Server-Timing Header** | **Yes** | No | No | No | No |
@@ -100,7 +101,7 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 - **Full ASGI compliance** without blocking operations
 - **Server-Timing header support** (W3C standard)
 - **Security-focused**: Header analysis, CORS detection, sensitive data redaction
-- **Multiple profiler backends**: cProfile and pyinstrument with flame graphs
+- **Multiple profiler backends**: cProfile, pyinstrument, and Tachyon (Python 3.15+) with flame graphs
 - **Cache tracking** for Redis and Memcached with hit/miss stats
 - **Advanced SQL analysis**: Duplicate detection, N+1 detection, EXPLAIN plans
 - **Memory profiling**: tracemalloc and memray backends
@@ -172,7 +173,7 @@ A comprehensive comparison of debug-toolbar against other popular Python debug t
 1. **Comprehensive header security analysis** with categorization
 2. **CORS header detection and analysis**
 3. **Server-Timing HTTP header** for browser DevTools integration
-4. **Dual profiler support** (cProfile + pyinstrument switchable)
+4. **Multiple profiler backends** (cProfile + pyinstrument + Tachyon on Python 3.15+, switchable)
 5. **SQLAlchemy duplicate query detection**
 6. **Async-safe cache tracking** for Redis/Memcached
 7. **EXPLAIN query plans** for PostgreSQL, SQLite, MySQL, MariaDB
@@ -213,7 +214,7 @@ If migrating from Django to Litestar:
 - SQLPanel -> SQLAlchemyPanel (use Advanced-Alchemy)
 - HeadersPanel -> HeadersPanel (enhanced with security analysis)
 - SettingsPanel -> SettingsPanel (equivalent)
-- ProfilingPanel -> ProfilingPanel (enhanced with pyinstrument and flame graphs)
+- ProfilingPanel -> ProfilingPanel (enhanced with pyinstrument, Tachyon on Python 3.15+, and flame graphs)
 - SignalsPanel -> EventsPanel (Litestar lifecycle hooks and exception handlers)
 
 ### From FastAPI Debug Toolbar

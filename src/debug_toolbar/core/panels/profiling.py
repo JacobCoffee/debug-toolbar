@@ -1,12 +1,14 @@
-"""Profiling panel for performance analysis using cProfile or pyinstrument."""
+"""Profiling panel for performance analysis using cProfile, pyinstrument, or Tachyon."""
 
 from __future__ import annotations
 
+import contextlib
 import cProfile
 import io
 import logging
 import pstats
 import sys
+import threading
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -53,12 +55,66 @@ if TYPE_CHECKING:
     except ImportError:
         PyinstrumentProfiler = None
 
+    try:
+        from profiling.sampling import CollapsedStackCollector  # type: ignore[import-not-found]
+    except ImportError:
+        CollapsedStackCollector = None
+
     from debug_toolbar.core.context import RequestContext
     from debug_toolbar.core.toolbar import DebugToolbar
 
 MAX_RECURSION_DEPTH = 100
 CPROFILE_FUNC_TUPLE_LENGTH = 3
 ENABLE_FLAMEGRAPH_DEFAULT = True
+TACHYON_MIN_PYTHON_VERSION = (3, 15)
+TACHYON_SAMPLE_INTERVAL_USEC_DEFAULT = 1000
+TACHYON_JOIN_TIMEOUT_SEC = 2.0
+
+
+class _TachyonPrintPatchState:
+    """Tracks the refcounted patch of ``profiling.sampling.sample.print``."""
+
+    __slots__ = ("lock", "original_print", "patch_count")
+
+    def __init__(self) -> None:
+        self.lock = threading.Lock()
+        self.patch_count = 0
+        self.original_print: object = None
+
+
+_tachyon_print_state = _TachyonPrintPatchState()
+
+
+def _no_op_print(*_args: object, **_kwargs: object) -> None:
+    """Replace ``sample.py``'s summary print while Tachyon sampling is silenced."""
+
+
+@contextlib.contextmanager
+def _silence_tachyon_output() -> Any:
+    """Silence the stdout summary that ``SampleProfiler.sample`` prints when it finishes.
+
+    Patches ``print`` on the ``profiling.sampling.sample`` module only, instead of
+    redirecting process-wide stdout, so other threads are unaffected. Uses a
+    reference count so concurrent requests can share the patch safely.
+    """
+    import profiling.sampling.sample as sample_module  # type: ignore[import-not-found]
+
+    state = _tachyon_print_state
+    with state.lock:
+        if state.patch_count == 0:
+            state.original_print = sample_module.__dict__.get("print")
+            sample_module.print = _no_op_print
+        state.patch_count += 1
+    try:
+        yield
+    finally:
+        with state.lock:
+            state.patch_count -= 1
+            if state.patch_count == 0:
+                if state.original_print is None:
+                    del sample_module.print
+                else:
+                    sample_module.print = state.original_print
 
 
 def _is_stdlib_or_internal(filename: str) -> bool:
@@ -90,17 +146,21 @@ def _is_user_code(filename: str) -> bool:
 class ProfilingPanel(Panel):
     """Panel for profiling request performance.
 
-    Supports two profiling backends:
+    Supports three profiling backends:
     - cProfile: Standard library profiler (default)
     - pyinstrument: Optional third-party profiler (more readable output)
+    - tachyon: Standard library statistical sampling profiler (Python 3.15+ only,
+      via PEP 799's `profiling.sampling`). Low overhead, good for profiling
+      requests without the deterministic-tracing cost of cProfile.
 
     The profiler tracks function calls, execution time, and generates
     detailed statistics about performance hotspots.
 
     Configure via toolbar config:
-        profiler_backend: "cprofile" | "pyinstrument" (default: "cprofile")
+        profiler_backend: "cprofile" | "pyinstrument" | "tachyon" (default: "cprofile")
         profiler_top_functions: int (default: 50)
         profiler_sort_by: str (default: "cumulative")
+        profiler_tachyon_interval_usec: int (default: 1000)
         enable_flamegraph: bool (default: True)
     """
 
@@ -110,16 +170,27 @@ class ProfilingPanel(Panel):
     has_content: ClassVar[bool] = True
     nav_title: ClassVar[str] = "Profile"
 
-    __slots__ = ("_backend", "_enable_flamegraph", "_profiler", "_profiling_overhead", "_sort_by", "_top_functions")
+    __slots__ = (
+        "_backend",
+        "_enable_flamegraph",
+        "_profiler",
+        "_profiling_overhead",
+        "_sort_by",
+        "_tachyon_request_native_id",
+        "_tachyon_thread",
+        "_top_functions",
+    )
 
     def __init__(self, toolbar: DebugToolbar) -> None:
         super().__init__(toolbar)
-        self._profiler: cProfile.Profile | PyinstrumentProfiler | None = None
+        self._profiler: cProfile.Profile | PyinstrumentProfiler | CollapsedStackCollector | None = None
         self._backend = self._get_backend()
         self._top_functions = self._get_config("profiler_top_functions", 50)
         self._sort_by = self._get_config("profiler_sort_by", "cumulative")
         self._enable_flamegraph = self._get_config("enable_flamegraph", ENABLE_FLAMEGRAPH_DEFAULT)
         self._profiling_overhead: float = 0.0
+        self._tachyon_thread: threading.Thread | None = None
+        self._tachyon_request_native_id: int | None = None
 
     def _get_backend(self) -> str:
         """Determine which profiling backend to use."""
@@ -131,6 +202,16 @@ class ProfilingPanel(Panel):
                 return "pyinstrument"
             except ImportError:
                 return "cprofile"
+        if backend == "tachyon":
+            if sys.version_info < TACHYON_MIN_PYTHON_VERSION:
+                logger.debug("Tachyon profiler requires Python 3.15+, falling back to cProfile")
+                return "cprofile"
+            try:
+                from profiling.sampling.sample import SampleProfiler  # noqa: F401  # type: ignore[import-not-found]
+            except ImportError:
+                logger.debug("Tachyon profiler (profiling.sampling) is unavailable, falling back to cProfile")
+                return "cprofile"
+            return "tachyon"
         return "cprofile"
 
     def _get_config(self, key: str, default: Any) -> Any:
@@ -160,6 +241,18 @@ class ProfilingPanel(Panel):
                 except ValueError:
                     logger.warning("Failed to enable cProfile profiler - another profiler may be active")
                     self._profiler = None
+        elif self._backend == "tachyon":
+            try:
+                self._start_tachyon()
+            except (ImportError, OSError, RuntimeError, SystemExit):
+                logger.debug("Failed to start Tachyon profiler, falling back to cProfile", exc_info=True)
+                self._backend = "cprofile"
+                self._profiler = cProfile.Profile()
+                try:
+                    self._profiler.enable()
+                except ValueError:
+                    logger.warning("Failed to enable cProfile profiler - another profiler may be active")
+                    self._profiler = None
         else:
             self._profiler = cProfile.Profile()
             try:
@@ -169,6 +262,48 @@ class ProfilingPanel(Panel):
                 self._profiler = None
 
         self._profiling_overhead = time.perf_counter() - start
+
+    def _start_tachyon(self) -> None:
+        """Start a Tachyon sampling profiler thread for the current request."""
+        import os
+
+        from profiling.sampling import CollapsedStackCollector  # type: ignore[import-not-found]
+        from profiling.sampling.sample import SampleProfiler  # type: ignore[import-not-found]
+
+        interval_usec = self._get_config("profiler_tachyon_interval_usec", TACHYON_SAMPLE_INTERVAL_USEC_DEFAULT)
+        collector = CollapsedStackCollector(interval_usec)
+        collector.running = True
+        sampler = SampleProfiler(os.getpid(), interval_usec, all_threads=True)
+
+        def run() -> None:
+            with _silence_tachyon_output():
+                sampler.sample(collector, duration_sec=None, async_aware=None)
+
+        thread = threading.Thread(target=run, name="tachyon-profiler-sample", daemon=True)
+        self._tachyon_request_native_id = threading.get_native_id()
+        thread.start()
+        self._tachyon_thread = thread
+        self._profiler = collector
+
+    def _stop_tachyon(self) -> float:
+        """Signal the sampler thread to stop and join it.
+
+        The toolbar calls ``generate_stats`` before ``process_response`` (see
+        ``DebugToolbar.process_response``), so stopping must happen the first time
+        either one runs; calling this more than once for the same request is a no-op.
+
+        Returns:
+            Elapsed time spent stopping and joining the sampler thread.
+        """
+        import time
+
+        start = time.perf_counter()
+        if self._profiler is not None:
+            self._profiler.running = False  # type: ignore[union-attr]
+        if self._tachyon_thread is not None:
+            self._tachyon_thread.join(timeout=TACHYON_JOIN_TIMEOUT_SEC)
+            self._tachyon_thread = None
+        return time.perf_counter() - start
 
     async def process_response(self, context: RequestContext) -> None:
         """Stop profiling at response completion."""
@@ -181,6 +316,8 @@ class ProfilingPanel(Panel):
 
         if self._backend == "pyinstrument" and hasattr(self._profiler, "stop"):
             self._profiler.stop()  # type: ignore[attr-defined]
+        elif self._backend == "tachyon":
+            self._stop_tachyon()
         elif hasattr(self._profiler, "disable"):
             self._profiler.disable()
 
@@ -201,6 +338,8 @@ class ProfilingPanel(Panel):
 
         if self._backend == "pyinstrument":
             return self._generate_pyinstrument_stats()
+        if self._backend == "tachyon":
+            return self._generate_tachyon_stats()
         return self._generate_cprofile_stats()
 
     def _generate_cprofile_stats(self) -> dict[str, Any]:
@@ -360,6 +499,138 @@ class ProfilingPanel(Panel):
 
         functions.sort(key=lambda x: x["cumulative_time"], reverse=True)
         return functions[: self._top_functions]
+
+    def _generate_tachyon_stats(self) -> dict[str, Any]:
+        """Extract statistics from the Tachyon sampling profiler."""
+        if self._profiler is None:
+            return self._empty_stats()
+
+        self._profiling_overhead += self._stop_tachyon()
+
+        stack_counter = getattr(self._profiler, "stack_counter", None)
+        if not stack_counter:
+            return self._empty_stats()
+
+        interval_usec = self._get_config("profiler_tachyon_interval_usec", TACHYON_SAMPLE_INTERVAL_USEC_DEFAULT)
+        interval_sec = interval_usec / 1_000_000
+        request_tid = self._tachyon_request_native_id
+
+        function_samples, total_samples = self._aggregate_tachyon_samples(stack_counter, request_tid)
+        user_funcs, lib_funcs = self._tachyon_function_lists(function_samples, interval_sec)
+
+        top_functions = user_funcs[: self._top_functions]
+        remaining = self._top_functions - len(top_functions)
+        if remaining > 0:
+            top_functions.extend(lib_funcs[:remaining])
+
+        result = {
+            "backend": "tachyon",
+            "total_time": total_samples * interval_sec,
+            "function_calls": total_samples,
+            "primitive_calls": total_samples,
+            "top_functions": top_functions,
+            "call_tree": self._generate_tachyon_tree(stack_counter, request_tid),
+            "profiling_overhead": self._profiling_overhead,
+            "user_function_count": len(user_funcs),
+            "library_function_count": len(lib_funcs),
+            "sample_count": total_samples,
+            "sample_interval_usec": interval_usec,
+        }
+
+        if self._enable_flamegraph:
+            from debug_toolbar.core.panels.flamegraph import generate_tachyon_flamegraph_data
+
+            flamegraph_data = generate_tachyon_flamegraph_data(stack_counter, request_tid, interval_sec)
+            result["flamegraph_available"] = flamegraph_data is not None
+            if flamegraph_data:
+                result["flamegraph_data"] = flamegraph_data
+
+        return result
+
+    @staticmethod
+    def _aggregate_tachyon_samples(
+        stack_counter: Any, request_tid: int | None
+    ) -> tuple[dict[tuple[str, int, str], dict[str, int]], int]:
+        """Aggregate per-function cumulative and self sample counts for the request thread."""
+        function_samples: dict[tuple[str, int, str], dict[str, int]] = {}
+        total_samples = 0
+
+        for (call_tree, thread_id), count in stack_counter.items():
+            if request_tid is not None and thread_id != request_tid:
+                continue
+            if not call_tree:
+                continue
+
+            total_samples += count
+
+            seen_in_stack: set[tuple[str, int, str]] = set()
+            for filename, lineno, func_name in call_tree:
+                if _is_stdlib_or_internal(filename):
+                    continue
+                key = (filename, lineno, func_name)
+                if key in seen_in_stack:
+                    continue
+                seen_in_stack.add(key)
+                function_samples.setdefault(key, {"cumulative": 0, "self": 0})["cumulative"] += count
+
+            leaf_filename, leaf_lineno, leaf_func = call_tree[-1]
+            if not _is_stdlib_or_internal(leaf_filename):
+                leaf_key = (leaf_filename, leaf_lineno, leaf_func)
+                function_samples.setdefault(leaf_key, {"cumulative": 0, "self": 0})["self"] += count
+
+        return function_samples, total_samples
+
+    @staticmethod
+    def _tachyon_function_lists(
+        function_samples: dict[tuple[str, int, str], dict[str, int]], interval_sec: float
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """Build sorted user/library function stat lists from aggregated sample counts."""
+        user_funcs: list[dict[str, Any]] = []
+        lib_funcs: list[dict[str, Any]] = []
+
+        for (filename, lineno, func_name), counts in function_samples.items():
+            cumulative_samples = counts["cumulative"]
+            self_samples = counts["self"]
+            cumulative_time = cumulative_samples * interval_sec
+            func_data = {
+                "function": func_name,
+                "filename": filename,
+                "lineno": lineno,
+                "calls": cumulative_samples,
+                "primitive_calls": self_samples,
+                "total_time": self_samples * interval_sec,
+                "cumulative_time": cumulative_time,
+                "per_call": cumulative_time / cumulative_samples if cumulative_samples else 0.0,
+            }
+
+            if _is_user_code(filename):
+                user_funcs.append(func_data)
+            else:
+                lib_funcs.append(func_data)
+
+        user_funcs.sort(key=lambda x: x["cumulative_time"], reverse=True)
+        lib_funcs.sort(key=lambda x: x["cumulative_time"], reverse=True)
+        return user_funcs, lib_funcs
+
+    def _generate_tachyon_tree(self, stack_counter: Any, request_tid: int | None) -> str:
+        """Generate a folded-stack call tree from Tachyon sample data."""
+        lines: list[tuple[str, int]] = []
+        for (call_tree, thread_id), count in stack_counter.items():
+            if request_tid is not None and thread_id != request_tid:
+                continue
+            if not call_tree:
+                continue
+            parts = []
+            for filename, lineno, func_name in call_tree:
+                if filename == "~" and lineno == 0:
+                    parts.append(func_name)
+                else:
+                    short_file = filename.rsplit("/", 1)[-1]
+                    parts.append(f"{short_file}:{func_name}:{lineno}")
+            lines.append((";".join(parts), count))
+
+        lines.sort(key=lambda item: item[1], reverse=True)
+        return "\n".join(f"{stack} {count}" for stack, count in lines[: self._top_functions])
 
     def _empty_stats(self) -> dict[str, Any]:
         """Return empty stats structure."""
