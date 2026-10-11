@@ -5,9 +5,11 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import threading
 import time
 import traceback
 from typing import Any
+from weakref import WeakKeyDictionary
 
 from debug_toolbar.core.panels.async_profiler.models import BlockingCall, LagSample
 
@@ -52,6 +54,91 @@ def _get_stack_frames(
     return frames
 
 
+class _LoopDebugPatchState:
+    """Tracks the refcounted patch of a loop's debug mode, slow callback
+    duration, and the ``asyncio`` logger level while one or more
+    ``BlockingCallDetector`` instances are installed on it.
+    """
+
+    __slots__ = (
+        "logger_level_changed",
+        "original_debug",
+        "original_duration",
+        "original_logger_level",
+        "thresholds_ms",
+    )
+
+    def __init__(self) -> None:
+        self.original_debug: bool = False
+        self.original_duration: float = 0.1
+        self.original_logger_level: int = logging.NOTSET
+        self.logger_level_changed: bool = False
+        self.thresholds_ms: dict[int, float] = {}
+
+
+_loop_patch_lock = threading.Lock()
+_loop_patch_states: WeakKeyDictionary[asyncio.AbstractEventLoop, _LoopDebugPatchState] = WeakKeyDictionary()
+
+
+def _acquire_loop_patch(loop: asyncio.AbstractEventLoop, detector_key: int, threshold_ms: float) -> None:
+    """Enable debug mode and slow-callback logging on a loop, shared across detectors.
+
+    Overlapping ``BlockingCallDetector.install()`` calls on the same loop share
+    one patch of the loop's debug state so the first detector to uninstall does
+    not disturb detectors still running, and the loop's original settings are
+    only restored once every detector has uninstalled.
+
+    Args:
+        loop: The event loop to patch.
+        detector_key: A key unique to the calling detector (its ``id()``).
+        threshold_ms: The calling detector's blocking-call threshold.
+    """
+    with _loop_patch_lock:
+        state = _loop_patch_states.get(loop)
+        if state is None:
+            state = _LoopDebugPatchState()
+            state.original_debug = loop.get_debug()
+            state.original_duration = loop.slow_callback_duration
+            asyncio_logger = logging.getLogger(ASYNCIO_LOGGER_NAME)
+            if asyncio_logger.getEffectiveLevel() > logging.WARNING:
+                state.original_logger_level = asyncio_logger.level
+                state.logger_level_changed = True
+                asyncio_logger.setLevel(logging.WARNING)
+            _loop_patch_states[loop] = state
+
+        state.thresholds_ms[detector_key] = threshold_ms
+        loop.set_debug(True)
+        loop.slow_callback_duration = min(state.thresholds_ms.values()) / MS_TO_SECONDS
+
+
+def _release_loop_patch(loop: asyncio.AbstractEventLoop, detector_key: int) -> None:
+    """Release one detector's share of a loop's debug patch.
+
+    Restores the loop's original debug mode, slow callback duration, and
+    (if it was changed) the ``asyncio`` logger level once no detector remains
+    installed on the loop.
+
+    Args:
+        loop: The event loop to release.
+        detector_key: The key passed to the matching ``_acquire_loop_patch`` call.
+    """
+    with _loop_patch_lock:
+        state = _loop_patch_states.get(loop)
+        if state is None:
+            return
+
+        state.thresholds_ms.pop(detector_key, None)
+        if state.thresholds_ms:
+            loop.slow_callback_duration = min(state.thresholds_ms.values()) / MS_TO_SECONDS
+            return
+
+        loop.set_debug(state.original_debug)
+        loop.slow_callback_duration = state.original_duration
+        if state.logger_level_changed:
+            logging.getLogger(ASYNCIO_LOGGER_NAME).setLevel(state.original_logger_level)
+        del _loop_patch_states[loop]
+
+
 class BlockingCallDetector:
     """Detects blocking calls in async context.
 
@@ -63,9 +150,6 @@ class BlockingCallDetector:
         "_blocking_calls",
         "_log_handler",
         "_loop",
-        "_original_debug",
-        "_original_duration",
-        "_original_logger_level",
         "_threshold_ms",
     )
 
@@ -78,13 +162,15 @@ class BlockingCallDetector:
         self._threshold_ms = threshold_ms
         self._blocking_calls: list[BlockingCall] = []
         self._loop: asyncio.AbstractEventLoop | None = None
-        self._original_debug: bool = False
-        self._original_duration: float = 0.1
-        self._original_logger_level: int = logging.NOTSET
         self._log_handler: _SlowCallbackLogHandler | None = None
 
     def install(self, loop: asyncio.AbstractEventLoop) -> None:
         """Install blocking call detection on the event loop.
+
+        Shares the loop's debug mode, slow callback duration, and ``asyncio``
+        logger level with any other detector already installed on the same
+        loop, so overlapping requests can detect blocking calls concurrently
+        without one request's cleanup disturbing another's.
 
         Args:
             loop: The asyncio event loop to monitor.
@@ -92,31 +178,25 @@ class BlockingCallDetector:
         self._loop = loop
         self._blocking_calls = []
 
-        self._original_debug = loop.get_debug()
-        self._original_duration = loop.slow_callback_duration
+        _acquire_loop_patch(loop, id(self), self._threshold_ms)
 
-        loop.set_debug(True)
-        loop.slow_callback_duration = self._threshold_ms / MS_TO_SECONDS
-
-        asyncio_logger = logging.getLogger(ASYNCIO_LOGGER_NAME)
-        self._original_logger_level = asyncio_logger.level
-        asyncio_logger.setLevel(logging.WARNING)
-        self._log_handler = _SlowCallbackLogHandler(self)
-        asyncio_logger.addHandler(self._log_handler)
+        self._log_handler = _SlowCallbackLogHandler(self, self._threshold_ms)
+        logging.getLogger(ASYNCIO_LOGGER_NAME).addHandler(self._log_handler)
 
     def uninstall(self) -> None:
-        """Uninstall blocking call detection and restore original settings."""
+        """Uninstall blocking call detection.
+
+        Only restores the loop's debug mode, slow callback duration, and
+        logger level once every detector sharing the loop has uninstalled.
+        """
         if self._loop is None:
             return
 
-        self._loop.set_debug(self._original_debug)
-        self._loop.slow_callback_duration = self._original_duration
-
-        asyncio_logger = logging.getLogger(ASYNCIO_LOGGER_NAME)
         if self._log_handler is not None:
-            asyncio_logger.removeHandler(self._log_handler)
+            logging.getLogger(ASYNCIO_LOGGER_NAME).removeHandler(self._log_handler)
             self._log_handler = None
-        asyncio_logger.setLevel(self._original_logger_level)
+
+        _release_loop_patch(self._loop, id(self))
 
     def record_blocking_call(
         self,
@@ -181,11 +261,12 @@ class _SlowCallbackLogHandler(logging.Handler):
     handler is attached directly to the ``asyncio`` logger to observe those records.
     """
 
-    __slots__ = ("_detector",)
+    __slots__ = ("_detector", "_threshold_ms")
 
-    def __init__(self, detector: BlockingCallDetector) -> None:
+    def __init__(self, detector: BlockingCallDetector, threshold_ms: float) -> None:
         super().__init__(level=logging.WARNING)
         self._detector = detector
+        self._threshold_ms = threshold_ms
 
     def emit(self, record: logging.LogRecord) -> None:
         """Parse a slow-callback warning record and record it as a blocking call.
@@ -206,6 +287,8 @@ class _SlowCallbackLogHandler(logging.Handler):
         if not isinstance(duration_arg, (int, float)):
             return
         duration_ms = float(duration_arg) * MS_TO_SECONDS
+        if duration_ms < self._threshold_ms:
+            return
 
         handle_repr = str(args[0])
         match = _SLOW_CALLBACK_LOCATION_RE.search(handle_repr)

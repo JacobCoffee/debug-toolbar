@@ -63,3 +63,62 @@ async def test_uninstall_restores_logger_and_loop_state() -> None:
     assert loop.slow_callback_duration == original_duration
     assert asyncio_logger.level == original_level
     assert asyncio_logger.handlers == original_handlers
+
+
+async def test_overlapping_detectors_share_loop_state_safely() -> None:
+    """Two detectors installed on the same loop at once must not clobber each
+    other's loop debug state: uninstalling one must not disturb the other, and
+    the loop's original settings are restored only once both have uninstalled.
+    """
+    loop = asyncio.get_running_loop()
+    asyncio_logger = logging.getLogger("asyncio")
+    original_debug = loop.get_debug()
+    original_duration = loop.slow_callback_duration
+    original_level = asyncio_logger.level
+
+    detector_a = BlockingCallDetector(threshold_ms=50)
+    detector_b = BlockingCallDetector(threshold_ms=80)
+    detector_a.install(loop)
+    detector_b.install(loop)
+    try:
+        task = loop.create_task(_blocking_handler())
+        await asyncio.sleep(0.3)
+        await task
+    finally:
+        detector_a.uninstall()
+        assert loop.get_debug() is True
+        detector_b.uninstall()
+
+    assert loop.get_debug() == original_debug
+    assert loop.slow_callback_duration == original_duration
+    assert asyncio_logger.level == original_level
+
+    assert len(detector_a.get_stats()["blocking_calls"]) == 1
+    assert len(detector_b.get_stats()["blocking_calls"]) == 1
+
+
+async def test_install_only_raises_logger_level_when_more_restrictive() -> None:
+    """A user's asyncio logger level more verbose than WARNING must survive
+    install/uninstall unchanged, while a level that would hide WARNING
+    records (e.g. ERROR) must be raised to WARNING while installed.
+    """
+    loop = asyncio.get_running_loop()
+    asyncio_logger = logging.getLogger("asyncio")
+
+    original_level = asyncio_logger.level
+    try:
+        asyncio_logger.setLevel(logging.DEBUG)
+        detector = BlockingCallDetector(threshold_ms=50)
+        detector.install(loop)
+        assert asyncio_logger.level == logging.DEBUG
+        detector.uninstall()
+        assert asyncio_logger.level == logging.DEBUG
+
+        asyncio_logger.setLevel(logging.ERROR)
+        detector = BlockingCallDetector(threshold_ms=50)
+        detector.install(loop)
+        assert asyncio_logger.level == logging.WARNING
+        detector.uninstall()
+        assert asyncio_logger.level == logging.ERROR
+    finally:
+        asyncio_logger.setLevel(original_level)
