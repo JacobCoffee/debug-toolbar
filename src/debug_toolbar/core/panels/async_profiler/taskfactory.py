@@ -69,6 +69,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         "_profiling_overhead",
         "_start_time",
         "_task_events",
+        "_task_refs",
     )
 
     def __init__(
@@ -85,6 +86,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         """
         self._original_factory: Any = None
         self._task_events: list[TaskEvent] = []
+        self._task_refs: dict[str, asyncio.Task[Any]] = {}
         self._start_time: float = 0.0
         self._loop: asyncio.AbstractEventLoop | None = None
         self._profiling_overhead: float = 0.0
@@ -102,6 +104,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         self._loop = loop
         self._start_time = loop.time()
         self._task_events = []
+        self._task_refs = {}
         self._original_factory = loop.get_task_factory()
         loop.set_task_factory(self._profiling_task_factory)
 
@@ -161,6 +164,7 @@ class TaskFactoryBackend(AsyncProfilerBackend):
             stack_frames=stack_frames,
         )
         self._task_events.append(event)
+        self._task_refs[event.task_id] = task
 
         task.add_done_callback(lambda t: self._record_task_complete(t, creation_time))
 
@@ -225,10 +229,12 @@ class TaskFactoryBackend(AsyncProfilerBackend):
         """
         tasks = []
         for event in self._task_events:
+            ref = self._task_refs.get(event.task_id)
+            task_name = ref.get_name() if ref is not None else event.task_name
             tasks.append(
                 {
                     "task_id": event.task_id,
-                    "task_name": event.task_name,
+                    "task_name": task_name,
                     "event_type": event.event_type,
                     "timestamp": event.timestamp,
                     "coro_name": event.coro_name,
