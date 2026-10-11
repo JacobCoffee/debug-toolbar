@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [1.0.1](https://github.com/JacobCoffee/debug-toolbar/compare/v1.0.0..v1.0.1) - 2026-10-11
+
+### Bug Fixes
+
+- async profiler no longer breaks apps running on uvloop (#57) - ([7aafdef](https://github.com/JacobCoffee/debug-toolbar/commit/7aafdefe0acef3ebfc345969fc9d71d51151ab32)) - Jacob Coffee
+- load toolbar styles and scripts for Starlette/FastAPI without Litestar installed (#59) - ([218dc7f](https://github.com/JacobCoffee/debug-toolbar/commit/218dc7f964e98654c08579ff6ca56e56a8ecc31c)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v1.0.0 - ([5a7cf8b](https://github.com/JacobCoffee/debug-toolbar/commit/5a7cf8b2ec00d1176676fd3202dbd4031c2f7e34)) - github-actions[bot]
+
+---
 ## [1.0.0](https://github.com/JacobCoffee/debug-toolbar/compare/v0.4.2..v1.0.0) - 2026-10-10
 
 ### Bug Fixes
