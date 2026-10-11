@@ -40,14 +40,14 @@ def _render_request_row(request_id: UUID, data: dict[str, Any]) -> str:
 
 def _get_toolbar_css() -> str:
     """Get the toolbar CSS content."""
-    from debug_toolbar.litestar.routes.handlers import get_toolbar_css
+    from debug_toolbar.core.assets import get_toolbar_css
 
     return get_toolbar_css()
 
 
 def _get_toolbar_js() -> str:
     """Get the toolbar JavaScript content."""
-    from debug_toolbar.litestar.routes.handlers import get_toolbar_js
+    from debug_toolbar.core.assets import get_toolbar_js
 
     return get_toolbar_js()
 
