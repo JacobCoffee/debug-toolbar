@@ -1980,11 +1980,21 @@ class DebugToolbar {
     addCollapseButton() {
         const collapseBtn = this.element.querySelector('.toolbar-collapse-btn');
         if (collapseBtn) {
+            this.updateCollapseButton(collapseBtn);
             collapseBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.toggle();
             });
         }
+    }
+
+    updateCollapseButton(collapseBtn) {
+        const btn = collapseBtn || this.element.querySelector('.toolbar-collapse-btn');
+        if (!btn) return;
+        const label = this.isCollapsed ? 'Expand toolbar' : 'Collapse toolbar';
+        btn.title = label;
+        btn.setAttribute('aria-label', label);
+        btn.setAttribute('aria-expanded', String(!this.isCollapsed));
     }
 
     addThemeToggle() {
@@ -2133,6 +2143,7 @@ class DebugToolbar {
         this.isCollapsed = !this.isCollapsed;
         this.element.classList.toggle('collapsed', this.isCollapsed);
         localStorage.setItem('debug-toolbar-collapsed', String(this.isCollapsed));
+        this.updateCollapseButton();
         this.applySize();
     }
 

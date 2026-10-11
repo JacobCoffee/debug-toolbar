@@ -76,6 +76,13 @@ class TestToolbarInjection:
         assert b"debug-toolbar" not in response.content
 
 
+class TestCollapseButtonAccessibility:
+    def test_initial_markup_has_aria_expanded(self, client: TestClient) -> None:
+        response = client.get("/")
+        assert b'aria-label="Collapse toolbar"' in response.content
+        assert b'aria-expanded="true"' in response.content
+
+
 class TestServerTimingHeader:
     def test_adds_server_timing_header_to_html(self, client: TestClient) -> None:
         response = client.get("/")

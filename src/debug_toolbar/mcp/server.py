@@ -8,19 +8,28 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+logger = logging.getLogger(__name__)
+
 if TYPE_CHECKING:
+    from mcp.server.fastmcp import FastMCP
+
     from debug_toolbar.core.storage import ToolbarStorage
     from debug_toolbar.core.toolbar import DebugToolbar
 
-logger = logging.getLogger(__name__)
-
-try:
-    from mcp.server.fastmcp import FastMCP
-
     MCP_AVAILABLE = True
-except ImportError:
-    MCP_AVAILABLE = False
-    FastMCP = None  # type: ignore[assignment, misc]
+else:
+    try:
+        from mcp.server.fastmcp import FastMCP
+
+        MCP_AVAILABLE = True
+    except ImportError:
+        try:
+            from mcp.server.mcpserver import MCPServer as FastMCP
+
+            MCP_AVAILABLE = True
+        except ImportError:
+            MCP_AVAILABLE = False
+            FastMCP = None  # type: ignore[assignment, misc]
 
 
 @dataclass
@@ -69,17 +78,18 @@ def create_mcp_server(
         msg = "MCP support requires the 'mcp' package. Install with: pip install litestar-debug-toolbar[mcp]"
         raise ImportError(msg)
 
+    mcp_ctx = MCPContext(
+        storage=storage,
+        toolbar=toolbar,
+        redact_sensitive=redact_sensitive,
+    )
+
     @asynccontextmanager
     async def lifespan(_server: FastMCP) -> AsyncIterator[MCPContext]:
         """Manage MCP server lifecycle with debug toolbar context."""
         logger.info("Starting debug-toolbar MCP server")
-        ctx = MCPContext(
-            storage=storage,
-            toolbar=toolbar,
-            redact_sensitive=redact_sensitive,
-        )
         try:
-            yield ctx
+            yield mcp_ctx
         finally:
             logger.info("Shutting down debug-toolbar MCP server")
 
@@ -92,7 +102,7 @@ def create_mcp_server(
     from debug_toolbar.mcp.tools import register_tools
 
     register_tools(mcp)
-    register_resources(mcp)
+    register_resources(mcp, mcp_ctx)
 
     return mcp
 

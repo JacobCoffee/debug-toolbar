@@ -23,6 +23,7 @@ class TrackedResolver:
         duration_ms: Execution duration in milliseconds.
         stack_trace: Call stack trace (if captured).
         is_slow: Whether duration exceeds threshold.
+        is_default_resolver: Whether this is Strawberry's default attribute resolver.
     """
 
     resolver_id: str
@@ -37,6 +38,7 @@ class TrackedResolver:
     duration_ms: float = 0.0
     stack_trace: list[dict[str, Any]] | None = None
     is_slow: bool = False
+    is_default_resolver: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for serialization.
@@ -57,6 +59,7 @@ class TrackedResolver:
             "duration_ms": self.duration_ms,
             "stack_trace": self.stack_trace,
             "is_slow": self.is_slow,
+            "is_default_resolver": self.is_default_resolver,
         }
 
 

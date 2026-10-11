@@ -7,24 +7,29 @@ from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
 if TYPE_CHECKING:
+    from mcp.server.fastmcp import FastMCP
+
     from debug_toolbar.mcp.server import MCPContext
+else:
+    try:
+        from mcp.server.fastmcp import FastMCP
+    except ImportError:
+        try:
+            from mcp.server.mcpserver import MCPServer as FastMCP
+        except ImportError:
+            FastMCP = Any  # type: ignore[assignment, misc]
 
-try:
-    from mcp.server.fastmcp import Context, FastMCP
-except ImportError:
-    Context = Any  # type: ignore[assignment, misc]
-    FastMCP = Any  # type: ignore[assignment, misc]
 
-
-def register_resources(mcp: FastMCP) -> None:  # noqa: C901
+def register_resources(mcp: FastMCP, mcp_ctx: MCPContext) -> None:  # noqa: C901
     """Register all debug toolbar resources with the MCP server.
 
     Args:
         mcp: FastMCP server instance.
+        mcp_ctx: Debug toolbar context holding storage, toolbar, and redaction settings.
     """
 
     @mcp.resource("debug://requests")
-    def get_all_requests(ctx: Context) -> str:
+    def get_all_requests() -> str:
         """List all tracked requests with summaries.
 
         Returns JSON array of request summaries including ID, method, path,
@@ -32,7 +37,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         requests = []
@@ -57,7 +61,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(requests, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}")
-    def get_request_detail(request_id: str, ctx: Context) -> str:
+    def get_request_detail(request_id: str) -> str:
         """Get full details for a specific request.
 
         Args:
@@ -67,7 +71,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -87,7 +90,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(result, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}/panels")
-    def get_request_panels(request_id: str, ctx: Context) -> str:
+    def get_request_panels(request_id: str) -> str:
         """Get all panel data for a specific request.
 
         Args:
@@ -97,7 +100,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -112,7 +114,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(panel_data, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}/panels/{panel_name}")
-    def get_panel_data(request_id: str, panel_name: str, ctx: Context) -> str:
+    def get_panel_data(request_id: str, panel_name: str) -> str:
         """Get specific panel data for a request.
 
         Args:
@@ -123,7 +125,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -148,7 +149,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(result, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}/sql")
-    def get_sql_queries(request_id: str, ctx: Context) -> str:
+    def get_sql_queries(request_id: str) -> str:
         """Get SQL queries for a specific request.
 
         Args:
@@ -158,7 +159,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict, redact_sql_parameters
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -190,7 +190,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         )
 
     @mcp.resource("debug://requests/{request_id}/graphql")
-    def get_graphql_data(request_id: str, ctx: Context) -> str:
+    def get_graphql_data(request_id: str) -> str:
         """Get GraphQL operations for a specific request.
 
         Args:
@@ -200,7 +200,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -219,7 +218,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(graphql_panel, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}/alerts")
-    def get_security_alerts(request_id: str, ctx: Context) -> str:
+    def get_security_alerts(request_id: str) -> str:
         """Get security alerts for a specific request.
 
         Args:
@@ -227,7 +226,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
 
         Returns JSON array of security alerts and warnings.
         """
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -247,7 +245,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         )
 
     @mcp.resource("debug://requests/{request_id}/memory")
-    def get_memory_profile(request_id: str, ctx: Context) -> str:
+    def get_memory_profile(request_id: str) -> str:
         """Get memory profiling data for a specific request.
 
         Args:
@@ -255,7 +253,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
 
         Returns JSON object with memory usage and allocation data.
         """
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -271,7 +268,7 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(memory_panel, indent=2, default=str)
 
     @mcp.resource("debug://requests/{request_id}/async")
-    def get_async_profile(request_id: str, ctx: Context) -> str:
+    def get_async_profile(request_id: str) -> str:
         """Get async task profiling data for a specific request.
 
         Args:
@@ -279,7 +276,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
 
         Returns JSON object with async task timeline and blocking call data.
         """
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         storage = mcp_ctx.storage
 
         data = storage.get(UUID(request_id))
@@ -295,14 +291,13 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
         return json.dumps(async_panel, indent=2, default=str)
 
     @mcp.resource("debug://config")
-    def get_config(ctx: Context) -> str:
+    def get_config() -> str:
         """Get current debug toolbar configuration.
 
         Returns JSON object with toolbar configuration settings.
         """
         from debug_toolbar.mcp.security import redact_dict
 
-        mcp_ctx: MCPContext = ctx.request_context.lifespan_context
         toolbar = mcp_ctx.toolbar
 
         if not toolbar:
@@ -313,7 +308,6 @@ def register_resources(mcp: FastMCP) -> None:  # noqa: C901
             "enabled": config.enabled,
             "panels": config.panels,
             "max_request_history": config.max_request_history,
-            "slow_request_threshold_ms": config.slow_request_threshold_ms,
         }
 
         if hasattr(config, "intercept_redirects"):
