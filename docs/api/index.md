@@ -215,9 +215,9 @@ Complete API documentation for debug-toolbar.
 ```{eval-rst}
 .. py:class:: debug_toolbar.core.panels.profiling.ProfilingPanel
 
-   CPU profiling with cProfile or pyinstrument.
+   CPU profiling with cProfile, pyinstrument, or Tachyon (Python 3.15+).
 
-   :cvar profiler_backend: "cprofile" or "pyinstrument"
+   :cvar profiler_backend: "cprofile", "pyinstrument", or "tachyon"
 ```
 
 ### Alerts Panel

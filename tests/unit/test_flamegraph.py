@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import cProfile
 
-from debug_toolbar.core.panels.flamegraph import FlameGraphGenerator, generate_flamegraph_data
+from debug_toolbar.core.panels.flamegraph import (
+    FlameGraphGenerator,
+    generate_flamegraph_data,
+    generate_tachyon_flamegraph_data,
+)
 
 
 def create_sample_profile() -> cProfile.Profile:
@@ -230,3 +234,47 @@ class TestFlameGraphIntegration:
         assert profile["endValue"] > 0
         assert len(profile["samples"]) > 0
         assert len(profile["weights"]) > 0
+
+
+class TestTachyonFlameGraphData:
+    """Tests for generate_tachyon_flamegraph_data."""
+
+    def test_none_for_empty_stack_counter(self) -> None:
+        """Test None is returned when there is no sample data."""
+        assert generate_tachyon_flamegraph_data({}, None, 0.001) is None
+
+    def test_none_when_no_matching_thread(self) -> None:
+        """Test None is returned when no samples match the request thread."""
+        call_tree = (("app.py", 10, "handler"),)
+        stack_counter = {(call_tree, 999): 5}
+        assert generate_tachyon_flamegraph_data(stack_counter, 111, 0.001) is None
+
+    def test_builds_nested_stacks(self) -> None:
+        """Test samples produce nested stacks and deduplicated frames."""
+        call_tree_a = (
+            ("app.py", 1, "outer"),
+            ("app.py", 2, "inner"),
+        )
+        call_tree_b = (
+            ("app.py", 1, "outer"),
+            ("app.py", 3, "other"),
+        )
+        stack_counter = {
+            (call_tree_a, 42): 10,
+            (call_tree_b, 42): 5,
+            (call_tree_a, 99): 100,
+        }
+
+        result = generate_tachyon_flamegraph_data(stack_counter, 42, 0.001)
+
+        assert result is not None
+        assert result["$schema"]
+        frames = result["shared"]["frames"]
+        frame_names = {f["name"] for f in frames}
+        assert frame_names == {"outer", "inner", "other"}
+
+        profile = result["profiles"][0]
+        assert profile["unit"] == "seconds"
+        assert len(profile["samples"]) == 2
+        assert sorted(profile["weights"]) == [0.005, 0.01]
+        assert profile["endValue"] == 0.015

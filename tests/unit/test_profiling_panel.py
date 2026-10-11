@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -18,6 +19,7 @@ def mock_toolbar() -> MagicMock:
     toolbar.config.profiler_backend = "cprofile"
     toolbar.config.profiler_top_functions = 50
     toolbar.config.profiler_sort_by = "cumulative"
+    toolbar.config.profiler_tachyon_interval_usec = 1000
     return toolbar
 
 
@@ -442,3 +444,98 @@ class TestProfilingPanelFlamegraph:
             assert stats["flamegraph_available"] == has_data, (
                 f"flamegraph_available={stats['flamegraph_available']} but flamegraph_data presence is {has_data}"
             )
+
+
+@pytest.mark.skipif(sys.version_info < (3, 15), reason="Tachyon requires Python 3.15+")
+class TestProfilingPanelTachyon:
+    """Tests for the Tachyon sampling profiler backend (Python 3.15+)."""
+
+    def test_backend_tachyon_when_available(self, mock_toolbar: MagicMock) -> None:
+        """Test tachyon backend is selected when profiling.sampling is importable."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        panel = ProfilingPanel(mock_toolbar)
+        assert panel._backend == "tachyon"
+
+    def test_backend_cprofile_when_tachyon_module_unavailable(self, mock_toolbar: MagicMock) -> None:
+        """Test fallback to cprofile when profiling.sampling cannot be imported."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        with patch.dict("sys.modules", {"profiling.sampling.sample": None}):
+            panel = ProfilingPanel(mock_toolbar)
+            assert panel._backend == "cprofile"
+
+    def test_backend_falls_back_when_start_fails(self, mock_toolbar: MagicMock) -> None:
+        """Test process_request falls back to cprofile if starting Tachyon raises."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        panel = ProfilingPanel(mock_toolbar)
+        assert panel._backend == "tachyon"
+
+        with patch.object(ProfilingPanel, "_start_tachyon", side_effect=RuntimeError("attach denied")):
+            import asyncio
+
+            from debug_toolbar.core.context import RequestContext as _RequestContext
+
+            asyncio.run(panel.process_request(_RequestContext()))
+
+        assert panel._backend == "cprofile"
+        assert panel._profiler is not None
+
+        panel._profiler.disable()
+
+    @pytest.mark.asyncio
+    async def test_tachyon_stats_capture_busy_function(
+        self, mock_toolbar: MagicMock, request_context: RequestContext
+    ) -> None:
+        """Test a CPU-busy function run during the request shows up in top_functions."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        mock_toolbar.config.profiler_tachyon_interval_usec = 200
+        mock_toolbar.config.enable_flamegraph = True
+        panel = ProfilingPanel(mock_toolbar)
+        assert panel._backend == "tachyon"
+
+        await panel.process_request(request_context)
+
+        def tachyon_busy_function() -> int:
+            total = 0
+            for i in range(5_000_000):
+                total += i * i
+            return total
+
+        tachyon_busy_function()
+
+        await panel.process_response(request_context)
+        stats = await panel.generate_stats(request_context)
+
+        assert stats["backend"] == "tachyon"
+        assert isinstance(stats["total_time"], float)
+        assert isinstance(stats["function_calls"], int)
+        assert stats["function_calls"] > 0
+
+        names = [func["function"] for func in stats["top_functions"]]
+        assert any("tachyon_busy_function" in name for name in names)
+
+        assert stats.get("flamegraph_available") is True
+        assert "flamegraph_data" in stats
+        assert "$schema" in stats["flamegraph_data"]
+
+    @pytest.mark.asyncio
+    async def test_tachyon_sampler_thread_is_stopped(
+        self, mock_toolbar: MagicMock, request_context: RequestContext
+    ) -> None:
+        """Test the sampler thread is signalled to stop and joined on response completion."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        panel = ProfilingPanel(mock_toolbar)
+
+        await panel.process_request(request_context)
+        assert panel._tachyon_thread is not None
+        assert panel._tachyon_thread.is_alive()
+
+        await panel.process_response(request_context)
+
+        assert panel._tachyon_thread is None
+        assert panel._profiler.running is False
+
+    def test_get_nav_subtitle_tachyon(self, mock_toolbar: MagicMock) -> None:
+        """Test nav subtitle reflects the tachyon backend."""
+        mock_toolbar.config.profiler_backend = "tachyon"
+        panel = ProfilingPanel(mock_toolbar)
+        assert panel.get_nav_subtitle() == "tachyon"

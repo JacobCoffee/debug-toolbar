@@ -123,12 +123,13 @@ Memory profiling backend selection:
 
 ### `profiler_backend`
 
-**Type**: `Literal["cprofile", "pyinstrument"]`
+**Type**: `Literal["cprofile", "pyinstrument", "tachyon"]`
 **Default**: `"cprofile"`
 
 Profiling backend selection:
 - `"cprofile"`: Python's built-in cProfile profiler (always available)
 - `"pyinstrument"`: Statistical sampling profiler (requires `pip install pyinstrument`)
+- `"tachyon"`: Python 3.15+'s built-in statistical sampling profiler (`profiling.sampling`, PEP 799). Use it when you want low-overhead profiling on requests where cProfile's per-call tracing cost would skew timings; falls back to `"cprofile"` automatically on older Python versions.
 
 ### `profiler_top_functions`
 
@@ -146,6 +147,13 @@ Sort order for profiling results. Common values:
 - `"cumulative"`: Sort by cumulative time (time spent in function and sub-calls)
 - `"tottime"`: Sort by total time (time spent in function only)
 - `"calls"`: Sort by number of calls
+
+### `profiler_tachyon_interval_usec`
+
+**Type**: `int`
+**Default**: `1000`
+
+Sampling interval in microseconds for the `"tachyon"` profiling backend. Lower values give finer-grained samples at the cost of slightly higher overhead.
 
 ### `enable_flamegraph`
 

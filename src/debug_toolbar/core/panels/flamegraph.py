@@ -123,3 +123,74 @@ def generate_flamegraph_data(profiler: cProfile.Profile | None) -> dict[str, Any
 
     generator = FlameGraphGenerator(profiler)
     return generator.generate()
+
+
+def generate_tachyon_flamegraph_data(
+    stack_counter: dict[tuple[tuple[tuple[str, int, str], ...], int], int],
+    request_thread_id: int | None,
+    interval_sec: float,
+) -> dict[str, Any] | None:
+    """Generate flame graph data from Tachyon sampling profiler stacks.
+
+    Unlike cProfile's flat frame data, Tachyon samples carry full call stacks,
+    so each sample becomes a proper nested stack in the speedscope output.
+
+    Args:
+        stack_counter: Mapping of (call_tree, thread_id) to sample count, as
+            produced by ``profiling.sampling.CollapsedStackCollector``.
+        request_thread_id: Native thread id that served the request; samples
+            from other threads (including the sampler's own thread) are dropped.
+        interval_sec: Sampling interval in seconds, used to weight samples.
+
+    Returns:
+        Speedscope JSON format dictionary, or None if there is no sample data.
+    """
+    if not stack_counter:
+        return None
+
+    frames: list[dict[str, Any]] = []
+    frame_map: dict[tuple[str, int, str], int] = {}
+    samples: list[list[int]] = []
+    weights: list[float] = []
+    total_samples = 0
+
+    for (call_tree, thread_id), count in stack_counter.items():
+        if request_thread_id is not None and thread_id != request_thread_id:
+            continue
+        if not call_tree:
+            continue
+
+        stack_indices = []
+        for filename, lineno, func_name in call_tree:
+            key = (filename, lineno, func_name)
+            frame_idx = frame_map.get(key)
+            if frame_idx is None:
+                frame_idx = len(frames)
+                frames.append({"name": func_name, "file": filename, "line": lineno})
+                frame_map[key] = frame_idx
+            stack_indices.append(frame_idx)
+
+        samples.append(stack_indices)
+        weights.append(count * interval_sec)
+        total_samples += count
+
+    if not samples:
+        return None
+
+    return {
+        "$schema": SPEEDSCOPE_SCHEMA_VERSION,
+        "shared": {"frames": frames},
+        "profiles": [
+            {
+                "type": "sampled",
+                "name": "Request Profile (Tachyon)",
+                "unit": "seconds",
+                "startValue": 0,
+                "endValue": total_samples * interval_sec,
+                "samples": samples,
+                "weights": weights,
+            }
+        ],
+        "exporter": "async-python-debug-toolbar",
+        "activeProfileIndex": 0,
+    }
