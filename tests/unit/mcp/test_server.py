@@ -96,6 +96,27 @@ class TestCreateMcpServer:
 
         assert mcp is not None
 
+    def test_static_resource_handlers_take_no_parameters(self) -> None:
+        """Static resources (no URI template variables) must not require injected
+        parameters, since some MCP SDK versions reject Context injection on them.
+        """
+        import inspect
+
+        from debug_toolbar.core.storage import ToolbarStorage
+        from debug_toolbar.mcp import create_mcp_server
+
+        storage = ToolbarStorage(max_size=10)
+        mcp = create_mcp_server(storage)
+
+        static_uris = {"debug://requests", "debug://config"}
+        resources = mcp._resource_manager._resources
+        checked = 0
+        for uri, resource in resources.items():
+            if str(uri) in static_uris:
+                checked += 1
+                assert inspect.signature(resource.fn).parameters == {}
+        assert checked == len(static_uris)
+
 
 class TestMcpNotAvailable:
     """Tests for when MCP is not available."""
