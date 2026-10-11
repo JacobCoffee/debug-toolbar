@@ -25,3 +25,22 @@ async def test_create_task_with_eager_start_while_profiling() -> None:
         backend.stop()
 
     assert result == "ok"
+
+
+async def test_task_name_reflects_create_task_name() -> None:
+    """asyncio applies the caller-supplied name after the task factory returns,
+    so the backend must resolve the real name lazily instead of capturing it
+    inside the factory call.
+    """
+    loop = asyncio.get_running_loop()
+    backend = TaskFactoryBackend()
+    backend.start(loop)
+    try:
+        task = loop.create_task(_child(), name="my-named-task")
+        await task
+    finally:
+        backend.stop()
+
+    stats = backend.get_stats()
+    created_names = [t["task_name"] for t in stats["tasks"] if t["event_type"] == "created"]
+    assert created_names == ["my-named-task"]
