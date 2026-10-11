@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql example-websocket example-mcp example-mcp-server act act-ci act-test
+.PHONY: help install dev install-uv lint lint-fix fmt fmt-check type-check test test-cov test-fast test-examples test-parallel test-parallel-fast test-debug test-failed ci docs docs-serve docs-clean build clean destroy prek-install prek-run prek-update lock upgrade wt worktree wt-ls worktree-list wt-j worktree-jump worktree-prune ci-install example example-asgi example-litestar example-aa example-graphql example-websocket example-mcp example-mcp-server act act-ci act-test
 
 # ==================================================================================== #
 # VARIABLES
@@ -57,6 +57,9 @@ test-cov: ## Run tests with coverage report
 
 test-fast: ## Run tests without slow/integration tests
 	@PYTHONDONTWRITEBYTECODE=1 uv run pytest -m "not integration"
+
+test-examples: ## Run example app tests only
+	@PYTHONDONTWRITEBYTECODE=1 uv run pytest tests/examples -v
 
 test-parallel: ## Run tests in parallel with pytest-xdist
 	@PYTHONDONTWRITEBYTECODE=1 uv run pytest -n auto
