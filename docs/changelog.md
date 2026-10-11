@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 ---
+## [1.1.1](https://github.com/JacobCoffee/debug-toolbar/compare/v1.1.0..v1.1.1) - 2026-10-11
+
+### Bug Fixes
+
+- accept documented profiling options in toolbar config (#70) - ([dbbeda2](https://github.com/JacobCoffee/debug-toolbar/commit/dbbeda2b7c8f508d4f8e9c42b51d337790e9f5c9)) - Jacob Coffee
+
+### Documentation
+
+- regenerate changelog for v1.1.0 - ([19f61a8](https://github.com/JacobCoffee/debug-toolbar/commit/19f61a873832e426846853aa0d67a9a05e5b4bfb)) - github-actions[bot]
+
+### Miscellaneous Chores
+
+- release 1.1.1 (#71) - ([5b444f8](https://github.com/JacobCoffee/debug-toolbar/commit/5b444f8228afe91f8fe0c321ef663818468afda0)) - Jacob Coffee
+
+---
 ## [1.1.0](https://github.com/JacobCoffee/debug-toolbar/compare/v1.0.1..v1.1.0) - 2026-10-11
 
 ### Bug Fixes
