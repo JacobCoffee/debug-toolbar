@@ -25,7 +25,7 @@ ASYNCIO_LOGGER_NAME = "asyncio"
 SLOW_CALLBACK_LOG_ARGS = 2
 
 _SLOW_CALLBACK_LOCATION_RE = re.compile(
-    r"(?P<func>[\w.]+)\(\).*?(?:running at|created at|defined at) (?P<file>[^\s:]+):(?P<line>\d+)"
+    r"(?P<func>[\w.]+)\(\).*?(?:running at|created at|defined at) (?P<file>.+?):(?P<line>\d+)"
 )
 
 

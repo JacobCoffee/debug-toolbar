@@ -34,6 +34,25 @@ async def test_detects_real_blocking_call() -> None:
     assert call["duration_ms"] >= 100
 
 
+async def test_parses_windows_path_in_slow_callback_warning() -> None:
+    loop = asyncio.get_running_loop()
+    detector = BlockingCallDetector(threshold_ms=50)
+    detector.install(loop)
+    try:
+        logging.getLogger("asyncio").warning(
+            "Executing %s took %.3f seconds",
+            r"<Task pending name='Task-2' coro=<_blocking_handler() running at C:\app\handlers.py:42>>",
+            0.2,
+        )
+    finally:
+        detector.uninstall()
+
+    call = detector.get_stats()["blocking_calls"][0]
+    assert call["function_name"] == "_blocking_handler"
+    assert call["file"] == r"C:\app\handlers.py"
+    assert call["line"] == 42
+
+
 async def test_no_false_positives_for_fast_code() -> None:
     loop = asyncio.get_running_loop()
     detector = BlockingCallDetector(threshold_ms=100)
