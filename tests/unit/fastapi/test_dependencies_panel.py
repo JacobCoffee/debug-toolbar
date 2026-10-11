@@ -52,7 +52,7 @@ class TestDependencyInjectionPanel:
         assert stats["cached_count"] == 0
         assert stats["fresh_count"] == 0
         assert stats["cache_hit_rate"] == 0
-        assert stats["total_time_ms"] == 0
+        assert stats["total_time_ms"] is None
 
     @pytest.mark.asyncio
     async def test_generate_stats_with_dependencies(self, mock_toolbar: MagicMock, context: RequestContext) -> None:
