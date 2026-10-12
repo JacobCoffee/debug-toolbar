@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "uv_build"
-requires = ["uv_build>=0.7.5,<0.13"]
+requires = ["uv_build>=0.7.5,<0.14"]
 
 [dependency-groups]
 docs = [
